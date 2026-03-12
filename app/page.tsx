@@ -48,7 +48,7 @@ export default function Home() {
             </Bounds>
           </Suspense>
 
-          <OrbitControls enablePan={false} />
+          <OrbitControls enableZoom={false} />
         </Canvas>
       </div>
     </main>
