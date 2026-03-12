@@ -47,9 +47,18 @@ type GLTFResult = GLTF & {
 
 type SmartphoneProps = JSX.IntrinsicElements["group"] & {
   imageUrl: string;
+  screenPosition: [number, number, number];
+  screenSize: [number, number];
+  screenRotation?: [number, number, number];
 };
 
-export function Smartphone({ imageUrl, ...props }: SmartphoneProps) {
+export function Smartphone({
+  imageUrl,
+  screenPosition,
+  screenRotation,
+  screenSize,
+  ...props
+}: SmartphoneProps) {
   const { nodes, materials } = useGLTF(
     "/models/smartphone.glb",
   ) as unknown as GLTFResult;
@@ -131,13 +140,10 @@ export function Smartphone({ imageUrl, ...props }: SmartphoneProps) {
         material={materials["Mat.1"]}
       />
 
-      <mesh geometry={nodes.o_Cube1.geometry} material={materials["Mat.2"]}>
-        <mesh position={[-100, 200, -210]}>
-          <planeGeometry args={[200, 400]} />
-          <meshBasicMaterial color="red" side={THREE.DoubleSide} />
-        </mesh>
+      <mesh position={screenPosition} rotation={screenRotation ?? [0, 0, 0]}>
+        <planeGeometry args={screenSize} />
+        <meshBasicMaterial color="red" side={THREE.DoubleSide} />
       </mesh>
-
       <mesh geometry={nodes.o_Capsule.geometry} material={materials["Mat.1"]} />
       <mesh
         geometry={nodes.o_Extrude_1.geometry}
