@@ -2,17 +2,15 @@
 
 import * as THREE from "three";
 import React, { JSX, useMemo } from "react";
-import { useGLTF } from "@react-three/drei";
+import { useGLTF, useTexture } from "@react-three/drei";
 import { GLTF } from "three-stdlib";
 
-// Função auxiliar para desenhar o shape de um retângulo arredondado centralizado
 function getRoundedRectangleShape(
   width: number,
   height: number,
   radius: number,
 ) {
   const shape = new THREE.Shape();
-  // Centralizamos o shape para que a posição do mesh funcione de forma intuitiva
   shape.moveTo(-width / 2, height / 2 - radius);
   shape.lineTo(-width / 2, radius - height / 2);
   shape.quadraticCurveTo(
@@ -87,9 +85,71 @@ type SmartphoneProps = JSX.IntrinsicElements["group"] & {
   screenRotation?: [number, number, number];
 };
 
+// Componente separado para a tela com textura.
+// Precisa ser separado porque useTexture (hook) não pode ser chamado
+// condicionalmente dentro do componente pai.
+function ScreenWithTexture({
+  imageUrl,
+  screenGeometry,
+  screenPosition,
+  screenRotation,
+}: {
+  imageUrl: string;
+  screenGeometry: THREE.ShapeGeometry;
+  screenPosition: [number, number, number];
+  screenRotation: [number, number, number];
+}) {
+  // useTexture integra com o Suspense do R3F:
+  // suspende a renderização até a textura estar 100% carregada,
+  // eliminando o bug da tela branca no carregamento inicial.
+  // O callback onLoad é a forma correta de configurar a textura sem violar
+  // a restrição do Drei de não modificar valores retornados pelo hook.
+  const texture = useTexture(imageUrl, (tex) => {
+    const t = Array.isArray(tex) ? tex[0] : tex;
+    t.colorSpace = THREE.SRGBColorSpace;
+    // flipY = true (padrão) é o correto para ShapeGeometry
+    t.flipY = true;
+    t.needsUpdate = true;
+  });
+
+  return (
+    <mesh
+      geometry={screenGeometry}
+      position={screenPosition}
+      rotation={screenRotation}
+    >
+      <meshBasicMaterial
+        map={texture}
+        side={THREE.DoubleSide}
+        toneMapped={false}
+      />
+    </mesh>
+  );
+}
+
+function ScreenPlaceholder({
+  screenGeometry,
+  screenPosition,
+  screenRotation,
+}: {
+  screenGeometry: THREE.ShapeGeometry;
+  screenPosition: [number, number, number];
+  screenRotation: [number, number, number];
+}) {
+  return (
+    <mesh
+      geometry={screenGeometry}
+      position={screenPosition}
+      rotation={screenRotation}
+    >
+      <meshBasicMaterial color="red" side={THREE.DoubleSide} />
+    </mesh>
+  );
+}
+
 export function Smartphone({
   imageUrl,
-  screenPosition = [-125, 315, -195], // Valores hardcoded que você encontrou
+  screenPosition = [-125, 315, -195],
   screenSize = [220, 469],
   screenRotation = [0, 0, 0],
   ...props
@@ -98,20 +158,30 @@ export function Smartphone({
     "/models/smartphone.glb",
   ) as unknown as GLTFResult;
 
-  const texture = useMemo(() => {
-    if (!imageUrl || imageUrl === "/placeholder.jpg") return null;
-    const loader = new THREE.TextureLoader();
-    const tex = loader.load(imageUrl);
-    tex.flipY = false;
-    tex.colorSpace = THREE.SRGBColorSpace;
-    return tex;
-  }, [imageUrl]);
+  // Geometria com UVs normalizados corretamente para [0, 1]
+  const screenGeometry = useMemo(() => {
+    const shape = getRoundedRectangleShape(screenSize[0], screenSize[1], 25);
+    const geo = new THREE.ShapeGeometry(shape);
 
-  // Geramos o shape object centralizado
-  const roundedShape = useMemo(() => {
-    // Ajuste o raio (aqui 25) se a curvatura não bater com o seu 3D
-    return getRoundedRectangleShape(screenSize[0], screenSize[1], 25);
+    const pos = geo.attributes.position;
+    const uvArray = new Float32Array(pos.count * 2);
+
+    const halfW = screenSize[0] / 2;
+    const halfH = screenSize[1] / 2;
+
+    for (let i = 0; i < pos.count; i++) {
+      const x = pos.getX(i);
+      const y = pos.getY(i);
+      // Invertemos o U (X) para compensar o rotation={[0, Math.PI, 0]} do modelo
+      uvArray[i * 2] = 1 - (x + halfW) / screenSize[0]; // 1 → 0
+      uvArray[i * 2 + 1] = (y + halfH) / screenSize[1]; // 0 → 1
+    }
+
+    geo.setAttribute("uv", new THREE.BufferAttribute(uvArray, 2));
+    return geo;
   }, [screenSize]);
+
+  const hasImage = !!imageUrl && imageUrl !== "/placeholder.jpg";
 
   return (
     <group {...props} dispose={null}>
@@ -182,18 +252,21 @@ export function Smartphone({
         material={materials["Mat.1"]}
       />
 
-      {/* TELA RETA COM BORDER RADIUS E TEXTURA */}
-      {/* Usamos <mesh> e <shapeGeometry> para criar uma geometria plana (shape reto) */}
-      <mesh position={screenPosition} rotation={screenRotation}>
-        {/* Passamos o shape object desenhado pela nossa função auxiliar */}
-        <shapeGeometry args={[roundedShape]} />
-        <meshBasicMaterial
-          color={texture ? "white" : "red"}
-          map={texture || null}
-          side={THREE.DoubleSide}
-          toneMapped={false} // Evita interferência de luzes
+      {/* TELA */}
+      {hasImage ? (
+        <ScreenWithTexture
+          imageUrl={imageUrl!}
+          screenGeometry={screenGeometry}
+          screenPosition={screenPosition}
+          screenRotation={screenRotation}
         />
-      </mesh>
+      ) : (
+        <ScreenPlaceholder
+          screenGeometry={screenGeometry}
+          screenPosition={screenPosition}
+          screenRotation={screenRotation}
+        />
+      )}
 
       <mesh geometry={nodes.o_Capsule.geometry} material={materials["Mat.1"]} />
       <mesh
