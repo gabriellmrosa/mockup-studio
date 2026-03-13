@@ -3,20 +3,11 @@
 import { useState, ChangeEvent, Suspense } from "react";
 import { Canvas } from "@react-three/fiber";
 import { Smartphone } from "./components/Smartphone";
-import { Bounds, Center } from "@react-three/drei";
-import { OrbitControls } from "@react-three/drei";
-import Control from "./components/Control";
+import { Bounds, Center, OrbitControls } from "@react-three/drei";
 
 export default function Home() {
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
-  const [posX, setPosX] = useState(-120);
-  const [posY, setPosY] = useState(200);
-  const [posZ, setPosZ] = useState(-210);
-
-  const [width, setWidth] = useState(200);
-  const [height, setHeight] = useState(400);
-
-  const [rotY, setRotY] = useState(0);
+  const [modelScale, setModelScale] = useState(0.009); // Escala inicial que você usava
 
   const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -39,56 +30,31 @@ export default function Home() {
         />
       </label>
 
+      {/* CONTROLE DE ESCALA GLOBAL */}
+      <div className="absolute left-6 bottom-6 bg-black/70 p-4 rounded-xl z-50 text-sm shadow-lg border border-neutral-800">
+        <label className="flex flex-col gap-3">
+          <span className="font-medium text-neutral-300">
+            Tamanho do Mockup
+          </span>
+          <input
+            type="range"
+            min="0.004"
+            max="0.015"
+            step="0.0005"
+            value={modelScale}
+            onChange={(e) => setModelScale(parseFloat(e.target.value))}
+            className="cursor-pointer accent-blue-500"
+          />
+        </label>
+      </div>
+
       {/* AREA 3D FULL */}
       <div className="w-full h-screen">
-        <div className="absolute left-6 top-6 bg-black/70 p-4 rounded-xl text-xs space-y-2 z-50">
-          <Control
-            label="posX"
-            value={posX}
-            setValue={setPosX}
-            min={-500}
-            max={500}
-          />
-          <Control
-            label="posY"
-            value={posY}
-            setValue={setPosY}
-            min={-500}
-            max={500}
-          />
-          <Control
-            label="posZ"
-            value={posZ}
-            setValue={setPosZ}
-            min={-500}
-            max={500}
-          />
-
-          <Control
-            label="width"
-            value={width}
-            setValue={setWidth}
-            min={50}
-            max={500}
-          />
-          <Control
-            label="height"
-            value={height}
-            setValue={setHeight}
-            min={50}
-            max={800}
-          />
-
-          <Control
-            label="rotY"
-            value={rotY}
-            setValue={setRotY}
-            min={-3.14}
-            max={3.14}
-            step={0.01}
-          />
-        </div>
-        <Canvas camera={{ position: [0, 0, 5], fov: 45 }}>
+        <Canvas
+          camera={{ position: [0, 0, 5], fov: 45 }}
+          // Correção do preserveDrawingBuffer (agora dentro de gl)
+          gl={{ preserveDrawingBuffer: true }}
+        >
           <ambientLight intensity={1} />
           <directionalLight position={[2, 3, 4]} intensity={2} />
 
@@ -97,11 +63,9 @@ export default function Home() {
               <Center>
                 <Smartphone
                   imageUrl={uploadedImage ?? "/placeholder.jpg"}
-                  scale={0.009}
+                  scale={modelScale}
                   rotation={[0, Math.PI, 0]}
-                  screenPosition={[posX, posY, posZ]}
-                  screenSize={[width, height]}
-                  screenRotation={[0, rotY, 0]}
+                  // screenPosition, screenSize e screenRotation agora têm valores padrão dentro do componente
                 />
               </Center>
             </Bounds>

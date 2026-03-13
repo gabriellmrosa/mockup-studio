@@ -5,6 +5,41 @@ import React, { JSX, useMemo } from "react";
 import { useGLTF } from "@react-three/drei";
 import { GLTF } from "three-stdlib";
 
+// Função auxiliar para desenhar o shape de um retângulo arredondado centralizado
+function getRoundedRectangleShape(
+  width: number,
+  height: number,
+  radius: number,
+) {
+  const shape = new THREE.Shape();
+  // Centralizamos o shape para que a posição do mesh funcione de forma intuitiva
+  shape.moveTo(-width / 2, height / 2 - radius);
+  shape.lineTo(-width / 2, radius - height / 2);
+  shape.quadraticCurveTo(
+    -width / 2,
+    -height / 2,
+    radius - width / 2,
+    -height / 2,
+  );
+  shape.lineTo(width / 2 - radius, -height / 2);
+  shape.quadraticCurveTo(
+    width / 2,
+    -height / 2,
+    width / 2,
+    radius - height / 2,
+  );
+  shape.lineTo(width / 2, height / 2 - radius);
+  shape.quadraticCurveTo(width / 2, height / 2, width / 2 - radius, height / 2);
+  shape.lineTo(radius - width / 2, height / 2);
+  shape.quadraticCurveTo(
+    -width / 2,
+    height / 2,
+    -width / 2,
+    height / 2 - radius,
+  );
+  return shape;
+}
+
 type GLTFResult = GLTF & {
   nodes: {
     o_Cube1: THREE.Mesh;
@@ -46,17 +81,17 @@ type GLTFResult = GLTF & {
 };
 
 type SmartphoneProps = JSX.IntrinsicElements["group"] & {
-  imageUrl: string;
-  screenPosition: [number, number, number];
-  screenSize: [number, number];
+  imageUrl?: string;
+  screenPosition?: [number, number, number];
+  screenSize?: [number, number];
   screenRotation?: [number, number, number];
 };
 
 export function Smartphone({
   imageUrl,
-  screenPosition,
-  screenRotation,
-  screenSize,
+  screenPosition = [-125, 315, -195], // Valores hardcoded que você encontrou
+  screenSize = [220, 469],
+  screenRotation = [0, 0, 0],
   ...props
 }: SmartphoneProps) {
   const { nodes, materials } = useGLTF(
@@ -64,12 +99,19 @@ export function Smartphone({
   ) as unknown as GLTFResult;
 
   const texture = useMemo(() => {
+    if (!imageUrl || imageUrl === "/placeholder.jpg") return null;
     const loader = new THREE.TextureLoader();
     const tex = loader.load(imageUrl);
     tex.flipY = false;
     tex.colorSpace = THREE.SRGBColorSpace;
     return tex;
   }, [imageUrl]);
+
+  // Geramos o shape object centralizado
+  const roundedShape = useMemo(() => {
+    // Ajuste o raio (aqui 25) se a curvatura não bater com o seu 3D
+    return getRoundedRectangleShape(screenSize[0], screenSize[1], 25);
+  }, [screenSize]);
 
   return (
     <group {...props} dispose={null}>
@@ -140,10 +182,19 @@ export function Smartphone({
         material={materials["Mat.1"]}
       />
 
-      <mesh position={screenPosition} rotation={screenRotation ?? [0, 0, 0]}>
-        <planeGeometry args={screenSize} />
-        <meshBasicMaterial color="red" side={THREE.DoubleSide} />
+      {/* TELA RETA COM BORDER RADIUS E TEXTURA */}
+      {/* Usamos <mesh> e <shapeGeometry> para criar uma geometria plana (shape reto) */}
+      <mesh position={screenPosition} rotation={screenRotation}>
+        {/* Passamos o shape object desenhado pela nossa função auxiliar */}
+        <shapeGeometry args={[roundedShape]} />
+        <meshBasicMaterial
+          color={texture ? "white" : "red"}
+          map={texture || null}
+          side={THREE.DoubleSide}
+          toneMapped={false} // Evita interferência de luzes
+        />
       </mesh>
+
       <mesh geometry={nodes.o_Capsule.geometry} material={materials["Mat.1"]} />
       <mesh
         geometry={nodes.o_Extrude_1.geometry}
