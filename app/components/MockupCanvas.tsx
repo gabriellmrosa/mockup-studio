@@ -23,11 +23,21 @@ export type ExportPreset = {
   width: number;
 };
 
+export type VideoRecordingState = "idle" | "recording" | "processing";
+
 type MockupCanvasProps = {
   objects: SceneObject[];
   onExportReady: (handler: (preset: ExportPreset) => Promise<void>) => void;
+  onVideoRecordReady: (api: VideoRecordApi) => void;
+  onVideoStateChange: (state: VideoRecordingState) => void;
   resetCameraVersion: number;
   uiTheme: UiTheme;
+  videoRecordingState: VideoRecordingState;
+};
+
+export type VideoRecordApi = {
+  start: () => void;
+  stop: () => void;
 };
 
 type ViewportControlsApi = {
@@ -86,6 +96,8 @@ function getResolvedObjectPosition(
 function SceneBridge({
   objects,
   onExportReady,
+  onVideoRecordReady,
+  onVideoStateChange,
   onViewportControlsReady,
   resetCameraVersion,
 }: SceneBridgeProps) {
@@ -153,6 +165,73 @@ function SceneBridge({
       });
     };
   }, [camera, gl, onExportReady, scene, size.height, size.width]);
+
+  useEffect(() => {
+    const MAX_DURATION_MS = 5000;
+    let mediaRecorder: MediaRecorder | null = null;
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+
+    const api: VideoRecordApi = {
+      start: () => {
+        const canvas = gl.domElement;
+        const stream = canvas.captureStream(30);
+        const chunks: BlobPart[] = [];
+
+        const mimeType = MediaRecorder.isTypeSupported("video/webm; codecs=vp9")
+          ? "video/webm; codecs=vp9"
+          : "video/webm";
+
+        mediaRecorder = new MediaRecorder(stream, { mimeType });
+
+        mediaRecorder.ondataavailable = (event) => {
+          if (event.data.size > 0) {
+            chunks.push(event.data);
+          }
+        };
+
+        mediaRecorder.onstop = () => {
+          if (timeoutId !== null) {
+            clearTimeout(timeoutId);
+            timeoutId = null;
+          }
+
+          const blob = new Blob(chunks, { type: mimeType });
+          downloadBlob(blob, "mockup-video.webm");
+          onVideoStateChange("idle");
+        };
+
+        mediaRecorder.start();
+
+        timeoutId = setTimeout(() => {
+          timeoutId = null;
+          if (mediaRecorder?.state === "recording") {
+            onVideoStateChange("processing");
+            mediaRecorder.stop();
+          }
+        }, MAX_DURATION_MS);
+      },
+      stop: () => {
+        if (timeoutId !== null) {
+          clearTimeout(timeoutId);
+          timeoutId = null;
+        }
+        if (mediaRecorder?.state === "recording") {
+          mediaRecorder.stop();
+        }
+      },
+    };
+
+    onVideoRecordReady(api);
+
+    return () => {
+      if (timeoutId !== null) {
+        clearTimeout(timeoutId);
+      }
+      if (mediaRecorder?.state === "recording") {
+        mediaRecorder.stop();
+      }
+    };
+  }, [gl, onVideoRecordReady, onVideoStateChange]);
 
   return (
     <>
@@ -313,6 +392,13 @@ export default function MockupCanvas(props: MockupCanvasProps) {
           onViewportControlsReady={setViewportControls}
         />
       </Canvas>
+
+      {props.videoRecordingState === "recording" ? (
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-600/90 text-white text-xs font-medium shadow-lg pointer-events-none select-none">
+          <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
+          REC
+        </div>
+      ) : null}
 
       <div className="canvas-zoom-controls">
         <button

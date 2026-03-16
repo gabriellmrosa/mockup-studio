@@ -2,7 +2,7 @@
 
 import ColorRow from "./ColorRow";
 import Control from "./Control";
-import type { ExportPreset } from "./MockupCanvas";
+import type { ExportPreset, VideoRecordingState } from "./MockupCanvas";
 import type { ThemeName } from "./Smartphone";
 import type { AppCopy, UiTheme } from "../lib/i18n";
 import type { SceneObject } from "../lib/scene-objects";
@@ -10,7 +10,9 @@ import { DEVICE_MODEL_LIST } from "../models/device-models";
 import {
   DownloadIcon,
   RotateCcwIcon,
+  StopCircleIcon,
   UploadIcon,
+  VideoIcon,
 } from "./Icons";
 
 type InspectorPanelProps = {
@@ -25,6 +27,8 @@ type InspectorPanelProps = {
   onModelChange: (modelId: SceneObject["modelId"]) => void;
   onResetCamera: () => void;
   onResetObject: () => void;
+  onStartVideoRecord: () => void;
+  onStopVideoRecord: () => void;
   onThemeChange: (themeId: ThemeName) => void;
   onToggleDebugMode: () => void;
   onToggleDeviceShell: () => void;
@@ -37,6 +41,7 @@ type InspectorPanelProps = {
   ) => void;
   uiTheme: UiTheme;
   uploadError: string;
+  videoRecordingState: VideoRecordingState;
 };
 
 export default function InspectorPanel({
@@ -51,6 +56,8 @@ export default function InspectorPanel({
   onModelChange,
   onResetCamera,
   onResetObject,
+  onStartVideoRecord,
+  onStopVideoRecord,
   onThemeChange,
   onToggleDebugMode,
   onToggleDeviceShell,
@@ -59,6 +66,7 @@ export default function InspectorPanel({
   onUpdateRotation,
   uiTheme,
   uploadError,
+  videoRecordingState,
 }: InspectorPanelProps) {
   if (!object) {
     return (
@@ -328,6 +336,35 @@ export default function InspectorPanel({
           </div>
           <p className="editor-sidebar-muted text-[10px] mt-2 leading-relaxed">
             {copy.exportSectionHint}
+          </p>
+        </section>
+
+        <section>
+          <p className="editor-sidebar-label mb-3">
+            {copy.videoSectionTitle}
+          </p>
+          {videoRecordingState === "recording" ? (
+            <button
+              onClick={onStopVideoRecord}
+              className="editor-button w-full inline-flex items-center justify-center gap-2 px-3 py-2 text-xs bg-red-600/15 border-red-500 text-red-400"
+            >
+              <StopCircleIcon className="h-3.5 w-3.5" />
+              {copy.videoStopButton}
+            </button>
+          ) : (
+            <button
+              onClick={onStartVideoRecord}
+              disabled={videoRecordingState === "processing"}
+              className="editor-button w-full inline-flex items-center justify-center gap-2 px-3 py-2 text-xs disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <VideoIcon className="h-3.5 w-3.5" />
+              {videoRecordingState === "processing"
+                ? copy.videoProcessing
+                : copy.videoRecordButton}
+            </button>
+          )}
+          <p className="editor-sidebar-muted text-[10px] mt-2 leading-relaxed">
+            {copy.videoSectionHint}
           </p>
         </section>
       </div>

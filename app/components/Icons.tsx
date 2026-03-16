@@ -97,3 +97,21 @@ export function FocusIcon({ className }: IconProps) {
     </svg>
   );
 }
+
+export function VideoIcon({ className }: IconProps) {
+  return (
+    <svg {...iconProps(className)}>
+      <rect x="2" y="5" width="14" height="14" rx="2" />
+      <path d="M16 10l6-3v10l-6-3" />
+    </svg>
+  );
+}
+
+export function StopCircleIcon({ className }: IconProps) {
+  return (
+    <svg {...iconProps(className)}>
+      <circle cx="12" cy="12" r="10" />
+      <rect x="9" y="9" width="6" height="6" rx="0.5" />
+    </svg>
+  );
+}

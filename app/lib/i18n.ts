@@ -48,6 +48,13 @@ export type AppCopy = {
   transformSectionHint: string;
   exportSectionTitle: string;
   exportSectionHint: string;
+  videoSectionTitle: string;
+  videoSectionHint: string;
+  videoRecordButton: string;
+  videoStopButton: string;
+  videoRecording: string;
+  videoProcessing: string;
+  videoExportError: string;
   debugOn: string;
   debugOff: string;
   uploadImageError: string;
@@ -103,6 +110,14 @@ export const APP_COPY: Record<Locale, AppCopy> = {
     exportSectionTitle: "Export PNG",
     exportSectionHint:
       "O arquivo sai sem fundo e com supersampling pelo resize do render.",
+    videoSectionTitle: "Export Video",
+    videoSectionHint:
+      "Grave ate 5 segundos do canvas 3D com fundo transparente. Interaja com a cena durante a gravacao.",
+    videoRecordButton: "Gravar video",
+    videoStopButton: "Parar gravacao",
+    videoRecording: "Gravando",
+    videoProcessing: "Processando...",
+    videoExportError: "Nao foi possivel exportar o video.",
     debugOn: "Debug interativo: ON",
     debugOff: "Debug interativo: OFF",
     uploadImageError: "Nao foi possivel preparar essa imagem.",
@@ -160,6 +175,14 @@ export const APP_COPY: Record<Locale, AppCopy> = {
     exportSectionTitle: "Export PNG",
     exportSectionHint:
       "The file is exported without background and uses supersampling via render resize.",
+    videoSectionTitle: "Export Video",
+    videoSectionHint:
+      "Record up to 5 seconds of the 3D canvas with transparent background. Interact with the scene during recording.",
+    videoRecordButton: "Record video",
+    videoStopButton: "Stop recording",
+    videoRecording: "Recording",
+    videoProcessing: "Processing...",
+    videoExportError: "Could not export the video.",
     debugOn: "Interactive debug: ON",
     debugOff: "Interactive debug: OFF",
     uploadImageError: "Could not prepare this image.",

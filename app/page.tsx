@@ -3,7 +3,7 @@
 import { ChangeEvent, useEffect, useState } from "react";
 import InspectorPanel from "./components/InspectorPanel";
 import LayersPanel from "./components/LayersPanel";
-import MockupCanvas, { type ExportPreset } from "./components/MockupCanvas";
+import MockupCanvas, { type ExportPreset, type VideoRecordApi, type VideoRecordingState } from "./components/MockupCanvas";
 import { type ThemeName } from "./components/Smartphone";
 import { APP_COPY, type Locale, type UiTheme } from "./lib/i18n";
 import { readFileAsDataUrl } from "./lib/mockup-image";
@@ -32,6 +32,11 @@ export default function Home() {
     useState<((preset: ExportPreset) => Promise<void>) | null>(null);
   const [isExporting, setIsExporting] = useState(false);
   const [resetCameraVersion, setResetCameraVersion] = useState(0);
+  const [videoRecordApi, setVideoRecordApi] = useState<VideoRecordApi | null>(
+    null,
+  );
+  const [videoRecordingState, setVideoRecordingState] =
+    useState<VideoRecordingState>("idle");
   const copy = APP_COPY[locale];
   const selectedObject =
     sceneObjects.find((object) => object.id === selectedObjectId) ??
@@ -215,8 +220,11 @@ export default function Home() {
       <MockupCanvas
         objects={sceneObjects}
         onExportReady={(handler) => setExportHandler(() => handler)}
+        onVideoRecordReady={(api) => setVideoRecordApi(api)}
+        onVideoStateChange={setVideoRecordingState}
         resetCameraVersion={resetCameraVersion}
         uiTheme={uiTheme}
+        videoRecordingState={videoRecordingState}
       />
 
       <InspectorPanel
@@ -231,6 +239,16 @@ export default function Home() {
         onModelChange={handleModelChange}
         onResetCamera={handleResetCamera}
         onResetObject={handleResetObject}
+        onStartVideoRecord={() => {
+          if (!videoRecordApi || videoRecordingState !== "idle") return;
+          setVideoRecordingState("recording");
+          videoRecordApi.start();
+        }}
+        onStopVideoRecord={() => {
+          if (!videoRecordApi || videoRecordingState !== "recording") return;
+          setVideoRecordingState("processing");
+          videoRecordApi.stop();
+        }}
         onThemeChange={handleThemeChange}
         onToggleDebugMode={() =>
           selectedObject &&
@@ -255,6 +273,7 @@ export default function Home() {
         }
         uiTheme={uiTheme}
         uploadError={uploadError}
+        videoRecordingState={videoRecordingState}
       />
     </main>
   );
