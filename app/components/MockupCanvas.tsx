@@ -46,8 +46,13 @@ type ViewportControlsApi = {
   zoomOut: () => void;
 };
 
-type SceneBridgeProps = MockupCanvasProps & {
+type SceneBridgeProps = {
+  objects: SceneObject[];
+  onExportReady: (handler: (preset: ExportPreset) => Promise<void>) => void;
+  onVideoRecordReady: (api: VideoRecordApi) => void;
+  onVideoStateChange: (state: VideoRecordingState) => void;
   onViewportControlsReady: (api: ViewportControlsApi | null) => void;
+  resetCameraVersion: number;
 };
 
 const CAMERA_POSITION: [number, number, number] = [0, 0, 5];
@@ -389,17 +394,22 @@ export default function MockupCanvas(props: MockupCanvasProps) {
         gl={{ alpha: true, antialias: true, preserveDrawingBuffer: true }}
       >
         <SceneBridge
-          {...props}
+          objects={props.objects}
+          onExportReady={props.onExportReady}
+          onVideoRecordReady={props.onVideoRecordReady}
+          onVideoStateChange={props.onVideoStateChange}
           onViewportControlsReady={setViewportControls}
+          resetCameraVersion={props.resetCameraVersion}
         />
       </Canvas>
 
-      {props.videoRecordingState === "recording" ? (
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-600/90 text-white text-xs font-medium shadow-lg pointer-events-none select-none">
-          <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
-          REC
-        </div>
-      ) : null}
+      <div
+        aria-hidden={props.videoRecordingState !== "recording"}
+        className={`absolute top-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-600/90 text-white text-xs font-medium shadow-lg pointer-events-none select-none ${props.videoRecordingState !== "recording" ? "hidden" : ""}`}
+      >
+        <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
+        REC
+      </div>
 
       <div className="canvas-zoom-controls">
         <button

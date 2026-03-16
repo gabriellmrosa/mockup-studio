@@ -220,7 +220,7 @@ export default function Home() {
       <MockupCanvas
         objects={sceneObjects}
         onExportReady={(handler) => setExportHandler(() => handler)}
-        onVideoRecordReady={(api) => setVideoRecordApi(api)}
+        onVideoRecordReady={setVideoRecordApi}
         onVideoStateChange={setVideoRecordingState}
         resetCameraVersion={resetCameraVersion}
         uiTheme={uiTheme}
