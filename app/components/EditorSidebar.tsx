@@ -125,41 +125,47 @@ export default function EditorSidebar({
 
       <div className="flex flex-col gap-6 px-5 py-5">
         <section className="grid grid-cols-2 gap-3">
-          <div>
-            <p className="editor-sidebar-label mb-3">{copy.themeLabel}</p>
-            <ToggleSwitch
-              ariaLabel={copy.themeLabel}
-              value={uiTheme}
-              onChange={onUiThemeChange}
-              options={[
-                {
-                  value: "dark",
-                  label: copy.darkMode,
-                  iconAlt: copy.darkMode,
-                  iconSrc: "/icons/moon-and-stars.png",
-                },
-                {
-                  value: "light",
-                  label: copy.lightMode,
-                  iconAlt: copy.lightMode,
-                  iconSrc: "/icons/sun.png",
-                },
-              ]}
-            />
-          </div>
+          <ToggleSwitch
+            ariaLabel={copy.themeLabel}
+            value={uiTheme}
+            onChange={onUiThemeChange}
+            options={[
+              {
+                value: "dark",
+                label: copy.darkMode,
+                iconAlt: copy.darkMode,
+                iconSrc: "/icons/moon-and-stars.png",
+              },
+              {
+                value: "light",
+                label: copy.lightMode,
+                iconAlt: copy.lightMode,
+                iconSrc: "/icons/sun.png",
+              },
+            ]}
+          />
 
-          <div>
-            <p className="editor-sidebar-label mb-3">{copy.languageLabel}</p>
-            <ToggleSwitch
-              ariaLabel={copy.languageLabel}
-              value={locale}
-              onChange={onLocaleChange}
-              options={[
-                { value: "pt-BR", label: copy.portuguese },
-                { value: "en-US", label: copy.english },
-              ]}
-            />
-          </div>
+          <ToggleSwitch
+            ariaLabel={copy.languageLabel}
+            value={locale}
+            onChange={onLocaleChange}
+            options={[
+              {
+                value: "pt-BR",
+                label: copy.portuguese,
+                iconAlt: copy.portuguese,
+                iconClassName: "toggle-switch-icon-flag",
+                iconSrc: "/icons/brazil-flag.png",
+              },
+              {
+                value: "en-US",
+                label: copy.english,
+                iconAlt: copy.english,
+                iconClassName: "toggle-switch-icon-flag",
+                iconSrc: "/icons/eua-flag.png",
+              },
+            ]}
+          />
         </section>
 
         <section>

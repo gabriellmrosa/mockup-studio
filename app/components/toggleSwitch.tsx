@@ -5,6 +5,7 @@ import Image from "next/image";
 type ToggleOption<T extends string> = {
   value: T;
   label: string;
+  iconClassName?: string;
   iconAlt?: string;
   iconSrc?: string;
 };
@@ -55,7 +56,7 @@ export default function ToggleSwitch<T extends string>({
                 alt={option.iconAlt ?? option.label}
                 width={20}
                 height={20}
-                className="toggle-switch-icon"
+                className={`toggle-switch-icon ${option.iconClassName ?? ""}`}
               />
             ) : (
               <span className="toggle-switch-label">{option.label}</span>

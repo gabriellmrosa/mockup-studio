@@ -63,8 +63,16 @@ body {
 
 .app-shell {
   background:
-    radial-gradient(circle at top left, rgba(255, 255, 255, 0.06), transparent 28%),
-    linear-gradient(180deg, color-mix(in srgb, var(--background) 92%, white 8%), var(--background));
+    radial-gradient(
+      circle at top left,
+      rgba(255, 255, 255, 0.06),
+      transparent 28%
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--background) 92%, white 8%),
+      var(--background)
+    );
 }
 
 .editor-sidebar {
@@ -143,8 +151,8 @@ body {
   --toggle-gap: 0.3rem;
   --toggle-index: 0;
   align-items: center;
-  background: color-mix(in srgb, var(--panel-bg) 84%, transparent);
-  border: 1px solid var(--button-border);
+  background: #d9d9d9;
+  border: 1px solid #4f5663;
   border-radius: 999px;
   display: grid;
   gap: var(--toggle-gap);
@@ -155,7 +163,7 @@ body {
 }
 
 .toggle-switch-thumb {
-  background: var(--button-active-bg);
+  background: #ffffff;
   border-radius: 999px;
   box-shadow: 0 8px 22px rgba(0, 0, 0, 0.18);
   height: calc(100% - (var(--toggle-gap) * 2));
@@ -174,7 +182,7 @@ body {
   align-items: center;
   background: transparent;
   border: 0;
-  color: var(--button-muted-fg);
+  color: #aeb5c2;
   cursor: pointer;
   display: inline-flex;
   font-size: 11px;
@@ -192,7 +200,7 @@ body {
 }
 
 .toggle-switch-option[data-active="true"] {
-  color: var(--button-active-fg);
+  color: #171717;
 }
 
 .toggle-switch-option[data-active="false"] {
@@ -209,8 +217,17 @@ body {
 
 .toggle-switch-icon {
   height: 20px;
+  object-fit: contain;
   user-select: none;
   width: 20px;
+}
+
+.toggle-switch-icon-flag {
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+  height: 16px;
+  object-fit: cover;
+  width: 24px;
 }
 
 .toggle-switch-label {
@@ -382,7 +399,11 @@ body {
 .mockup-stage-light {
   background:
     radial-gradient(circle at top, rgba(255, 255, 255, 0.6), transparent 34%),
-    radial-gradient(circle at bottom right, rgba(196, 181, 253, 0.22), transparent 28%),
+    radial-gradient(
+      circle at bottom right,
+      rgba(196, 181, 253, 0.22),
+      transparent 28%
+    ),
     linear-gradient(155deg, #f8f4ed 0%, #ece4d7 50%, #e2d7c9 100%);
 }
 

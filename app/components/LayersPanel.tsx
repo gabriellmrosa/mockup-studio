@@ -42,7 +42,10 @@ export default function LayersPanel({
       <div className="flex-1 overflow-y-auto px-5 py-5">
         <div className="flex items-center justify-between mb-3">
           <p className="editor-sidebar-label">{copy.layersSectionTitle}</p>
-          <button className="editor-button px-3 py-2 text-xs" onClick={onAddObject}>
+          <button
+            className="editor-button px-3 py-2 text-xs"
+            onClick={onAddObject}
+          >
             {copy.addObject}
           </button>
         </div>
@@ -60,7 +63,9 @@ export default function LayersPanel({
               >
                 <div className="flex-1 min-w-0 text-left">
                   <div className="flex items-center gap-2">
-                    <p className="text-sm font-medium truncate">{object.name}</p>
+                    <p className="text-sm font-medium truncate">
+                      {object.name}
+                    </p>
                     {!object.deletable ? (
                       <span className="layer-badge">{copy.baseObject}</span>
                     ) : null}
@@ -94,9 +99,8 @@ export default function LayersPanel({
         </div>
       </div>
 
-      <div className="px-5 py-4 border-t border-[var(--sidebar-border)] space-y-4">
-        <div>
-          <p className="editor-sidebar-label mb-3">{copy.themeLabel}</p>
+      <div className="px-5 py-4 border-t border-[var(--sidebar-border)]">
+        <div className="flex gap-3">
           <ToggleSwitch
             ariaLabel={copy.themeLabel}
             value={uiTheme}
@@ -116,20 +120,33 @@ export default function LayersPanel({
               },
             ]}
           />
-        </div>
 
-        <div>
-          <p className="editor-sidebar-label mb-3">{copy.languageLabel}</p>
           <ToggleSwitch
             ariaLabel={copy.languageLabel}
             value={locale}
             onChange={onLocaleChange}
             options={[
-              { value: "pt-BR", label: copy.portuguese },
-              { value: "en-US", label: copy.english },
+              {
+                value: "pt-BR",
+                label: copy.portuguese,
+                iconAlt: copy.portuguese,
+                iconClassName: "toggle-switch-icon-flag",
+                iconSrc: "/icons/brazil-flag.png",
+              },
+              {
+                value: "en-US",
+                label: copy.english,
+                iconAlt: copy.english,
+                iconClassName: "toggle-switch-icon-flag",
+                iconSrc: "/icons/eua-flag.png",
+              },
             ]}
           />
         </div>
+
+        <p className="editor-sidebar-muted mt-3 text-[10px] text-center tracking-[0.08em] uppercase">
+          Made with love by Gabriel Rosa
+        </p>
       </div>
     </aside>
   );
