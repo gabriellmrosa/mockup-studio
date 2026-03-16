@@ -5,15 +5,24 @@ import type { ThemeName } from "../components/Smartphone";
 export type Locale = "pt-BR" | "en-US";
 export type UiTheme = "dark" | "light";
 
-type AppCopy = {
+export type AppCopy = {
   appTitle: string;
   appSubtitle: string;
+  addObject: string;
+  baseObject: string;
   languageLabel: string;
   themeLabel: string;
   darkMode: string;
   lightMode: string;
   portuguese: string;
   english: string;
+  layersSectionTitle: string;
+  deleteObject: string;
+  modelLabel: string;
+  objectSectionTitle: string;
+  objectNameLabel: string;
+  resetCameraButton: string;
+  resetObjectButton: string;
   deviceSectionTitle: string;
   activeDevice: string;
   deviceSectionHint: string;
@@ -48,12 +57,21 @@ export const APP_COPY: Record<Locale, AppCopy> = {
   "pt-BR": {
     appTitle: "Mockup Studio",
     appSubtitle: "MVP de 1 objeto com export transparente",
+    addObject: "Adicionar objeto",
+    baseObject: "Objeto base",
     languageLabel: "Idioma",
     themeLabel: "Interface",
     darkMode: "Dark",
     lightMode: "Light",
     portuguese: "PT-BR",
     english: "EN-US",
+    layersSectionTitle: "Camadas",
+    deleteObject: "Excluir",
+    modelLabel: "Modelo",
+    objectSectionTitle: "Objeto",
+    objectNameLabel: "Nome",
+    resetCameraButton: "Reset camera",
+    resetObjectButton: "Reset objeto",
     deviceSectionTitle: "Dispositivo",
     activeDevice: "Ativo",
     deviceSectionHint:
@@ -94,12 +112,21 @@ export const APP_COPY: Record<Locale, AppCopy> = {
   "en-US": {
     appTitle: "Mockup Studio",
     appSubtitle: "Single-object MVP with transparent export",
+    addObject: "Add object",
+    baseObject: "Base object",
     languageLabel: "Language",
     themeLabel: "Interface",
     darkMode: "Dark",
     lightMode: "Light",
     portuguese: "PT-BR",
     english: "EN-US",
+    layersSectionTitle: "Layers",
+    deleteObject: "Delete",
+    modelLabel: "Model",
+    objectSectionTitle: "Object",
+    objectNameLabel: "Name",
+    resetCameraButton: "Reset camera",
+    resetObjectButton: "Reset object",
     deviceSectionTitle: "Device",
     activeDevice: "Active",
     deviceSectionHint:

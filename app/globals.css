@@ -178,6 +178,58 @@ body {
   border-color: var(--button-border-hover);
 }
 
+.layer-card {
+  align-items: center;
+  border-radius: 1rem;
+  border: 1px solid var(--button-border);
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+  padding: 0.875rem;
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease,
+    color 160ms ease;
+  width: 100%;
+}
+
+.layer-card-active {
+  background: var(--button-active-bg);
+  border-color: var(--button-active-bg);
+  color: var(--button-active-fg);
+}
+
+.layer-card-inactive {
+  background: var(--button-bg);
+  color: var(--button-fg);
+}
+
+.layer-card-inactive:hover {
+  border-color: var(--button-border-hover);
+}
+
+.layer-badge {
+  background: color-mix(in srgb, var(--button-active-bg) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--button-active-bg) 28%, transparent);
+  border-radius: 999px;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  padding: 0.15rem 0.45rem;
+  text-transform: uppercase;
+}
+
+.layer-delete {
+  color: inherit;
+  cursor: pointer;
+  font-size: 11px;
+  opacity: 0.72;
+  transition: opacity 160ms ease;
+}
+
+.layer-delete:hover {
+  opacity: 1;
+}
+
 .theme-card {
   align-items: center;
   border-radius: 1rem;

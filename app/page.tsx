@@ -1,16 +1,19 @@
 "use client";
 
 import { ChangeEvent, useEffect, useState } from "react";
-import EditorSidebar from "./components/EditorSidebar";
+import InspectorPanel from "./components/InspectorPanel";
+import LayersPanel from "./components/LayersPanel";
 import MockupCanvas, { type ExportPreset } from "./components/MockupCanvas";
-import { type PhoneColors, type ThemeName } from "./components/Smartphone";
+import { type ThemeName } from "./components/Smartphone";
 import { APP_COPY, type Locale, type UiTheme } from "./lib/i18n";
 import { readFileAsDataUrl } from "./lib/mockup-image";
 import {
-  DEFAULT_DEVICE_MODEL,
-  DEVICE_MODELS,
-  type DeviceModelId,
-} from "./models/device-models";
+  changeSceneObjectModel,
+  createSceneObject,
+  resetSceneObject,
+  type SceneObject,
+} from "./lib/scene-objects";
+import { DEVICE_MODELS } from "./models/device-models";
 
 const EXPORT_PRESETS: ExportPreset[] = [
   { height: 1080, label: "mockup-1080p", width: 1920 },
@@ -18,30 +21,22 @@ const EXPORT_PRESETS: ExportPreset[] = [
 ];
 
 export default function Home() {
-  const [selectedModelId, setSelectedModelId] =
-    useState<DeviceModelId>(DEFAULT_DEVICE_MODEL.id);
-  const model = DEVICE_MODELS[selectedModelId];
   const [locale, setLocale] = useState<Locale>("pt-BR");
   const [uiTheme, setUiTheme] = useState<UiTheme>("dark");
-  const [uploadedImage, setUploadedImage] =
-    useState<string>("/placeholder.png");
-  const [uploadError, setUploadError] = useState<string>("");
-  const [deviceTheme, setDeviceTheme] = useState<ThemeName>(model.defaultTheme);
-  const [colors, setColors] = useState<PhoneColors>(
-    model.themes[model.defaultTheme],
-  );
-  const [rotationX, setRotationX] = useState(0);
-  const [rotationY, setRotationY] = useState(180);
-  const [rotationZ, setRotationZ] = useState(0);
-  const [showDeviceShell, setShowDeviceShell] = useState(true);
-  const [debugMode, setDebugMode] = useState(false);
-  const [debugPartColors, setDebugPartColors] =
-    useState<Record<string, string>>(model.initialDebugColors);
+  const [uploadError, setUploadError] = useState("");
+  const [sceneObjects, setSceneObjects] = useState<SceneObject[]>(() => [
+    createSceneObject({ deletable: false, name: "Object 1" }),
+  ]);
+  const [selectedObjectId, setSelectedObjectId] = useState("");
   const [exportHandler, setExportHandler] =
     useState<((preset: ExportPreset) => Promise<void>) | null>(null);
   const [isExporting, setIsExporting] = useState(false);
-  const [resetVersion, setResetVersion] = useState(0);
+  const [resetCameraVersion, setResetCameraVersion] = useState(0);
   const copy = APP_COPY[locale];
+  const selectedObject =
+    sceneObjects.find((object) => object.id === selectedObjectId) ??
+    sceneObjects[0] ??
+    null;
 
   useEffect(() => {
     const storedLocale = window.localStorage.getItem("mock-photo-locale");
@@ -67,20 +62,36 @@ export default function Home() {
   }, [uiTheme]);
 
   useEffect(() => {
-    setDeviceTheme(model.defaultTheme);
-    setColors(model.themes[model.defaultTheme]);
-    setDebugPartColors(model.initialDebugColors);
-  }, [model]);
+    if (!selectedObjectId && sceneObjects[0]) {
+      setSelectedObjectId(sceneObjects[0].id);
+      return;
+    }
+
+    if (
+      selectedObjectId &&
+      !sceneObjects.some((object) => object.id === selectedObjectId)
+    ) {
+      setSelectedObjectId(sceneObjects[0]?.id ?? "");
+    }
+  }, [sceneObjects, selectedObjectId]);
+
+  function updateSceneObject(id: string, patch: Partial<SceneObject>) {
+    setSceneObjects((current) =>
+      current.map((object) =>
+        object.id === id ? { ...object, ...patch } : object,
+      ),
+    );
+  }
 
   async function handleImageUpload(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
-    if (!file) {
+    if (!file || !selectedObject) {
       return;
     }
 
     try {
       const nextImage = await readFileAsDataUrl(file);
-      setUploadedImage(nextImage);
+      updateSceneObject(selectedObject.id, { imageUrl: nextImage });
       setUploadError("");
     } catch (error) {
       console.error(error);
@@ -90,25 +101,84 @@ export default function Home() {
     }
   }
 
-  function applyTheme(themeId: ThemeName) {
-    setDeviceTheme(themeId);
-    setColors(model.themes[themeId]);
+  function handleAddObject() {
+    const nextObject = createSceneObject({
+      name: `Object ${sceneObjects.length + 1}`,
+    });
+
+    setSceneObjects((current) => [...current, nextObject]);
+    setSelectedObjectId(nextObject.id);
   }
 
-  function updateColor(part: keyof PhoneColors, hex: string) {
-    setDeviceTheme("" as ThemeName);
-    setColors((prev) => ({ ...prev, [part]: hex }));
+  function handleRemoveObject(id: string) {
+    setSceneObjects((current) => current.filter((object) => object.id !== id));
   }
 
-  function updateDebugColor(part: string, hex: string) {
-    setDebugPartColors((prev) => ({ ...prev, [part]: hex }));
+  function handleThemeChange(themeId: ThemeName) {
+    if (!selectedObject) {
+      return;
+    }
+
+    const model = DEVICE_MODELS[selectedObject.modelId];
+    updateSceneObject(selectedObject.id, {
+      colors: model.themes[themeId],
+      deviceTheme: themeId,
+    });
   }
 
-  function resetMockup() {
-    setRotationX(0);
-    setRotationY(180);
-    setRotationZ(0);
-    setResetVersion((current) => current + 1);
+  function handleColorChange(hex: string) {
+    if (!selectedObject) {
+      return;
+    }
+
+    updateSceneObject(selectedObject.id, {
+      colors: { ...selectedObject.colors, body: hex },
+      deviceTheme: "" as ThemeName,
+    });
+  }
+
+  function handleDebugColorChange(part: string, hex: string) {
+    if (!selectedObject) {
+      return;
+    }
+
+    updateSceneObject(selectedObject.id, {
+      debugPartColors: {
+        ...selectedObject.debugPartColors,
+        [part]: hex,
+      },
+    });
+  }
+
+  function handleModelChange(modelId: SceneObject["modelId"]) {
+    if (!selectedObject) {
+      return;
+    }
+
+    setSceneObjects((current) =>
+      current.map((object) =>
+        object.id === selectedObject.id
+          ? changeSceneObjectModel(object, modelId)
+          : object,
+      ),
+    );
+    setUploadError("");
+  }
+
+  function handleResetObject() {
+    if (!selectedObject) {
+      return;
+    }
+
+    setSceneObjects((current) =>
+      current.map((object) =>
+        object.id === selectedObject.id ? resetSceneObject(object) : object,
+      ),
+    );
+  }
+
+  function handleResetCamera() {
+    setResetCameraVersion((current) => current + 1);
   }
 
   async function exportImage(preset: ExportPreset) {
@@ -129,55 +199,57 @@ export default function Home() {
 
   return (
     <main className="app-shell min-h-screen relative flex">
-      <MockupCanvas
-        colors={colors}
-        debugMode={debugMode}
-        debugPartColors={debugPartColors}
-        imageUrl={uploadedImage}
-        model={model}
-        onExportReady={(handler) => setExportHandler(() => handler)}
-        resetVersion={resetVersion}
-        showDeviceShell={showDeviceShell}
+      <LayersPanel
+        copy={copy}
+        locale={locale}
+        objects={sceneObjects}
+        onAddObject={handleAddObject}
+        onLocaleChange={setLocale}
+        onRemoveObject={handleRemoveObject}
+        onSelectObject={setSelectedObjectId}
+        onUiThemeChange={setUiTheme}
+        selectedObjectId={selectedObject?.id ?? ""}
         uiTheme={uiTheme}
-        transform={{
-          position: [0, 0, 0],
-          rotation: [
-            (rotationX * Math.PI) / 180,
-            (rotationY * Math.PI) / 180,
-            (rotationZ * Math.PI) / 180,
-          ],
-        }}
       />
 
-      <EditorSidebar
+      <MockupCanvas
+        objects={sceneObjects}
+        onExportReady={(handler) => setExportHandler(() => handler)}
+        resetCameraVersion={resetCameraVersion}
+        uiTheme={uiTheme}
+      />
+
+      <InspectorPanel
         copy={copy}
-        colors={colors}
-        debugMode={debugMode}
-        debugPartColors={debugPartColors}
-        deviceTheme={deviceTheme}
         exportPresets={EXPORT_PRESETS}
         isExporting={isExporting}
-        locale={locale}
-        model={model}
-        onColorChange={updateColor}
-        onDebugColorChange={updateDebugColor}
+        object={selectedObject}
+        onColorChange={handleColorChange}
+        onDebugColorChange={handleDebugColorChange}
         onExport={exportImage}
         onImageUpload={handleImageUpload}
-        onLocaleChange={setLocale}
-        onModelChange={setSelectedModelId}
-        onReset={resetMockup}
-        onThemeChange={applyTheme}
-        onToggleDeviceShell={() => setShowDeviceShell((current) => !current)}
-        onToggleDebugMode={() => setDebugMode((current) => !current)}
-        onUiThemeChange={setUiTheme}
-        rotationX={rotationX}
-        rotationY={rotationY}
-        rotationZ={rotationZ}
-        selectedModelId={selectedModelId}
-        setRotationX={setRotationX}
-        setRotationY={setRotationY}
-        setRotationZ={setRotationZ}
-        showDeviceShell={showDeviceShell}
+        onModelChange={handleModelChange}
+        onResetCamera={handleResetCamera}
+        onResetObject={handleResetObject}
+        onThemeChange={handleThemeChange}
+        onToggleDebugMode={() =>
+          selectedObject &&
+          updateSceneObject(selectedObject.id, {
+            debugMode: !selectedObject.debugMode,
+          })
+        }
+        onToggleDeviceShell={() =>
+          selectedObject &&
+          updateSceneObject(selectedObject.id, {
+            showDeviceShell: !selectedObject.showDeviceShell,
+          })
+        }
+        onUpdateName={(name) =>
+          selectedObject && updateSceneObject(selectedObject.id, { name })
+        }
+        onUpdateRotation={(rotationPatch) =>
+          selectedObject && updateSceneObject(selectedObject.id, rotationPatch)
+        }
         uiTheme={uiTheme}
         uploadError={uploadError}
       />

@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useLayoutEffect, useRef } from "react";
+import { Suspense, useEffect, useRef } from "react";
 import * as THREE from "three";
 import { Canvas, useThree } from "@react-three/fiber";
 import {
@@ -12,16 +12,9 @@ import {
   type OrbitControlsProps,
 } from "@react-three/drei";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
-import {
-  type PhoneColors,
-} from "./Smartphone";
-import type { DeviceModelDefinition } from "../models/device-models";
 import type { UiTheme } from "../lib/i18n";
-
-export type MockupTransform = {
-  position: [number, number, number];
-  rotation: [number, number, number];
-};
+import type { SceneObject } from "../lib/scene-objects";
+import { DEVICE_MODELS } from "../models/device-models";
 
 export type ExportPreset = {
   height: number;
@@ -30,15 +23,9 @@ export type ExportPreset = {
 };
 
 type MockupCanvasProps = {
-  colors: PhoneColors;
-  debugPartColors?: Record<string, string>;
-  debugMode: boolean;
-  imageUrl: string;
-  model: DeviceModelDefinition;
+  objects: SceneObject[];
   onExportReady: (handler: (preset: ExportPreset) => Promise<void>) => void;
-  resetVersion: number;
-  showDeviceShell: boolean;
-  transform: MockupTransform;
+  resetCameraVersion: number;
   uiTheme: UiTheme;
 };
 
@@ -53,20 +40,31 @@ const ORBIT_LIMITS: OrbitControlsProps = {
   minAzimuthAngle: -0.85,
   minPolarAngle: Math.PI * 0.32,
 };
+const AUTO_OBJECT_POSITIONS: [number, number, number][] = [
+  [0, 0, 0],
+  [-0.8, 0.02, 0.1],
+  [0.8, -0.02, -0.1],
+  [-1.1, 0.04, -0.2],
+  [1.1, -0.04, 0.2],
+];
+
+function getObjectPosition(index: number): [number, number, number] {
+  if (AUTO_OBJECT_POSITIONS[index]) {
+    return AUTO_OBJECT_POSITIONS[index];
+  }
+
+  const side = index % 2 === 0 ? 1 : -1;
+  const ring = Math.floor(index / 2);
+  return [side * (0.7 + ring * 0.28), 0, side * 0.12];
+}
 
 function SceneBridge({
-  colors,
-  debugPartColors,
-  debugMode,
-  imageUrl,
-  model,
+  objects,
   onExportReady,
-  resetVersion,
-  showDeviceShell,
-  transform,
+  resetCameraVersion,
 }: MockupCanvasProps) {
   const controlsRef = useRef<OrbitControlsImpl | null>(null);
-  const mockupRef = useRef<THREE.Group | null>(null);
+  const sceneRef = useRef<THREE.Group | null>(null);
   const { camera, gl, scene, size } = useThree();
 
   useEffect(() => {
@@ -130,39 +128,47 @@ function SceneBridge({
     };
   }, [camera, gl, onExportReady, scene, size.height, size.width]);
 
-  useLayoutEffect(() => {
-    const mockup = mockupRef.current;
-    if (!mockup) {
-      return;
-    }
-
-    mockup.position.set(...transform.position);
-    mockup.rotation.set(...transform.rotation);
-  }, [transform.position, transform.rotation]);
-
   return (
     <>
       <Environment preset="studio" />
       <Suspense fallback={null}>
-        <Bounds fit clip margin={1.15}>
+        <Bounds fit clip margin={1.18}>
           <Center>
-            <group ref={mockupRef}>
-              <model.component
-                bodyColor={colors.body}
-                buttonsColor={colors.buttons}
-                debugPartColors={debugMode ? debugPartColors : undefined}
-                imageUrl={imageUrl}
-                screenPosition={model.screenPosition}
-                screenSize={model.screenSize}
-                showDeviceShell={showDeviceShell}
-              />
+            <group ref={sceneRef}>
+              {objects.map((object, index) => {
+                const model = DEVICE_MODELS[object.modelId];
+
+                return (
+                  <group
+                    key={object.id}
+                    position={getObjectPosition(index)}
+                    rotation={[
+                      (object.rotationX * Math.PI) / 180,
+                      (object.rotationY * Math.PI) / 180,
+                      (object.rotationZ * Math.PI) / 180,
+                    ]}
+                  >
+                    <model.component
+                      bodyColor={object.colors.body}
+                      buttonsColor={object.colors.buttons}
+                      debugPartColors={
+                        object.debugMode ? object.debugPartColors : undefined
+                      }
+                      imageUrl={object.imageUrl}
+                      screenPosition={model.screenPosition}
+                      screenSize={model.screenSize}
+                      showDeviceShell={object.showDeviceShell}
+                    />
+                  </group>
+                );
+              })}
             </group>
           </Center>
           <BoundsResetController
             camera={camera}
             controlsRef={controlsRef}
-            mockupRef={mockupRef}
-            resetVersion={resetVersion}
+            resetCameraVersion={resetCameraVersion}
+            sceneRef={sceneRef}
           />
         </Bounds>
       </Suspense>
@@ -179,18 +185,18 @@ function SceneBridge({
 function BoundsResetController({
   camera,
   controlsRef,
-  mockupRef,
-  resetVersion,
+  resetCameraVersion,
+  sceneRef,
 }: {
   camera: THREE.Camera;
   controlsRef: { current: OrbitControlsImpl | null };
-  mockupRef: { current: THREE.Group | null };
-  resetVersion: number;
+  resetCameraVersion: number;
+  sceneRef: { current: THREE.Group | null };
 }) {
   const bounds = useBounds();
 
   useEffect(() => {
-    if (resetVersion === 0) {
+    if (resetCameraVersion === 0) {
       return;
     }
 
@@ -198,13 +204,13 @@ function BoundsResetController({
 
     frameId = requestAnimationFrame(() => {
       const controls = controlsRef.current;
-      const mockup = mockupRef.current;
+      const sceneGroup = sceneRef.current;
 
-      if (!mockup || !controls) {
+      if (!sceneGroup || !controls) {
         return;
       }
 
-      bounds.refresh(mockup).clip();
+      bounds.refresh(sceneGroup).clip();
 
       const { center, distance } = bounds.getSize();
       const nextPosition = center
@@ -226,7 +232,7 @@ function BoundsResetController({
     return () => {
       cancelAnimationFrame(frameId);
     };
-  }, [bounds, camera, controlsRef, mockupRef, resetVersion]);
+  }, [bounds, camera, controlsRef, resetCameraVersion, sceneRef]);
 
   return null;
 }
