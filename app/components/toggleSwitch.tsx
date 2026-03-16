@@ -5,9 +5,9 @@ import Image from "next/image";
 type ToggleOption<T extends string> = {
   value: T;
   label: string;
+  iconSrc: string;
   iconClassName?: string;
   iconAlt?: string;
-  iconSrc?: string;
 };
 
 type ToggleSwitchProps<T extends string> = {
@@ -37,7 +37,6 @@ export default function ToggleSwitch<T extends string>({
 
       {options.map((option) => {
         const isActive = option.value === value;
-        const hasIcon = Boolean(option.iconSrc);
 
         return (
           <button
@@ -47,20 +46,16 @@ export default function ToggleSwitch<T extends string>({
             aria-checked={isActive}
             aria-label={option.label}
             onClick={() => onChange(option.value)}
-            className={`toggle-switch-option ${hasIcon ? "toggle-switch-option-icon" : ""}`}
+            className="toggle-switch-option"
             data-active={isActive}
           >
-            {option.iconSrc ? (
-              <Image
-                src={option.iconSrc}
-                alt={option.iconAlt ?? option.label}
-                width={20}
-                height={20}
-                className={`toggle-switch-icon ${option.iconClassName ?? ""}`}
-              />
-            ) : (
-              <span className="toggle-switch-label">{option.label}</span>
-            )}
+            <Image
+              src={option.iconSrc}
+              alt={option.iconAlt ?? option.label}
+              width={16}
+              height={16}
+              className={`toggle-switch-icon ${option.iconClassName ?? ""}`}
+            />
           </button>
         );
       })}
