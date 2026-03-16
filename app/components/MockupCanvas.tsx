@@ -44,6 +44,7 @@ type MockupCanvasProps = {
 
 const CAMERA_POSITION: [number, number, number] = [0, 0, 5];
 const CAMERA_FOV = 45;
+const DEFAULT_CAMERA_DIRECTION = new THREE.Vector3(...CAMERA_POSITION).normalize();
 const ORBIT_LIMITS: OrbitControlsProps = {
   enablePan: false,
   enableZoom: false,
@@ -159,6 +160,7 @@ function SceneBridge({
           </Center>
           <BoundsResetController
             camera={camera}
+            controlsRef={controlsRef}
             mockupRef={mockupRef}
             resetVersion={resetVersion}
           />
@@ -176,10 +178,12 @@ function SceneBridge({
 
 function BoundsResetController({
   camera,
+  controlsRef,
   mockupRef,
   resetVersion,
 }: {
   camera: THREE.Camera;
+  controlsRef: { current: OrbitControlsImpl | null };
   mockupRef: { current: THREE.Group | null };
   resetVersion: number;
 }) {
@@ -193,21 +197,36 @@ function BoundsResetController({
     let frameId = 0;
 
     frameId = requestAnimationFrame(() => {
-      if (!mockupRef.current) {
+      const controls = controlsRef.current;
+      const mockup = mockupRef.current;
+
+      if (!mockup || !controls) {
         return;
       }
 
-      bounds.refresh(mockupRef.current).clip().reset().fit();
+      bounds.refresh(mockup).clip();
+
+      const { center, distance } = bounds.getSize();
+      const nextPosition = center
+        .clone()
+        .addScaledVector(DEFAULT_CAMERA_DIRECTION, distance);
+
+      camera.position.copy(nextPosition);
+      camera.up.set(0, 1, 0);
+      camera.lookAt(center);
 
       if (camera instanceof THREE.PerspectiveCamera) {
         camera.updateProjectionMatrix();
       }
+
+      controls.target.copy(center);
+      controls.update();
     });
 
     return () => {
       cancelAnimationFrame(frameId);
     };
-  }, [bounds, camera, mockupRef, resetVersion]);
+  }, [bounds, camera, controlsRef, mockupRef, resetVersion]);
 
   return null;
 }
