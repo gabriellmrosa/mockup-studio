@@ -8,6 +8,7 @@ import {
   Center,
   Environment,
   OrbitControls,
+  useBounds,
   type OrbitControlsProps,
 } from "@react-three/drei";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
@@ -15,6 +16,7 @@ import {
   type PhoneColors,
 } from "./Smartphone";
 import type { DeviceModelDefinition } from "../models/device-models";
+import type { UiTheme } from "../lib/i18n";
 
 export type MockupTransform = {
   position: [number, number, number];
@@ -34,9 +36,10 @@ type MockupCanvasProps = {
   imageUrl: string;
   model: DeviceModelDefinition;
   onExportReady: (handler: (preset: ExportPreset) => Promise<void>) => void;
-  onResetCameraReady: (handler: () => void) => void;
+  resetVersion: number;
   showDeviceShell: boolean;
   transform: MockupTransform;
+  uiTheme: UiTheme;
 };
 
 const CAMERA_POSITION: [number, number, number] = [0, 0, 5];
@@ -57,7 +60,7 @@ function SceneBridge({
   imageUrl,
   model,
   onExportReady,
-  onResetCameraReady,
+  resetVersion,
   showDeviceShell,
   transform,
 }: MockupCanvasProps) {
@@ -73,12 +76,7 @@ function SceneBridge({
 
     controls.target.set(0, 0, 0);
     controls.update();
-    onResetCameraReady(() => {
-      controls.reset();
-      controls.target.set(0, 0, 0);
-      controls.update();
-    });
-  }, [onResetCameraReady]);
+  }, []);
 
   useEffect(() => {
     onExportReady(async ({ height, label, width }) => {
@@ -159,6 +157,11 @@ function SceneBridge({
               />
             </group>
           </Center>
+          <BoundsResetController
+            camera={camera}
+            mockupRef={mockupRef}
+            resetVersion={resetVersion}
+          />
         </Bounds>
       </Suspense>
       <OrbitControls
@@ -171,9 +174,49 @@ function SceneBridge({
   );
 }
 
+function BoundsResetController({
+  camera,
+  mockupRef,
+  resetVersion,
+}: {
+  camera: THREE.Camera;
+  mockupRef: { current: THREE.Group | null };
+  resetVersion: number;
+}) {
+  const bounds = useBounds();
+
+  useEffect(() => {
+    if (resetVersion === 0) {
+      return;
+    }
+
+    let frameId = 0;
+
+    frameId = requestAnimationFrame(() => {
+      if (!mockupRef.current) {
+        return;
+      }
+
+      bounds.refresh(mockupRef.current).clip().reset().fit();
+
+      if (camera instanceof THREE.PerspectiveCamera) {
+        camera.updateProjectionMatrix();
+      }
+    });
+
+    return () => {
+      cancelAnimationFrame(frameId);
+    };
+  }, [bounds, camera, mockupRef, resetVersion]);
+
+  return null;
+}
+
 export default function MockupCanvas(props: MockupCanvasProps) {
   return (
-    <div className="mockup-stage flex-1 h-screen">
+    <div
+      className={`mockup-stage flex-1 h-screen ${props.uiTheme === "dark" ? "mockup-stage-dark" : "mockup-stage-light"}`}
+    >
       <Canvas
         camera={{ fov: CAMERA_FOV, position: CAMERA_POSITION }}
         dpr={[1, 2]}

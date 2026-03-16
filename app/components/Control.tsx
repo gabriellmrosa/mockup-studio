@@ -1,5 +1,6 @@
 export default function Control({
   label,
+  uiTheme,
   value,
   setValue,
   min,
@@ -7,6 +8,7 @@ export default function Control({
   step = 1,
 }: {
   label: string;
+  uiTheme: "dark" | "light";
   value: number;
   setValue: (v: number) => void;
   min: number;
@@ -16,10 +18,10 @@ export default function Control({
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between gap-3">
-        <span className="text-[11px] uppercase tracking-[0.18em] text-neutral-500">
+        <span className="text-[11px] uppercase tracking-[0.18em] text-[var(--sidebar-muted)]">
           {label}
         </span>
-        <span className="text-xs text-neutral-300 font-mono">
+        <span className="text-xs font-mono text-[var(--sidebar-value)]">
           {value.toFixed(step < 1 ? 2 : 0)}
         </span>
       </div>
@@ -31,12 +33,12 @@ export default function Control({
         step={step}
         value={value}
         onChange={(e) => setValue(Number(e.target.value))}
-        className="accent-white"
+        className={uiTheme === "dark" ? "accent-white" : "accent-black"}
       />
 
       <input
         type="number"
-        className="bg-neutral-800 border border-neutral-700 rounded-lg px-2 py-1.5 text-sm text-neutral-100 focus:outline-none focus:border-neutral-500"
+        className="editor-input rounded-lg px-2 py-1.5 text-sm focus:outline-none"
         value={value}
         step={step}
         min={min}

@@ -4,6 +4,7 @@ import { ChangeEvent, useEffect, useState } from "react";
 import EditorSidebar from "./components/EditorSidebar";
 import MockupCanvas, { type ExportPreset } from "./components/MockupCanvas";
 import { type PhoneColors, type ThemeName } from "./components/Smartphone";
+import { APP_COPY, type Locale, type UiTheme } from "./lib/i18n";
 import { readFileAsDataUrl } from "./lib/mockup-image";
 import {
   DEFAULT_DEVICE_MODEL,
@@ -20,10 +21,12 @@ export default function Home() {
   const [selectedModelId, setSelectedModelId] =
     useState<DeviceModelId>(DEFAULT_DEVICE_MODEL.id);
   const model = DEVICE_MODELS[selectedModelId];
+  const [locale, setLocale] = useState<Locale>("pt-BR");
+  const [uiTheme, setUiTheme] = useState<UiTheme>("dark");
   const [uploadedImage, setUploadedImage] =
     useState<string>("/placeholder.png");
   const [uploadError, setUploadError] = useState<string>("");
-  const [activeTheme, setActiveTheme] = useState<ThemeName>(model.defaultTheme);
+  const [deviceTheme, setDeviceTheme] = useState<ThemeName>(model.defaultTheme);
   const [colors, setColors] = useState<PhoneColors>(
     model.themes[model.defaultTheme],
   );
@@ -36,12 +39,35 @@ export default function Home() {
     useState<Record<string, string>>(model.initialDebugColors);
   const [exportHandler, setExportHandler] =
     useState<((preset: ExportPreset) => Promise<void>) | null>(null);
-  const [resetCameraHandler, setResetCameraHandler] =
-    useState<(() => void) | null>(null);
   const [isExporting, setIsExporting] = useState(false);
+  const [resetVersion, setResetVersion] = useState(0);
+  const copy = APP_COPY[locale];
 
   useEffect(() => {
-    setActiveTheme(model.defaultTheme);
+    const storedLocale = window.localStorage.getItem("mock-photo-locale");
+    const storedUiTheme = window.localStorage.getItem("mock-photo-ui-theme");
+
+    if (storedLocale === "pt-BR" || storedLocale === "en-US") {
+      setLocale(storedLocale);
+    }
+
+    if (storedUiTheme === "dark" || storedUiTheme === "light") {
+      setUiTheme(storedUiTheme);
+    }
+  }, []);
+
+  useEffect(() => {
+    window.localStorage.setItem("mock-photo-locale", locale);
+    document.documentElement.lang = locale;
+  }, [locale]);
+
+  useEffect(() => {
+    window.localStorage.setItem("mock-photo-ui-theme", uiTheme);
+    document.documentElement.dataset.theme = uiTheme;
+  }, [uiTheme]);
+
+  useEffect(() => {
+    setDeviceTheme(model.defaultTheme);
     setColors(model.themes[model.defaultTheme]);
     setDebugPartColors(model.initialDebugColors);
   }, [model]);
@@ -58,19 +84,19 @@ export default function Home() {
       setUploadError("");
     } catch (error) {
       console.error(error);
-      setUploadError("Nao foi possivel preparar essa imagem.");
+      setUploadError(copy.uploadImageError);
     } finally {
       event.target.value = "";
     }
   }
 
   function applyTheme(themeId: ThemeName) {
-    setActiveTheme(themeId);
+    setDeviceTheme(themeId);
     setColors(model.themes[themeId]);
   }
 
   function updateColor(part: keyof PhoneColors, hex: string) {
-    setActiveTheme("" as ThemeName);
+    setDeviceTheme("" as ThemeName);
     setColors((prev) => ({ ...prev, [part]: hex }));
   }
 
@@ -82,7 +108,7 @@ export default function Home() {
     setRotationX(0);
     setRotationY(180);
     setRotationZ(0);
-    resetCameraHandler?.();
+    setResetVersion((current) => current + 1);
   }
 
   async function exportImage(preset: ExportPreset) {
@@ -95,14 +121,14 @@ export default function Home() {
       await exportHandler(preset);
     } catch (error) {
       console.error(error);
-      setUploadError("Nao foi possivel exportar o PNG.");
+      setUploadError(copy.exportImageError);
     } finally {
       setIsExporting(false);
     }
   }
 
   return (
-    <main className="min-h-screen bg-stone-950 text-white relative flex">
+    <main className="app-shell min-h-screen relative flex">
       <MockupCanvas
         colors={colors}
         debugMode={debugMode}
@@ -110,8 +136,9 @@ export default function Home() {
         imageUrl={uploadedImage}
         model={model}
         onExportReady={(handler) => setExportHandler(() => handler)}
-        onResetCameraReady={(handler) => setResetCameraHandler(() => handler)}
+        resetVersion={resetVersion}
         showDeviceShell={showDeviceShell}
+        uiTheme={uiTheme}
         transform={{
           position: [0, 0, 0],
           rotation: [
@@ -123,22 +150,26 @@ export default function Home() {
       />
 
       <EditorSidebar
-        activeTheme={activeTheme}
+        copy={copy}
         colors={colors}
         debugMode={debugMode}
         debugPartColors={debugPartColors}
+        deviceTheme={deviceTheme}
         exportPresets={EXPORT_PRESETS}
         isExporting={isExporting}
+        locale={locale}
         model={model}
         onColorChange={updateColor}
         onDebugColorChange={updateDebugColor}
         onExport={exportImage}
         onImageUpload={handleImageUpload}
+        onLocaleChange={setLocale}
         onModelChange={setSelectedModelId}
         onReset={resetMockup}
         onThemeChange={applyTheme}
         onToggleDeviceShell={() => setShowDeviceShell((current) => !current)}
         onToggleDebugMode={() => setDebugMode((current) => !current)}
+        onUiThemeChange={setUiTheme}
         rotationX={rotationX}
         rotationY={rotationY}
         rotationZ={rotationZ}
@@ -147,6 +178,7 @@ export default function Home() {
         setRotationY={setRotationY}
         setRotationZ={setRotationZ}
         showDeviceShell={showDeviceShell}
+        uiTheme={uiTheme}
         uploadError={uploadError}
       />
     </main>

@@ -5,10 +5,16 @@ import { ChangeEvent, useState } from "react";
 type ColorRowProps = {
   label: string;
   onChange: (hex: string) => void;
+  uiTheme: "dark" | "light";
   value: string;
 };
 
-export default function ColorRow({ label, onChange, value }: ColorRowProps) {
+export default function ColorRow({
+  label,
+  onChange,
+  uiTheme,
+  value,
+}: ColorRowProps) {
   const [inputVal, setInputVal] = useState(value);
 
   const handleHexInput = (event: ChangeEvent<HTMLInputElement>) => {
@@ -31,10 +37,10 @@ export default function ColorRow({ label, onChange, value }: ColorRowProps) {
 
   return (
     <div className="flex items-center gap-2">
-      <span className="text-neutral-400 text-[10px] flex-1 truncate">
+      <span className="text-[10px] flex-1 truncate text-[var(--sidebar-muted)]">
         {label}
       </span>
-      <label className="relative w-6 h-6 rounded overflow-hidden border border-neutral-600 cursor-pointer shrink-0 hover:border-neutral-400 transition">
+      <label className="relative w-6 h-6 rounded overflow-hidden border border-[var(--input-border)] cursor-pointer shrink-0 transition hover:border-[var(--input-border-hover)]">
         <input
           type="color"
           value={value}
@@ -49,7 +55,7 @@ export default function ColorRow({ label, onChange, value }: ColorRowProps) {
         onChange={handleHexInput}
         maxLength={7}
         placeholder="#000000"
-        className="w-20 bg-neutral-800 border border-neutral-700 rounded px-1.5 py-1 text-[10px] text-neutral-200 font-mono focus:outline-none focus:border-neutral-500 transition"
+        className={`editor-input w-20 rounded px-1.5 py-1 text-[10px] font-mono transition focus:outline-none ${uiTheme === "dark" ? "selection:bg-white/20" : "selection:bg-black/10"}`}
       />
     </div>
   );

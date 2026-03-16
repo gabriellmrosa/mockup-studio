@@ -1,8 +1,27 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #0b0b0d;
+  --foreground: #f3f4f6;
+  --sidebar-bg: rgba(10, 10, 12, 0.94);
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+  --sidebar-muted: #8d93a1;
+  --sidebar-value: #e5e7eb;
+  --sidebar-label: #b8beca;
+  --sidebar-dot: #525866;
+  --panel-bg: #17181c;
+  --panel-border: rgba(255, 255, 255, 0.08);
+  --button-bg: #17181c;
+  --button-border: #3b3f4a;
+  --button-border-hover: #5b6170;
+  --button-fg: #f3f4f6;
+  --button-muted-fg: #b8beca;
+  --button-active-bg: #f3f4f6;
+  --button-active-fg: #0b0b0d;
+  --input-bg: #1a1d22;
+  --input-border: #3b3f4a;
+  --input-border-hover: #5b6170;
+  --input-fg: #f3f4f6;
 }
 
 @theme inline {
@@ -12,11 +31,28 @@
   --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+[data-theme="light"] {
+  --background: #f3efe7;
+  --foreground: #171717;
+  --sidebar-bg: rgba(246, 240, 231, 0.96);
+  --sidebar-border: rgba(23, 23, 23, 0.12);
+  --sidebar-muted: #6b7280;
+  --sidebar-value: #1f2937;
+  --sidebar-label: #4b5563;
+  --sidebar-dot: #a3a3a3;
+  --panel-bg: rgba(255, 255, 255, 0.72);
+  --panel-border: rgba(23, 23, 23, 0.1);
+  --button-bg: rgba(255, 255, 255, 0.72);
+  --button-border: rgba(23, 23, 23, 0.14);
+  --button-border-hover: rgba(23, 23, 23, 0.24);
+  --button-fg: #171717;
+  --button-muted-fg: #52525b;
+  --button-active-bg: #171717;
+  --button-active-fg: #f8fafc;
+  --input-bg: rgba(255, 255, 255, 0.82);
+  --input-border: rgba(23, 23, 23, 0.14);
+  --input-border-hover: rgba(23, 23, 23, 0.24);
+  --input-fg: #171717;
 }
 
 body {
@@ -25,10 +61,199 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+.app-shell {
+  background:
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.06), transparent 28%),
+    linear-gradient(180deg, color-mix(in srgb, var(--background) 92%, white 8%), var(--background));
+}
+
+.editor-sidebar {
+  background: var(--sidebar-bg);
+  border-left: 1px solid var(--sidebar-border);
+  color: var(--foreground);
+  backdrop-filter: blur(14px);
+}
+
+.editor-sidebar-label {
+  color: var(--sidebar-label);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.editor-sidebar-muted {
+  color: var(--sidebar-muted);
+}
+
+.panel-card {
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 1rem;
+}
+
+.editor-button {
+  background: var(--button-bg);
+  border: 1px solid var(--button-border);
+  border-radius: 0.75rem;
+  color: var(--button-fg);
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease,
+    color 160ms ease;
+}
+
+.editor-button:hover {
+  border-color: var(--button-border-hover);
+}
+
+.editor-button-muted {
+  color: var(--button-muted-fg);
+}
+
+.editor-toggle {
+  border-radius: 0.75rem;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  padding: 0.65rem 0.75rem;
+  text-transform: uppercase;
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease,
+    color 160ms ease;
+}
+
+.editor-toggle-active {
+  background: var(--button-active-bg);
+  border: 1px solid var(--button-active-bg);
+  color: var(--button-active-fg);
+}
+
+.editor-toggle-inactive {
+  background: var(--button-bg);
+  border: 1px solid var(--button-border);
+  color: var(--button-muted-fg);
+}
+
+.editor-toggle-inactive:hover {
+  border-color: var(--button-border-hover);
+}
+
+.editor-link-button {
+  color: var(--sidebar-muted);
+  font-size: 11px;
+  transition: color 160ms ease;
+}
+
+.editor-link-button:hover {
+  color: var(--foreground);
+}
+
+.device-card {
+  align-items: center;
+  border-radius: 1rem;
+  border: 1px solid var(--button-border);
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem;
+  text-align: left;
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease,
+    color 160ms ease;
+}
+
+.device-card-active {
+  background: var(--button-active-bg);
+  border-color: var(--button-active-bg);
+  color: var(--button-active-fg);
+}
+
+.device-card-inactive {
+  background: var(--button-bg);
+  color: var(--button-fg);
+}
+
+.device-card-inactive:hover {
+  border-color: var(--button-border-hover);
+}
+
+.theme-card {
+  align-items: center;
+  border-radius: 1rem;
+  border: 1px solid var(--button-border);
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  padding: 0.5rem;
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease,
+    color 160ms ease;
+}
+
+.theme-card-active {
+  background: var(--button-active-bg);
+  border-color: var(--button-active-bg);
+  color: var(--button-active-fg);
+}
+
+.theme-card-inactive {
+  background: transparent;
+  color: var(--button-fg);
+}
+
+.theme-card-inactive:hover {
+  border-color: var(--button-border-hover);
+}
+
+.upload-card {
+  align-items: center;
+  background: var(--button-bg);
+  border: 1px dashed var(--button-border);
+  border-radius: 1rem;
+  color: var(--button-muted-fg);
+  cursor: pointer;
+  display: flex;
+  font-size: 0.875rem;
+  gap: 0.5rem;
+  justify-content: center;
+  padding: 0.75rem;
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease,
+    color 160ms ease;
+}
+
+.upload-card:hover {
+  border-color: var(--button-border-hover);
+}
+
+.editor-input {
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  color: var(--input-fg);
+}
+
+.editor-input:focus {
+  border-color: var(--input-border-hover);
+}
+
 .mockup-stage {
+  transition: background 160ms ease;
+}
+
+.mockup-stage-dark {
   background:
     radial-gradient(circle at top, rgba(255, 255, 255, 0.1), transparent 35%),
     linear-gradient(160deg, #18181b 0%, #09090b 55%, #000000 100%);
+}
+
+.mockup-stage-light {
+  background:
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.6), transparent 34%),
+    radial-gradient(circle at bottom right, rgba(196, 181, 253, 0.22), transparent 28%),
+    linear-gradient(155deg, #f8f4ed 0%, #ece4d7 50%, #e2d7c9 100%);
 }
 
 .mockup-stage canvas {

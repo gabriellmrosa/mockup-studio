@@ -4,6 +4,7 @@ import Control from "./Control";
 import ColorRow from "./ColorRow";
 import type { ExportPreset } from "./MockupCanvas";
 import type { PhoneColors, ThemeName } from "./Smartphone";
+import type { Locale, UiTheme } from "../lib/i18n";
 import {
   DEVICE_MODEL_LIST,
   type DeviceModelDefinition,
@@ -11,22 +12,61 @@ import {
 } from "../models/device-models";
 
 type EditorSidebarProps = {
-  activeTheme: ThemeName;
+  copy: {
+    activeDevice: string;
+    appSubtitle: string;
+    appTitle: string;
+    bodyColorLabel: string;
+    bodyColorSectionTitle: string;
+    darkMode: string;
+    debugOff: string;
+    debugOn: string;
+    debugSectionTitle: string;
+    deviceSectionHint: string;
+    deviceSectionTitle: string;
+    english: string;
+    exportSectionHint: string;
+    exportSectionTitle: string;
+    languageLabel: string;
+    lightMode: string;
+    portuguese: string;
+    resetButton: string;
+    rotationX: string;
+    rotationY: string;
+    rotationZ: string;
+    sceneSectionHint: string;
+    sceneSectionTitle: string;
+    screenOnly: string;
+    screenSectionHintLine1: string;
+    screenSectionHintLine2: string;
+    screenSectionTitle: string;
+    shellOn: string;
+    themeLabel: string;
+    themeNames: Record<ThemeName, string>;
+    themesSectionTitle: string;
+    transformSectionHint: string;
+    transformSectionTitle: string;
+    uploadImage: string;
+  };
   colors: PhoneColors;
   debugMode: boolean;
   debugPartColors: Record<string, string>;
+  deviceTheme: ThemeName;
   exportPresets: ExportPreset[];
   isExporting: boolean;
+  locale: Locale;
   model: DeviceModelDefinition;
   onColorChange: (part: keyof PhoneColors, hex: string) => void;
   onDebugColorChange: (part: string, hex: string) => void;
   onExport: (preset: ExportPreset) => Promise<void>;
   onImageUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onLocaleChange: (locale: Locale) => void;
   onModelChange: (modelId: DeviceModelId) => void;
   onReset: () => void;
   onThemeChange: (themeId: ThemeName) => void;
   onToggleDeviceShell: () => void;
   onToggleDebugMode: () => void;
+  onUiThemeChange: (theme: UiTheme) => void;
   rotationX: number;
   rotationY: number;
   rotationZ: number;
@@ -35,26 +75,31 @@ type EditorSidebarProps = {
   setRotationY: (value: number) => void;
   setRotationZ: (value: number) => void;
   showDeviceShell: boolean;
+  uiTheme: UiTheme;
   uploadError: string;
 };
 
 export default function EditorSidebar({
-  activeTheme,
+  copy,
   colors,
   debugMode,
   debugPartColors,
+  deviceTheme,
   exportPresets,
   isExporting,
+  locale,
   model,
   onColorChange,
   onDebugColorChange,
   onExport,
   onImageUpload,
+  onLocaleChange,
   onModelChange,
   onReset,
   onThemeChange,
   onToggleDeviceShell,
   onToggleDebugMode,
+  onUiThemeChange,
   rotationX,
   rotationY,
   rotationZ,
@@ -63,75 +108,112 @@ export default function EditorSidebar({
   setRotationY,
   setRotationZ,
   showDeviceShell,
+  uiTheme,
   uploadError,
 }: EditorSidebarProps) {
   return (
-    <aside className="w-[320px] h-screen bg-neutral-950/95 border-l border-white/10 flex flex-col overflow-y-auto shrink-0">
-      <div className="px-5 py-4 border-b border-white/10">
-        <h1 className="text-sm font-semibold text-white tracking-[0.22em] uppercase">
-          Mockup Studio
+    <aside className="editor-sidebar w-[320px] h-screen flex flex-col overflow-y-auto shrink-0">
+      <div className="px-5 py-4 border-b border-[var(--sidebar-border)]">
+        <h1 className="text-sm font-semibold tracking-[0.22em] uppercase">
+          {copy.appTitle}
         </h1>
-        <p className="text-xs text-neutral-500 mt-1">
-          MVP de 1 objeto com export transparente
+        <p className="editor-sidebar-muted text-xs mt-1">
+          {copy.appSubtitle}
         </p>
       </div>
 
       <div className="flex flex-col gap-6 px-5 py-5">
+        <section className="grid grid-cols-2 gap-3">
+          <div>
+            <p className="editor-sidebar-label mb-3">{copy.themeLabel}</p>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={() => onUiThemeChange("dark")}
+                className={`editor-toggle ${uiTheme === "dark" ? "editor-toggle-active" : "editor-toggle-inactive"}`}
+              >
+                {copy.darkMode}
+              </button>
+              <button
+                onClick={() => onUiThemeChange("light")}
+                className={`editor-toggle ${uiTheme === "light" ? "editor-toggle-active" : "editor-toggle-inactive"}`}
+              >
+                {copy.lightMode}
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <p className="editor-sidebar-label mb-3">{copy.languageLabel}</p>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={() => onLocaleChange("pt-BR")}
+                className={`editor-toggle ${locale === "pt-BR" ? "editor-toggle-active" : "editor-toggle-inactive"}`}
+              >
+                {copy.portuguese}
+              </button>
+              <button
+                onClick={() => onLocaleChange("en-US")}
+                className={`editor-toggle ${locale === "en-US" ? "editor-toggle-active" : "editor-toggle-inactive"}`}
+              >
+                {copy.english}
+              </button>
+            </div>
+          </div>
+        </section>
+
         <section>
-          <p className="text-xs font-semibold text-neutral-400 uppercase tracking-widest mb-3">
-            Dispositivo
+          <p className="editor-sidebar-label mb-3">
+            {copy.deviceSectionTitle}
           </p>
           <div className="grid grid-cols-1 gap-2">
             {DEVICE_MODEL_LIST.map((device) => (
               <button
                 key={device.id}
                 onClick={() => onModelChange(device.id)}
-                className={`flex items-center justify-between rounded-xl border px-3 py-3 text-left transition ${selectedModelId === device.id ? "border-white bg-white text-black" : "border-neutral-700 bg-neutral-900 text-white hover:border-neutral-500"}`}
+                className={`device-card ${selectedModelId === device.id ? "device-card-active" : "device-card-inactive"}`}
               >
                 <div>
                   <p className="text-sm font-medium">{device.name}</p>
                   <p
-                    className={`text-[10px] uppercase tracking-[0.18em] ${selectedModelId === device.id ? "text-black/60" : "text-neutral-500"}`}
+                    className={`text-[10px] uppercase tracking-[0.18em] ${selectedModelId === device.id ? "text-black/60" : "editor-sidebar-muted"}`}
                   >
-                    Ativo
+                    {copy.activeDevice}
                   </p>
                 </div>
                 <span
-                  className={`h-2.5 w-2.5 rounded-full ${selectedModelId === device.id ? "bg-black" : "bg-neutral-600"}`}
+                  className={`h-2.5 w-2.5 rounded-full ${selectedModelId === device.id ? "bg-black" : "bg-[var(--sidebar-dot)]"}`}
                 />
               </button>
             ))}
           </div>
-          <p className="text-[10px] text-neutral-500 mt-2 leading-relaxed">
-            A base agora suporta catalogo de dispositivos, mesmo com apenas um
-            modelo ativo por enquanto.
+          <p className="editor-sidebar-muted text-[10px] mt-2 leading-relaxed">
+            {copy.deviceSectionHint}
           </p>
         </section>
 
         <section>
           <div className="flex items-center justify-between mb-3">
-            <p className="text-xs font-semibold text-neutral-400 uppercase tracking-widest">
-              Cena
+            <p className="editor-sidebar-label">
+              {copy.sceneSectionTitle}
             </p>
             <button
               onClick={onToggleDeviceShell}
-              className={`rounded-lg border px-3 py-1.5 text-[11px] uppercase tracking-[0.16em] transition ${showDeviceShell ? "border-neutral-700 bg-neutral-900 text-neutral-300 hover:border-neutral-500" : "border-white bg-white text-black"}`}
+              className={`editor-toggle ${showDeviceShell ? "editor-toggle-inactive" : "editor-toggle-active"}`}
             >
-              {showDeviceShell ? "Casca ligada" : "So tela"}
+              {showDeviceShell ? copy.shellOn : copy.screenOnly}
             </button>
           </div>
-          <p className="text-[10px] text-neutral-500 leading-relaxed">
-            Desligue a casca para trabalhar apenas com a textura da tela, sem
-            moldura de dispositivo ao redor.
+          <p className="editor-sidebar-muted text-[10px] leading-relaxed">
+            {copy.sceneSectionHint}
           </p>
         </section>
 
         <section>
-          <p className="text-xs font-semibold text-neutral-400 uppercase tracking-widest mb-3">
-            Tela do App
+          <p className="editor-sidebar-label mb-3">
+            {copy.screenSectionTitle}
           </p>
-          <label className="flex items-center justify-center gap-2 w-full py-3 rounded-xl border border-dashed border-neutral-700 hover:border-neutral-500 bg-neutral-900 hover:bg-neutral-800 cursor-pointer transition text-sm text-neutral-300">
-            Upload imagem
+          <label className="upload-card">
+            {copy.uploadImage}
             <input
               type="file"
               accept="image/png,image/jpeg,image/webp"
@@ -139,10 +221,10 @@ export default function EditorSidebar({
               className="hidden"
             />
           </label>
-          <p className="text-[10px] text-neutral-500 mt-2 leading-relaxed">
-            Proporcao recomendada: 9:19.3.
+          <p className="editor-sidebar-muted text-[10px] mt-2 leading-relaxed">
+            {copy.screenSectionHintLine1}
             <br />
-            Export final sempre em PNG com fundo transparente.
+            {copy.screenSectionHintLine2}
           </p>
           {uploadError ? (
             <p className="text-[11px] text-red-400 mt-2">{uploadError}</p>
@@ -152,23 +234,23 @@ export default function EditorSidebar({
         {!debugMode ? (
           <>
             <section>
-              <p className="text-xs font-semibold text-neutral-400 uppercase tracking-widest mb-3">
-                Temas
+              <p className="editor-sidebar-label mb-3">
+                {copy.themesSectionTitle}
               </p>
               <div className="grid grid-cols-3 gap-2">
                 {model.themeOptions.map((theme) => (
                   <button
                     key={theme.id}
                     onClick={() => onThemeChange(theme.id)}
-                    title={theme.label}
-                    className={`flex flex-col items-center gap-1.5 p-2 rounded-xl border transition ${activeTheme === theme.id ? "border-white bg-white text-black" : "border-neutral-700 hover:border-neutral-500 bg-transparent text-white"}`}
+                    title={copy.themeNames[theme.id]}
+                    className={`theme-card ${deviceTheme === theme.id ? "theme-card-active" : "theme-card-inactive"}`}
                   >
                     <div
                       className="w-8 h-8 rounded-full border border-black/10 shadow-inner"
                       style={{ backgroundColor: theme.preview }}
                     />
                     <span className="text-[10px] leading-tight text-center">
-                      {theme.label}
+                      {copy.themeNames[theme.id]}
                     </span>
                   </button>
                 ))}
@@ -176,11 +258,12 @@ export default function EditorSidebar({
             </section>
 
             <section>
-              <p className="text-xs font-semibold text-neutral-400 uppercase tracking-widest mb-3">
-                Cor do Body
+              <p className="editor-sidebar-label mb-3">
+                {copy.bodyColorSectionTitle}
               </p>
               <ColorRow
-                label="Body"
+                label={copy.bodyColorLabel}
+                uiTheme={uiTheme}
                 value={colors.body}
                 onChange={(hex) => onColorChange("body", hex)}
               />
@@ -188,14 +271,15 @@ export default function EditorSidebar({
           </>
         ) : (
           <section>
-            <p className="text-xs font-semibold text-neutral-400 uppercase tracking-widest mb-3">
-              Debug
+            <p className="editor-sidebar-label mb-3">
+              {copy.debugSectionTitle}
             </p>
-            <div className="flex flex-col gap-2 rounded-xl border border-neutral-800 bg-neutral-900 p-3">
+            <div className="panel-card flex flex-col gap-2 p-3">
               {Object.entries(debugPartColors).map(([part, color]) => (
                 <ColorRow
                   key={part}
                   label={part}
+                  uiTheme={uiTheme}
                   value={color}
                   onChange={(hex) => onDebugColorChange(part, hex)}
                 />
@@ -206,20 +290,21 @@ export default function EditorSidebar({
 
         <section>
           <div className="flex items-center justify-between mb-3">
-            <p className="text-xs font-semibold text-neutral-400 uppercase tracking-widest">
-              Transform
+            <p className="editor-sidebar-label">
+              {copy.transformSectionTitle}
             </p>
             <button
               onClick={onReset}
-              className="text-[11px] text-neutral-400 hover:text-white transition"
+              className="editor-link-button"
             >
-              Reset camera + objeto
+              {copy.resetButton}
             </button>
           </div>
 
-          <div className="rounded-2xl border border-white/10 bg-neutral-900 p-3 space-y-4">
+          <div className="panel-card space-y-4 p-3">
             <Control
-              label="Rotacao X"
+              label={copy.rotationX}
+              uiTheme={uiTheme}
               value={rotationX}
               setValue={setRotationX}
               min={-45}
@@ -227,7 +312,8 @@ export default function EditorSidebar({
               step={1}
             />
             <Control
-              label="Rotacao Y"
+              label={copy.rotationY}
+              uiTheme={uiTheme}
               value={rotationY}
               setValue={setRotationY}
               min={135}
@@ -235,7 +321,8 @@ export default function EditorSidebar({
               step={1}
             />
             <Control
-              label="Rotacao Z"
+              label={copy.rotationZ}
+              uiTheme={uiTheme}
               value={rotationZ}
               setValue={setRotationZ}
               min={-25}
@@ -243,14 +330,14 @@ export default function EditorSidebar({
               step={1}
             />
           </div>
-          <p className="text-[10px] text-neutral-500 mt-2 leading-relaxed">
-            O objeto continua centralizado; por enquanto so liberamos rotacao.
+          <p className="editor-sidebar-muted text-[10px] mt-2 leading-relaxed">
+            {copy.transformSectionHint}
           </p>
         </section>
 
         <section>
-          <p className="text-xs font-semibold text-neutral-400 uppercase tracking-widest mb-3">
-            Export PNG
+          <p className="editor-sidebar-label mb-3">
+            {copy.exportSectionTitle}
           </p>
           <div className="grid grid-cols-2 gap-2">
             {exportPresets.map((preset) => (
@@ -258,23 +345,23 @@ export default function EditorSidebar({
                 key={preset.label}
                 onClick={() => void onExport(preset)}
                 disabled={isExporting}
-                className="rounded-xl border border-neutral-700 bg-neutral-900 px-3 py-3 text-sm text-white hover:border-neutral-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="editor-button px-3 py-3 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {preset.width}x{preset.height}
               </button>
             ))}
           </div>
-          <p className="text-[10px] text-neutral-500 mt-2 leading-relaxed">
-            O arquivo sai sem fundo e com supersampling pelo resize do render.
+          <p className="editor-sidebar-muted text-[10px] mt-2 leading-relaxed">
+            {copy.exportSectionHint}
           </p>
         </section>
 
         <section>
           <button
             onClick={onToggleDebugMode}
-            className={`w-full py-2 rounded-lg text-xs font-medium transition border ${debugMode ? "bg-yellow-500/15 border-yellow-500 text-yellow-300" : "bg-neutral-900 border-neutral-700 text-neutral-400 hover:border-neutral-500"}`}
+            className={`w-full py-2 rounded-lg text-xs font-medium transition border ${debugMode ? "bg-yellow-500/15 border-yellow-500 text-yellow-300" : "editor-button editor-button-muted"}`}
           >
-            {debugMode ? "Debug interativo: ON" : "Debug interativo: OFF"}
+            {debugMode ? copy.debugOn : copy.debugOff}
           </button>
         </section>
       </div>
