@@ -417,6 +417,7 @@ body {
 
 .mockup-stage {
   transition: background 160ms ease;
+  touch-action: none;
 }
 
 .mockup-stage-dark {
@@ -438,4 +439,37 @@ body {
 
 .mockup-stage canvas {
   background: transparent;
+}
+
+.canvas-zoom-controls {
+  bottom: 20px;
+  display: flex;
+  gap: 8px;
+  position: absolute;
+  right: 20px;
+  z-index: 10;
+}
+
+.canvas-zoom-button {
+  align-items: center;
+  backdrop-filter: blur(14px);
+  background: color-mix(in srgb, var(--sidebar-bg) 88%, transparent);
+  border: 1px solid var(--button-border);
+  border-radius: 999px;
+  color: var(--button-fg);
+  cursor: pointer;
+  display: inline-flex;
+  height: 36px;
+  justify-content: center;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    background-color 160ms ease;
+  width: 36px;
+}
+
+.canvas-zoom-button:hover {
+  background: color-mix(in srgb, var(--panel-bg) 86%, transparent);
+  border-color: var(--button-border-hover);
+  transform: translateY(-1px);
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useRef } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { Canvas, useThree } from "@react-three/fiber";
 import {
@@ -15,6 +15,7 @@ import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import type { UiTheme } from "../lib/i18n";
 import type { SceneObject } from "../lib/scene-objects";
 import { DEVICE_MODELS } from "../models/device-models";
+import { FocusIcon, ZoomInIcon, ZoomOutIcon } from "./Icons";
 
 export type ExportPreset = {
   height: number;
@@ -29,12 +30,23 @@ type MockupCanvasProps = {
   uiTheme: UiTheme;
 };
 
+type ViewportControlsApi = {
+  fitToScene: () => void;
+  zoomIn: () => void;
+  zoomOut: () => void;
+};
+
+type SceneBridgeProps = MockupCanvasProps & {
+  onViewportControlsReady: (api: ViewportControlsApi | null) => void;
+};
+
 const CAMERA_POSITION: [number, number, number] = [0, 0, 5];
 const CAMERA_FOV = 45;
 const DEFAULT_CAMERA_DIRECTION = new THREE.Vector3(...CAMERA_POSITION).normalize();
+const OBJECT_POSITION_MULTIPLIER = 140;
 const ORBIT_LIMITS: OrbitControlsProps = {
   enablePan: false,
-  enableZoom: false,
+  enableZoom: true,
   maxAzimuthAngle: 0.85,
   maxPolarAngle: Math.PI * 0.68,
   minAzimuthAngle: -0.85,
@@ -58,11 +70,25 @@ function getObjectPosition(index: number): [number, number, number] {
   return [side * (0.7 + ring * 0.28), 0, side * 0.12];
 }
 
+function getResolvedObjectPosition(
+  object: SceneObject,
+  index: number,
+): [number, number, number] {
+  const [baseX, baseY, baseZ] = getObjectPosition(index);
+
+  return [
+    baseX + object.positionX * OBJECT_POSITION_MULTIPLIER,
+    baseY + object.positionY * OBJECT_POSITION_MULTIPLIER,
+    baseZ,
+  ];
+}
+
 function SceneBridge({
   objects,
   onExportReady,
+  onViewportControlsReady,
   resetCameraVersion,
-}: MockupCanvasProps) {
+}: SceneBridgeProps) {
   const controlsRef = useRef<OrbitControlsImpl | null>(null);
   const sceneRef = useRef<THREE.Group | null>(null);
   const { camera, gl, scene, size } = useThree();
@@ -141,7 +167,7 @@ function SceneBridge({
                 return (
                   <group
                     key={object.id}
-                    position={getObjectPosition(index)}
+                    position={getResolvedObjectPosition(object, index)}
                     rotation={[
                       (object.rotationX * Math.PI) / 180,
                       (object.rotationY * Math.PI) / 180,
@@ -167,6 +193,7 @@ function SceneBridge({
           <BoundsResetController
             camera={camera}
             controlsRef={controlsRef}
+            onViewportControlsReady={onViewportControlsReady}
             resetCameraVersion={resetCameraVersion}
             sceneRef={sceneRef}
           />
@@ -185,15 +212,61 @@ function SceneBridge({
 function BoundsResetController({
   camera,
   controlsRef,
+  onViewportControlsReady,
   resetCameraVersion,
   sceneRef,
 }: {
   camera: THREE.Camera;
   controlsRef: { current: OrbitControlsImpl | null };
+  onViewportControlsReady: (api: ViewportControlsApi | null) => void;
   resetCameraVersion: number;
   sceneRef: { current: THREE.Group | null };
 }) {
   const bounds = useBounds();
+
+  useEffect(() => {
+    const controls = controlsRef.current;
+
+    if (!controls) {
+      return;
+    }
+
+    const runZoom = (direction: "in" | "out") => {
+      const zoomStep = 1.16;
+      const zoomHandler =
+        direction === "in"
+          ? (controls as OrbitControlsImpl & { dollyIn?: (scale: number) => void })
+              .dollyIn
+          : (controls as OrbitControlsImpl & {
+              dollyOut?: (scale: number) => void;
+            }).dollyOut;
+
+      zoomHandler?.call(controls, zoomStep);
+      controls.update();
+    };
+
+    onViewportControlsReady({
+      fitToScene: () => {
+        const sceneGroup = sceneRef.current;
+
+        if (!sceneGroup) {
+          return;
+        }
+
+        bounds.refresh(sceneGroup).reset().clip();
+      },
+      zoomIn: () => {
+        runZoom("out");
+      },
+      zoomOut: () => {
+        runZoom("in");
+      },
+    });
+
+    return () => {
+      onViewportControlsReady(null);
+    };
+  }, [bounds, controlsRef, onViewportControlsReady, sceneRef]);
 
   useEffect(() => {
     if (resetCameraVersion === 0) {
@@ -211,22 +284,7 @@ function BoundsResetController({
       }
 
       bounds.refresh(sceneGroup).clip();
-
-      const { center, distance } = bounds.getSize();
-      const nextPosition = center
-        .clone()
-        .addScaledVector(DEFAULT_CAMERA_DIRECTION, distance);
-
-      camera.position.copy(nextPosition);
-      camera.up.set(0, 1, 0);
-      camera.lookAt(center);
-
-      if (camera instanceof THREE.PerspectiveCamera) {
-        camera.updateProjectionMatrix();
-      }
-
-      controls.target.copy(center);
-      controls.update();
+      fitCameraToScene(camera, controls, sceneGroup, bounds);
     });
 
     return () => {
@@ -238,19 +296,95 @@ function BoundsResetController({
 }
 
 export default function MockupCanvas(props: MockupCanvasProps) {
+  const [viewportControls, setViewportControls] =
+    useState<ViewportControlsApi | null>(null);
+
   return (
     <div
-      className={`mockup-stage flex-1 h-screen ${props.uiTheme === "dark" ? "mockup-stage-dark" : "mockup-stage-light"}`}
+      className={`mockup-stage relative flex-1 h-screen ${props.uiTheme === "dark" ? "mockup-stage-dark" : "mockup-stage-light"}`}
     >
       <Canvas
         camera={{ fov: CAMERA_FOV, position: CAMERA_POSITION }}
         dpr={[1, 2]}
         gl={{ alpha: true, antialias: true, preserveDrawingBuffer: true }}
       >
-        <SceneBridge {...props} />
+        <SceneBridge
+          {...props}
+          onViewportControlsReady={setViewportControls}
+        />
       </Canvas>
+
+      <div className="canvas-zoom-controls">
+        <button
+          type="button"
+          className="canvas-zoom-button"
+          aria-label="Zoom out"
+          title="Zoom out"
+          onClick={() => viewportControls?.zoomOut()}
+        >
+          <ZoomOutIcon className="h-4 w-4" />
+        </button>
+        <button
+          type="button"
+          className="canvas-zoom-button"
+          aria-label="Fit scene"
+          title="Fit scene"
+          onClick={() => viewportControls?.fitToScene()}
+        >
+          <FocusIcon className="h-4 w-4" />
+        </button>
+        <button
+          type="button"
+          className="canvas-zoom-button"
+          aria-label="Zoom in"
+          title="Zoom in"
+          onClick={() => viewportControls?.zoomIn()}
+        >
+          <ZoomInIcon className="h-4 w-4" />
+        </button>
+      </div>
     </div>
   );
+}
+
+function fitCameraToScene(
+  camera: THREE.Camera,
+  controls: OrbitControlsImpl,
+  sceneGroup: THREE.Group | null,
+  bounds?: ReturnType<typeof useBounds>,
+) {
+  if (!sceneGroup) {
+    return;
+  }
+
+  const box = new THREE.Box3().setFromObject(sceneGroup);
+
+  if (box.isEmpty()) {
+    return;
+  }
+
+  const center = box.getCenter(new THREE.Vector3());
+  const size = box.getSize(new THREE.Vector3());
+  const distance = size.length() * 0.72;
+  const nextPosition = center
+    .clone()
+    .addScaledVector(DEFAULT_CAMERA_DIRECTION, distance);
+
+  camera.position.copy(nextPosition);
+  camera.up.set(0, 1, 0);
+  camera.lookAt(center);
+
+  if (camera instanceof THREE.PerspectiveCamera) {
+    camera.updateProjectionMatrix();
+  }
+
+  controls.target.copy(center);
+
+  if (bounds) {
+    bounds.refresh(sceneGroup).clip();
+  }
+
+  controls.update();
 }
 
 function downloadBlob(blob: Blob, filename: string) {

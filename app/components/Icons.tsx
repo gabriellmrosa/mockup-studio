@@ -64,3 +64,36 @@ export function DownloadIcon({ className }: IconProps) {
     </svg>
   );
 }
+
+export function ZoomInIcon({ className }: IconProps) {
+  return (
+    <svg {...iconProps(className)}>
+      <circle cx="11" cy="11" r="6.5" />
+      <path d="M21 21l-4.35-4.35" />
+      <path d="M11 8.5v5" />
+      <path d="M8.5 11h5" />
+    </svg>
+  );
+}
+
+export function ZoomOutIcon({ className }: IconProps) {
+  return (
+    <svg {...iconProps(className)}>
+      <circle cx="11" cy="11" r="6.5" />
+      <path d="M21 21l-4.35-4.35" />
+      <path d="M8.5 11h5" />
+    </svg>
+  );
+}
+
+export function FocusIcon({ className }: IconProps) {
+  return (
+    <svg {...iconProps(className)}>
+      <path d="M9 4H5v4" />
+      <path d="M15 4h4v4" />
+      <path d="M19 15v4h-4" />
+      <path d="M5 15v4h4" />
+      <circle cx="12" cy="12" r="2.5" />
+    </svg>
+  );
+}

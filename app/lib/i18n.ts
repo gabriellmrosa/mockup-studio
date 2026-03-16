@@ -40,6 +40,8 @@ export type AppCopy = {
   debugSectionTitle: string;
   transformSectionTitle: string;
   resetButton: string;
+  positionX: string;
+  positionY: string;
   rotationX: string;
   rotationY: string;
   rotationZ: string;
@@ -91,11 +93,13 @@ export const APP_COPY: Record<Locale, AppCopy> = {
     debugSectionTitle: "Debug",
     transformSectionTitle: "Transform",
     resetButton: "Reset camera + objeto",
+    positionX: "Posicao X",
+    positionY: "Posicao Y",
     rotationX: "Rotacao X",
     rotationY: "Rotacao Y",
     rotationZ: "Rotacao Z",
     transformSectionHint:
-      "O objeto continua centralizado; por enquanto so liberamos rotacao.",
+      "Ajuste a posicao do objeto no canvas e refine a rotacao sem mover a camera.",
     exportSectionTitle: "Export PNG",
     exportSectionHint:
       "O arquivo sai sem fundo e com supersampling pelo resize do render.",
@@ -146,11 +150,13 @@ export const APP_COPY: Record<Locale, AppCopy> = {
     debugSectionTitle: "Debug",
     transformSectionTitle: "Transform",
     resetButton: "Reset camera + object",
+    positionX: "Position X",
+    positionY: "Position Y",
     rotationX: "Rotation X",
     rotationY: "Rotation Y",
     rotationZ: "Rotation Z",
     transformSectionHint:
-      "The object stays centered; for now we only expose rotation.",
+      "Adjust the object's position on the canvas and refine rotation without moving the camera.",
     exportSectionTitle: "Export PNG",
     exportSectionHint:
       "The file is exported without background and uses supersampling via render resize.",

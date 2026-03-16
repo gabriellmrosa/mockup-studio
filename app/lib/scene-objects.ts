@@ -16,6 +16,8 @@ export type SceneObject = {
   imageUrl: string;
   modelId: DeviceModelId;
   name: string;
+  positionX: number;
+  positionY: number;
   rotationX: number;
   rotationY: number;
   rotationZ: number;
@@ -45,6 +47,8 @@ export function createSceneObject({
     imageUrl: DEFAULT_IMAGE_URL,
     modelId,
     name,
+    positionX: 0,
+    positionY: 0,
     rotationX: 0,
     rotationY: 180,
     rotationZ: 0,
@@ -61,6 +65,8 @@ export function resetSceneObject(object: SceneObject): SceneObject {
     debugMode: false,
     debugPartColors: { ...model.initialDebugColors },
     deviceTheme: model.defaultTheme,
+    positionX: 0,
+    positionY: 0,
     rotationX: 0,
     rotationY: 180,
     rotationZ: 0,
@@ -82,6 +88,8 @@ export function changeSceneObjectModel(
     deviceTheme: model.defaultTheme,
     imageUrl: DEFAULT_IMAGE_URL,
     modelId,
+    positionX: 0,
+    positionY: 0,
     rotationX: 0,
     rotationY: 180,
     rotationZ: 0,

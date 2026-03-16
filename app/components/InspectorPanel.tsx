@@ -32,6 +32,9 @@ type InspectorPanelProps = {
   onUpdateRotation: (
     patch: Pick<SceneObject, "rotationX" | "rotationY" | "rotationZ">,
   ) => void;
+  onUpdatePosition: (
+    patch: Pick<SceneObject, "positionX" | "positionY">,
+  ) => void;
   uiTheme: UiTheme;
   uploadError: string;
 };
@@ -52,6 +55,7 @@ export default function InspectorPanel({
   onToggleDebugMode,
   onToggleDeviceShell,
   onUpdateName,
+  onUpdatePosition,
   onUpdateRotation,
   uiTheme,
   uploadError,
@@ -212,6 +216,34 @@ export default function InspectorPanel({
             </button>
           </div>
           <div className="panel-card space-y-3 p-3">
+            <Control
+              label={copy.positionX}
+              uiTheme={uiTheme}
+              value={object.positionX}
+              setValue={(value) =>
+                onUpdatePosition({
+                  positionX: value,
+                  positionY: object.positionY,
+                })
+              }
+              min={-2}
+              max={2}
+              step={0.01}
+            />
+            <Control
+              label={copy.positionY}
+              uiTheme={uiTheme}
+              value={object.positionY}
+              setValue={(value) =>
+                onUpdatePosition({
+                  positionX: object.positionX,
+                  positionY: value,
+                })
+              }
+              min={-2}
+              max={2}
+              step={0.01}
+            />
             <Control
               label={copy.rotationX}
               uiTheme={uiTheme}

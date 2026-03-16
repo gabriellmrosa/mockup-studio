@@ -247,6 +247,9 @@ export default function Home() {
         onUpdateName={(name) =>
           selectedObject && updateSceneObject(selectedObject.id, { name })
         }
+        onUpdatePosition={(positionPatch) =>
+          selectedObject && updateSceneObject(selectedObject.id, positionPatch)
+        }
         onUpdateRotation={(rotationPatch) =>
           selectedObject && updateSceneObject(selectedObject.id, rotationPatch)
         }
