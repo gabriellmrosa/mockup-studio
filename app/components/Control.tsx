@@ -16,7 +16,7 @@ export default function Control({
   step?: number;
 }) {
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-1.5">
       <div className="flex items-center justify-between gap-3">
         <span className="text-[11px] uppercase tracking-[0.18em] text-[var(--sidebar-muted)]">
           {label}
@@ -26,25 +26,27 @@ export default function Control({
         </span>
       </div>
 
-      <input
-        type="range"
-        min={min}
-        max={max}
-        step={step}
-        value={value}
-        onChange={(e) => setValue(Number(e.target.value))}
-        className={uiTheme === "dark" ? "accent-white" : "accent-black"}
-      />
+      <div className="flex items-center gap-3">
+        <input
+          type="range"
+          min={min}
+          max={max}
+          step={step}
+          value={value}
+          onChange={(e) => setValue(Number(e.target.value))}
+          className={`flex-1 ${uiTheme === "dark" ? "accent-white" : "accent-black"}`}
+        />
 
-      <input
-        type="number"
-        className="editor-input rounded-lg px-2 py-1.5 text-sm focus:outline-none"
-        value={value}
-        step={step}
-        min={min}
-        max={max}
-        onChange={(e) => setValue(Number(e.target.value))}
-      />
+        <input
+          type="number"
+          className="editor-input w-18 rounded-md px-2 py-1 text-xs focus:outline-none"
+          value={value}
+          step={step}
+          min={min}
+          max={max}
+          onChange={(e) => setValue(Number(e.target.value))}
+        />
+      </div>
     </div>
   );
 }

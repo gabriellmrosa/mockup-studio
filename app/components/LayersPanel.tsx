@@ -3,6 +3,7 @@
 import type { AppCopy, Locale, UiTheme } from "../lib/i18n";
 import type { SceneObject } from "../lib/scene-objects";
 import { DEVICE_MODELS } from "../models/device-models";
+import { PlusIcon, TrashIcon } from "./Icons";
 import ToggleSwitch from "./toggleSwitch";
 
 type LayersPanelProps = {
@@ -43,14 +44,15 @@ export default function LayersPanel({
         <div className="flex items-center justify-between mb-3">
           <p className="editor-sidebar-label">{copy.layersSectionTitle}</p>
           <button
-            className="editor-button px-3 py-2 text-xs"
+            className="editor-button editor-button-compact inline-flex items-center gap-2 px-2.5 py-1.5 text-[11px]"
             onClick={onAddObject}
           >
+            <PlusIcon className="h-3.5 w-3.5" />
             {copy.addObject}
           </button>
         </div>
 
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-1">
           {objects.map((object) => {
             const model = DEVICE_MODELS[object.modelId];
             const isSelected = object.id === selectedObjectId;
@@ -63,7 +65,7 @@ export default function LayersPanel({
               >
                 <div className="flex-1 min-w-0 text-left">
                   <div className="flex items-center gap-2">
-                    <p className="text-sm font-medium truncate">
+                    <p className="text-[13px] font-medium truncate">
                       {object.name}
                     </p>
                     {!object.deletable ? (
@@ -75,23 +77,18 @@ export default function LayersPanel({
                   </p>
                 </div>
                 {object.deletable ? (
-                  <span
+                  <button
+                    type="button"
                     className="layer-delete"
+                    aria-label={copy.deleteObject}
+                    title={copy.deleteObject}
                     onClick={(event) => {
                       event.stopPropagation();
                       onRemoveObject(object.id);
                     }}
-                    role="button"
-                    tabIndex={0}
-                    onKeyDown={(event) => {
-                      if (event.key === "Enter" || event.key === " ") {
-                        event.preventDefault();
-                        onRemoveObject(object.id);
-                      }
-                    }}
                   >
-                    {copy.deleteObject}
-                  </span>
+                    <TrashIcon className="h-3.5 w-3.5" />
+                  </button>
                 ) : null}
               </button>
             );

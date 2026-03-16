@@ -7,6 +7,11 @@ import type { ThemeName } from "./Smartphone";
 import type { AppCopy, UiTheme } from "../lib/i18n";
 import type { SceneObject } from "../lib/scene-objects";
 import { DEVICE_MODEL_LIST } from "../models/device-models";
+import {
+  DownloadIcon,
+  RotateCcwIcon,
+  UploadIcon,
+} from "./Icons";
 
 type InspectorPanelProps = {
   copy: AppCopy;
@@ -68,11 +73,11 @@ export default function InspectorPanel({
         <p className="editor-sidebar-muted text-xs mt-1">{object.name}</p>
       </div>
 
-      <div className="flex flex-col gap-6 px-5 py-5">
+      <div className="flex flex-col gap-5 px-5 py-5">
         <section>
           <p className="editor-sidebar-label mb-3">{copy.objectNameLabel}</p>
           <input
-            className="editor-input w-full rounded-xl px-3 py-3 text-sm focus:outline-none"
+            className="editor-input w-full rounded-lg px-3 py-2 text-sm focus:outline-none"
             value={object.name}
             onChange={(event) => onUpdateName(event.target.value)}
           />
@@ -81,7 +86,7 @@ export default function InspectorPanel({
         <section>
           <p className="editor-sidebar-label mb-3">{copy.modelLabel}</p>
           <select
-            className="editor-input w-full rounded-xl px-3 py-3 text-sm focus:outline-none"
+            className="editor-input w-full rounded-lg px-3 py-2 text-sm focus:outline-none"
             value={object.modelId}
             onChange={(event) =>
               onModelChange(event.target.value as SceneObject["modelId"])
@@ -120,6 +125,7 @@ export default function InspectorPanel({
             {copy.screenSectionTitle}
           </p>
           <label className="upload-card">
+            <UploadIcon className="h-4 w-4" />
             {copy.uploadImage}
             <input
               type="file"
@@ -196,11 +202,16 @@ export default function InspectorPanel({
         <section>
           <div className="flex items-center justify-between mb-3">
             <p className="editor-sidebar-label">{copy.transformSectionTitle}</p>
-            <button onClick={onResetObject} className="editor-link-button">
-              {copy.resetObjectButton}
+            <button
+              onClick={onResetObject}
+              className="editor-icon-button"
+              aria-label={copy.resetObjectButton}
+              title={copy.resetObjectButton}
+            >
+              <RotateCcwIcon className="h-3.5 w-3.5" />
             </button>
           </div>
-          <div className="panel-card space-y-4 p-3">
+          <div className="panel-card space-y-3 p-3">
             <Control
               label={copy.rotationX}
               uiTheme={uiTheme}
@@ -261,8 +272,13 @@ export default function InspectorPanel({
         <section>
           <div className="flex items-center justify-between mb-3">
             <p className="editor-sidebar-label">{copy.exportSectionTitle}</p>
-            <button onClick={onResetCamera} className="editor-link-button">
-              {copy.resetCameraButton}
+            <button
+              onClick={onResetCamera}
+              className="editor-icon-button"
+              aria-label={copy.resetCameraButton}
+              title={copy.resetCameraButton}
+            >
+              <RotateCcwIcon className="h-3.5 w-3.5" />
             </button>
           </div>
           <div className="grid grid-cols-2 gap-2">
@@ -271,8 +287,9 @@ export default function InspectorPanel({
                 key={preset.label}
                 onClick={() => void onExport(preset)}
                 disabled={isExporting}
-                className="editor-button px-3 py-3 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                className="editor-button inline-flex items-center justify-center gap-2 px-3 py-2 text-xs disabled:opacity-50 disabled:cursor-not-allowed"
               >
+                <DownloadIcon className="h-3.5 w-3.5" />
                 {preset.width}x{preset.height}
               </button>
             ))}
