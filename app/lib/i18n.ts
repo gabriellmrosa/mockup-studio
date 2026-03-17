@@ -42,6 +42,7 @@ export type AppCopy = {
   resetButton: string;
   positionX: string;
   positionY: string;
+  positionZ: string;
   rotationX: string;
   rotationY: string;
   rotationZ: string;
@@ -95,11 +96,12 @@ export const APP_COPY: Record<Locale, AppCopy> = {
     resetButton: "Reset camera + objeto",
     positionX: "Posicao X",
     positionY: "Posicao Y",
+    positionZ: "Posicao Z",
     rotationX: "Rotacao X",
     rotationY: "Rotacao Y",
     rotationZ: "Rotacao Z",
     transformSectionHint:
-      "Ajuste a posicao do objeto no canvas e refine a rotacao sem mover a camera.",
+      "Os sliders ajustam o objeto em X, Y e Z; o giro com mouse orbita a camera. O reset desta secao afeta apenas o objeto.",
     exportSectionTitle: "Export PNG",
     exportSectionHint:
       "O arquivo sai sem fundo e com supersampling pelo resize do render.",
@@ -152,11 +154,12 @@ export const APP_COPY: Record<Locale, AppCopy> = {
     resetButton: "Reset camera + object",
     positionX: "Position X",
     positionY: "Position Y",
+    positionZ: "Position Z",
     rotationX: "Rotation X",
     rotationY: "Rotation Y",
     rotationZ: "Rotation Z",
     transformSectionHint:
-      "Adjust the object's position on the canvas and refine rotation without moving the camera.",
+      "The sliders adjust the object in X, Y, and Z; mouse drag orbits the camera. Reset in this section only affects the object.",
     exportSectionTitle: "Export PNG",
     exportSectionHint:
       "The file is exported without background and uses supersampling via render resize.",

@@ -5,6 +5,7 @@ import {
   type DeviceModelId,
 } from "../models/device-models";
 import type { PhoneColors, ThemeName } from "../components/Smartphone";
+import { DEFAULT_OBJECT_TRANSFORM } from "./scene-presets";
 
 export type SceneObject = {
   colors: PhoneColors;
@@ -18,6 +19,7 @@ export type SceneObject = {
   name: string;
   positionX: number;
   positionY: number;
+  positionZ: number;
   rotationX: number;
   rotationY: number;
   rotationZ: number;
@@ -47,11 +49,7 @@ export function createSceneObject({
     imageUrl: DEFAULT_IMAGE_URL,
     modelId,
     name,
-    positionX: 0,
-    positionY: 0,
-    rotationX: 0,
-    rotationY: 180,
-    rotationZ: 0,
+    ...DEFAULT_OBJECT_TRANSFORM,
     showDeviceShell: true,
   };
 }
@@ -65,11 +63,7 @@ export function resetSceneObject(object: SceneObject): SceneObject {
     debugMode: false,
     debugPartColors: { ...model.initialDebugColors },
     deviceTheme: model.defaultTheme,
-    positionX: 0,
-    positionY: 0,
-    rotationX: 0,
-    rotationY: 180,
-    rotationZ: 0,
+    ...DEFAULT_OBJECT_TRANSFORM,
     showDeviceShell: true,
   };
 }
@@ -88,11 +82,7 @@ export function changeSceneObjectModel(
     deviceTheme: model.defaultTheme,
     imageUrl: DEFAULT_IMAGE_URL,
     modelId,
-    positionX: 0,
-    positionY: 0,
-    rotationX: 0,
-    rotationY: 180,
-    rotationZ: 0,
+    ...DEFAULT_OBJECT_TRANSFORM,
     showDeviceShell: true,
   };
 }

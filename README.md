@@ -18,8 +18,9 @@ Ja implementado:
 - inspector separado para editar apenas o objeto selecionado;
 - selecao de tema base do device por objeto;
 - ajuste manual da cor do body por objeto;
+- controles de posicao X, Y e Z por objeto;
 - controles de rotacao X, Y e Z por objeto;
-- reset do objeto selecionado;
+- reset das transformacoes do objeto selecionado;
 - reset global de camera;
 - export PNG transparente em `1920x1080` e `2560x1440`;
 - modo debug de cores por parte por objeto;
@@ -32,9 +33,9 @@ Ja implementado:
 
 - foco atual: validar bem o fluxo multiobjeto antes de expandir o catalogo;
 - export: somente PNG com fundo transparente;
-- transformacoes liberadas nesta etapa: apenas rotacao por objeto;
-- sem reposicionamento manual horizontal/vertical por enquanto;
+- transformacoes liberadas nesta etapa: posicao X/Y/Z e rotacao X/Y/Z por objeto;
 - camera continua global da cena;
+- o giro com mouse no canvas atua na camera via `OrbitControls`, nao no estado de rotacao do objeto;
 - cada objeto possui sua propria imagem e sua propria configuracao;
 - o objeto inicial da cena nao pode ser deletado;
 - novos objetos entram com leve deslocamento automatico para nao sobrepor totalmente o objeto base;
@@ -51,6 +52,7 @@ Ja implementado:
 - [app/components/Smartphone.tsx](/Users/gabrielrosa/Desktop/dev/mock-photo/app/components/Smartphone.tsx): modelo atual do smartphone, tela com textura e modo sem casca.
 - [app/models/device-models.ts](/Users/gabrielrosa/Desktop/dev/mock-photo/app/models/device-models.ts): catalogo de dispositivos e metadados do modelo ativo.
 - [app/lib/scene-objects.ts](/Users/gabrielrosa/Desktop/dev/mock-photo/app/lib/scene-objects.ts): helpers para criar, resetar e trocar o modelo de objetos da cena.
+- [app/lib/scene-presets.ts](/Users/gabrielrosa/Desktop/dev/mock-photo/app/lib/scene-presets.ts): presets padrao de transformacao e offsets automaticos da cena.
 - [app/lib/mockup-image.ts](/Users/gabrielrosa/Desktop/dev/mock-photo/app/lib/mockup-image.ts): utilitarios da textura/imagem da tela.
 - [app/lib/i18n.ts](/Users/gabrielrosa/Desktop/dev/mock-photo/app/lib/i18n.ts): copy da interface em `pt-BR` e `en-US`.
 
@@ -73,14 +75,16 @@ A ultima feature implementada foi:
 Validar com calma o fluxo multiobjeto atual e, depois disso, escolher entre:
 
 - adicionar o segundo modelo real ao catalogo, aproveitando a nova estrutura por objeto;
-- liberar posicionamento manual por objeto para composicao mais flexivel;
+- refinar os controles de composicao por objeto, incluindo limites, presets ou interacoes mais rapidas;
 - refinar UX de camadas, incluindo reorder, lock ou visibilidade.
 
 ## Observacoes Tecnicas
 
 - a textura da tela ja foi corrigida e nao deve mais deformar sozinha;
-- o reset de camera foi ajustado para restaurar corretamente o enquadramento da cena;
-- o offset automatico entre objetos e temporario e serve apenas para validar multiobjeto antes de expor controles de posicao;
+- o reset da secao `Transform` atua apenas no objeto selecionado;
+- o botao flutuante central do canvas reenquadra a cena visivel via `Bounds`, de forma separada do reset de transformacao do objeto;
+- presets padrao de transformacao e offsets automaticos da cena foram centralizados em uma fonte unica para evitar valores soltos;
+- o offset automatico entre objetos continua ajudando a evitar sobreposicao total ao adicionar novos itens, mesmo com os controles manuais de posicao ja expostos no inspector;
 - existe apenas 1 modelo real no catalogo neste momento: `smartphone`;
 - `npm run lint` passa;
 - `npx next build --webpack` passa;

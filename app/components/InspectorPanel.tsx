@@ -33,7 +33,7 @@ type InspectorPanelProps = {
     patch: Pick<SceneObject, "rotationX" | "rotationY" | "rotationZ">,
   ) => void;
   onUpdatePosition: (
-    patch: Pick<SceneObject, "positionX" | "positionY">,
+    patch: Pick<SceneObject, "positionX" | "positionY" | "positionZ">,
   ) => void;
   uiTheme: UiTheme;
   uploadError: string;
@@ -215,77 +215,99 @@ export default function InspectorPanel({
               <RotateCcwIcon className="h-3.5 w-3.5" />
             </button>
           </div>
-          <div className="panel-card space-y-3 p-3">
-            <Control
-              label={copy.positionX}
-              uiTheme={uiTheme}
-              value={object.positionX}
-              setValue={(value) =>
-                onUpdatePosition({
-                  positionX: value,
-                  positionY: object.positionY,
-                })
-              }
-              min={-2}
-              max={2}
-              step={0.01}
-            />
-            <Control
-              label={copy.positionY}
-              uiTheme={uiTheme}
-              value={object.positionY}
-              setValue={(value) =>
-                onUpdatePosition({
-                  positionX: object.positionX,
-                  positionY: value,
-                })
-              }
-              min={-2}
-              max={2}
-              step={0.01}
-            />
-            <Control
-              label={copy.rotationX}
-              uiTheme={uiTheme}
-              value={object.rotationX}
-              setValue={(value) =>
-                onUpdateRotation({
-                  rotationX: value,
-                  rotationY: object.rotationY,
-                  rotationZ: object.rotationZ,
-                })
-              }
-              min={-45}
-              max={45}
-            />
-            <Control
-              label={copy.rotationY}
-              uiTheme={uiTheme}
-              value={object.rotationY}
-              setValue={(value) =>
-                onUpdateRotation({
-                  rotationX: object.rotationX,
-                  rotationY: value,
-                  rotationZ: object.rotationZ,
-                })
-              }
-              min={135}
-              max={225}
-            />
-            <Control
-              label={copy.rotationZ}
-              uiTheme={uiTheme}
-              value={object.rotationZ}
-              setValue={(value) =>
-                onUpdateRotation({
-                  rotationX: object.rotationX,
-                  rotationY: object.rotationY,
-                  rotationZ: value,
-                })
-              }
-              min={-25}
-              max={25}
-            />
+          <div className="space-y-3">
+            <div className="panel-card space-y-3 p-3">
+              <Control
+                label={copy.positionX}
+                uiTheme={uiTheme}
+                value={object.positionX}
+                setValue={(value) =>
+                  onUpdatePosition({
+                    positionX: value,
+                    positionY: object.positionY,
+                    positionZ: object.positionZ,
+                  })
+                }
+                min={-2}
+                max={2}
+                step={0.01}
+              />
+              <Control
+                label={copy.positionY}
+                uiTheme={uiTheme}
+                value={object.positionY}
+                setValue={(value) =>
+                  onUpdatePosition({
+                    positionX: object.positionX,
+                    positionY: value,
+                    positionZ: object.positionZ,
+                  })
+                }
+                min={-2}
+                max={2}
+                step={0.01}
+              />
+              <Control
+                label={copy.positionZ}
+                uiTheme={uiTheme}
+                value={object.positionZ}
+                setValue={(value) =>
+                  onUpdatePosition({
+                    positionX: object.positionX,
+                    positionY: object.positionY,
+                    positionZ: value,
+                  })
+                }
+                min={-1}
+                max={1}
+                step={0.01}
+              />
+            </div>
+
+            <div className="panel-card space-y-3 p-3">
+              <Control
+                label={copy.rotationX}
+                uiTheme={uiTheme}
+                value={object.rotationX}
+                setValue={(value) =>
+                  onUpdateRotation({
+                    rotationX: value,
+                    rotationY: object.rotationY,
+                    rotationZ: object.rotationZ,
+                  })
+                }
+                min={-45}
+                max={45}
+              />
+              <Control
+                label={copy.rotationY}
+                uiTheme={uiTheme}
+                value={object.rotationY}
+                setValue={(value) =>
+                  onUpdateRotation({
+                    rotationX: object.rotationX,
+                    rotationY: value,
+                    rotationZ: object.rotationZ,
+                  })
+                }
+                min={135}
+                max={225}
+              />
+              <Control
+                label={copy.rotationZ}
+                uiTheme={uiTheme}
+                value={object.rotationZ}
+                setValue={(value) =>
+                  onUpdateRotation({
+                    rotationX: object.rotationX,
+                    rotationY: object.rotationY,
+                    rotationZ: value,
+                  })
+                }
+                min={-25}
+                max={25}
+              />
+            </div>
           </div>
           <p className="editor-sidebar-muted text-[10px] mt-2 leading-relaxed">
             {copy.transformSectionHint}

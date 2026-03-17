@@ -14,6 +14,10 @@ import {
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import type { UiTheme } from "../lib/i18n";
 import type { SceneObject } from "../lib/scene-objects";
+import {
+  AUTO_OBJECT_POSITIONS,
+  OBJECT_POSITION_MULTIPLIER,
+} from "../lib/scene-presets";
 import { DEVICE_MODELS } from "../models/device-models";
 import { FocusIcon, ZoomInIcon, ZoomOutIcon } from "./Icons";
 
@@ -42,8 +46,6 @@ type SceneBridgeProps = MockupCanvasProps & {
 
 const CAMERA_POSITION: [number, number, number] = [0, 0, 5];
 const CAMERA_FOV = 45;
-const DEFAULT_CAMERA_DIRECTION = new THREE.Vector3(...CAMERA_POSITION).normalize();
-const OBJECT_POSITION_MULTIPLIER = 140;
 const ORBIT_LIMITS: OrbitControlsProps = {
   enablePan: false,
   enableZoom: true,
@@ -52,14 +54,6 @@ const ORBIT_LIMITS: OrbitControlsProps = {
   minAzimuthAngle: -0.85,
   minPolarAngle: Math.PI * 0.32,
 };
-const AUTO_OBJECT_POSITIONS: [number, number, number][] = [
-  [0, 0, 0],
-  [-0.8, 0.02, 0.1],
-  [0.8, -0.02, -0.1],
-  [-1.1, 0.04, -0.2],
-  [1.1, -0.04, 0.2],
-];
-
 function getObjectPosition(index: number): [number, number, number] {
   if (AUTO_OBJECT_POSITIONS[index]) {
     return AUTO_OBJECT_POSITIONS[index];
@@ -79,7 +73,7 @@ function getResolvedObjectPosition(
   return [
     baseX + object.positionX * OBJECT_POSITION_MULTIPLIER,
     baseY + object.positionY * OBJECT_POSITION_MULTIPLIER,
-    baseZ,
+    baseZ + object.positionZ * OBJECT_POSITION_MULTIPLIER,
   ];
 }
 
@@ -101,6 +95,7 @@ function SceneBridge({
 
     controls.target.set(0, 0, 0);
     controls.update();
+    controls.saveState();
   }, []);
 
   useEffect(() => {
@@ -191,7 +186,6 @@ function SceneBridge({
             </group>
           </Center>
           <BoundsResetController
-            camera={camera}
             controlsRef={controlsRef}
             onViewportControlsReady={onViewportControlsReady}
             resetCameraVersion={resetCameraVersion}
@@ -210,13 +204,11 @@ function SceneBridge({
 }
 
 function BoundsResetController({
-  camera,
   controlsRef,
   onViewportControlsReady,
   resetCameraVersion,
   sceneRef,
 }: {
-  camera: THREE.Camera;
   controlsRef: { current: OrbitControlsImpl | null };
   onViewportControlsReady: (api: ViewportControlsApi | null) => void;
   resetCameraVersion: number;
@@ -279,18 +271,17 @@ function BoundsResetController({
       const controls = controlsRef.current;
       const sceneGroup = sceneRef.current;
 
-      if (!sceneGroup || !controls) {
+      if (!controls || !sceneGroup) {
         return;
       }
 
-      bounds.refresh(sceneGroup).clip();
-      fitCameraToScene(camera, controls, sceneGroup, bounds);
+      bounds.refresh(sceneGroup).reset().clip();
     });
 
     return () => {
       cancelAnimationFrame(frameId);
     };
-  }, [bounds, camera, controlsRef, resetCameraVersion, sceneRef]);
+  }, [bounds, controlsRef, resetCameraVersion, sceneRef]);
 
   return null;
 }
@@ -327,8 +318,8 @@ export default function MockupCanvas(props: MockupCanvasProps) {
         <button
           type="button"
           className="canvas-zoom-button"
-          aria-label="Fit scene"
-          title="Fit scene"
+          aria-label="Reset camera"
+          title="Reset camera"
           onClick={() => viewportControls?.fitToScene()}
         >
           <FocusIcon className="h-4 w-4" />
@@ -345,46 +336,6 @@ export default function MockupCanvas(props: MockupCanvasProps) {
       </div>
     </div>
   );
-}
-
-function fitCameraToScene(
-  camera: THREE.Camera,
-  controls: OrbitControlsImpl,
-  sceneGroup: THREE.Group | null,
-  bounds?: ReturnType<typeof useBounds>,
-) {
-  if (!sceneGroup) {
-    return;
-  }
-
-  const box = new THREE.Box3().setFromObject(sceneGroup);
-
-  if (box.isEmpty()) {
-    return;
-  }
-
-  const center = box.getCenter(new THREE.Vector3());
-  const size = box.getSize(new THREE.Vector3());
-  const distance = size.length() * 0.72;
-  const nextPosition = center
-    .clone()
-    .addScaledVector(DEFAULT_CAMERA_DIRECTION, distance);
-
-  camera.position.copy(nextPosition);
-  camera.up.set(0, 1, 0);
-  camera.lookAt(center);
-
-  if (camera instanceof THREE.PerspectiveCamera) {
-    camera.updateProjectionMatrix();
-  }
-
-  controls.target.copy(center);
-
-  if (bounds) {
-    bounds.refresh(sceneGroup).clip();
-  }
-
-  controls.update();
 }
 
 function downloadBlob(blob: Blob, filename: string) {
