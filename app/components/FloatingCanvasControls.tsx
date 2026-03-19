@@ -4,7 +4,7 @@ import {
   ArrowRightIcon,
   ArrowUpIcon,
   CameraIcon,
-  FocusIcon,
+  RotateCcwIcon,
   ZoomInIcon,
   ZoomOutIcon,
 } from "./Icons";
@@ -30,7 +30,7 @@ export default function FloatingCanvasControls({
           title="Reset camera"
           onClick={onFitToScene}
         >
-          <FocusIcon className="h-4 w-4" />
+          <RotateCcwIcon className="h-4 w-4" />
         </button>
         <button
           type="button"

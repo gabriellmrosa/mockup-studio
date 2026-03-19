@@ -82,18 +82,6 @@ export function ZoomOutIcon({ className }: IconProps) {
   );
 }
 
-export function FocusIcon({ className }: IconProps) {
-  return (
-    <svg {...iconProps(className)}>
-      <path d="M9 4H5v4" />
-      <path d="M15 4h4v4" />
-      <path d="M19 15v4h-4" />
-      <path d="M5 15v4h4" />
-      <circle cx="12" cy="12" r="2.5" />
-    </svg>
-  );
-}
-
 export function ArrowUpIcon({ className }: IconProps) {
   return (
     <svg {...iconProps(className)}>
