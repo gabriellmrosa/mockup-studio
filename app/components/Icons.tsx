@@ -42,18 +42,6 @@ export function ChevronDownIcon({ className }: IconProps) {
   );
 }
 
-export function TrashIcon({ className }: IconProps) {
-  return (
-    <svg {...iconProps(className)}>
-      <path d="M3 6h18" />
-      <path d="M8 6V4h8v2" />
-      <path d="M19 6l-1 14H6L5 6" />
-      <path d="M10 11v6" />
-      <path d="M14 11v6" />
-    </svg>
-  );
-}
-
 export function RotateCcwIcon({ className }: IconProps) {
   return (
     <svg {...iconProps(className)}>
@@ -68,16 +56,6 @@ export function UploadIcon({ className }: IconProps) {
     <svg {...iconProps(className)}>
       <path d="M12 16V5" />
       <path d="m7 10 5-5 5 5" />
-      <path d="M5 19h14" />
-    </svg>
-  );
-}
-
-export function DownloadIcon({ className }: IconProps) {
-  return (
-    <svg {...iconProps(className)}>
-      <path d="M12 5v11" />
-      <path d="m7 11 5 5 5-5" />
       <path d="M5 19h14" />
     </svg>
   );

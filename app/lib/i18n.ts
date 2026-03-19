@@ -7,7 +7,6 @@ export type UiTheme = "dark" | "light";
 
 export type AppCopy = {
   appTitle: string;
-  appSubtitle: string;
   addObject: string;
   baseObject: string;
   languageLabel: string;
@@ -16,49 +15,32 @@ export type AppCopy = {
   lightMode: string;
   portuguese: string;
   english: string;
-  layersSectionTitle: string;
   deleteObject: string;
   modelLabel: string;
-  objectSectionTitle: string;
-  objectNameLabel: string;
-  resetCameraButton: string;
-  resetObjectButton: string;
-  deviceSectionTitle: string;
-  activeDevice: string;
-  deviceSectionHint: string;
-  sceneSectionTitle: string;
-  shellOn: string;
-  screenOnly: string;
   sceneSectionHint: string;
   screenSectionTitle: string;
   uploadImage: string;
   screenSectionHint: string;
   themesSectionTitle: string;
-  bodyColorSectionTitle: string;
   bodyColorLabel: string;
   debugSectionTitle: string;
   transformSectionTitle: string;
-  resetButton: string;
+  resetObjectButton: string;
   positionX: string;
   positionY: string;
   positionZ: string;
   rotationX: string;
   rotationY: string;
   rotationZ: string;
-  transformSectionHint: string;
-  exportSectionTitle: string;
-  exportSectionHint: string;
   debugOn: string;
   debugOff: string;
   uploadImageError: string;
-  exportImageError: string;
   themeNames: Record<ThemeName, string>;
 };
 
 export const APP_COPY: Record<Locale, AppCopy> = {
   "pt-BR": {
     appTitle: "Mock Studio",
-    appSubtitle: "MVP de 1 objeto com export transparente",
     addObject: "Adicionar objeto",
     baseObject: "Objeto base",
     languageLabel: "Idioma",
@@ -67,46 +49,27 @@ export const APP_COPY: Record<Locale, AppCopy> = {
     lightMode: "Light",
     portuguese: "PT-BR",
     english: "EN-US",
-    layersSectionTitle: "Camadas",
     deleteObject: "Excluir",
     modelLabel: "Modelo",
-    objectSectionTitle: "Objeto",
-    objectNameLabel: "Nome",
-    resetCameraButton: "Reset camera",
-    resetObjectButton: "Reset objeto",
-    deviceSectionTitle: "Dispositivo",
-    activeDevice: "Ativo",
-    deviceSectionHint:
-      "A base agora suporta catalogo de dispositivos, mesmo com apenas um modelo ativo por enquanto.",
-    sceneSectionTitle: "Cena",
-    shellOn: "Casca ligada",
-    screenOnly: "So tela",
     sceneSectionHint:
       "Desligue a casca para trabalhar apenas com a textura da tela, sem moldura de dispositivo ao redor.",
     screenSectionTitle: "Tela do App",
     uploadImage: "Upload imagem",
     screenSectionHint: "Recommended 1290x2755",
     themesSectionTitle: "Temas",
-    bodyColorSectionTitle: "Cor do Body",
     bodyColorLabel: "Body",
     debugSectionTitle: "Debug",
     transformSectionTitle: "Transform",
-    resetButton: "Reset camera + objeto",
+    resetObjectButton: "Reset objeto",
     positionX: "Posicao X",
     positionY: "Posicao Y",
     positionZ: "Posicao Z",
     rotationX: "Rotacao X",
     rotationY: "Rotacao Y",
     rotationZ: "Rotacao Z",
-    transformSectionHint:
-      "Os sliders ajustam o objeto em X, Y e Z; o giro com mouse orbita a camera. O reset desta secao afeta apenas o objeto.",
-    exportSectionTitle: "Export PNG",
-    exportSectionHint:
-      "O arquivo sai sem fundo e com supersampling pelo resize do render.",
     debugOn: "Debug interativo: ON",
     debugOff: "Debug interativo: OFF",
     uploadImageError: "Nao foi possivel preparar essa imagem.",
-    exportImageError: "Nao foi possivel exportar o PNG.",
     themeNames: {
       gray: "Cinza",
       black: "Preto",
@@ -115,7 +78,6 @@ export const APP_COPY: Record<Locale, AppCopy> = {
   },
   "en-US": {
     appTitle: "Mock Studio",
-    appSubtitle: "Single-object MVP with transparent export",
     addObject: "Add object",
     baseObject: "Base object",
     languageLabel: "Language",
@@ -124,46 +86,27 @@ export const APP_COPY: Record<Locale, AppCopy> = {
     lightMode: "Light",
     portuguese: "PT-BR",
     english: "EN-US",
-    layersSectionTitle: "Layers",
     deleteObject: "Delete",
     modelLabel: "Model",
-    objectSectionTitle: "Object",
-    objectNameLabel: "Name",
-    resetCameraButton: "Reset camera",
-    resetObjectButton: "Reset object",
-    deviceSectionTitle: "Device",
-    activeDevice: "Active",
-    deviceSectionHint:
-      "The foundation now supports a device catalog, even with only one active model for now.",
-    sceneSectionTitle: "Scene",
-    shellOn: "Shell on",
-    screenOnly: "Screen only",
     sceneSectionHint:
       "Turn the shell off to work only with the screen texture, without the device frame around it.",
     screenSectionTitle: "App Screen",
     uploadImage: "Upload image",
     screenSectionHint: "Recommended 1290x2755",
     themesSectionTitle: "Themes",
-    bodyColorSectionTitle: "Body Color",
     bodyColorLabel: "Body",
     debugSectionTitle: "Debug",
     transformSectionTitle: "Transform",
-    resetButton: "Reset camera + object",
+    resetObjectButton: "Reset object",
     positionX: "Position X",
     positionY: "Position Y",
     positionZ: "Position Z",
     rotationX: "Rotation X",
     rotationY: "Rotation Y",
     rotationZ: "Rotation Z",
-    transformSectionHint:
-      "The sliders adjust the object in X, Y, and Z; mouse drag orbits the camera. Reset in this section only affects the object.",
-    exportSectionTitle: "Export PNG",
-    exportSectionHint:
-      "The file is exported without background and uses supersampling via render resize.",
     debugOn: "Interactive debug: ON",
     debugOff: "Interactive debug: OFF",
     uploadImageError: "Could not prepare this image.",
-    exportImageError: "Could not export the PNG.",
     themeNames: {
       gray: "Gray",
       black: "Black",
