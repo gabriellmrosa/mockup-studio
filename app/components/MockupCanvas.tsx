@@ -28,7 +28,9 @@ export type ExportPreset = {
 };
 
 type MockupCanvasProps = {
+  canvasBgColor: string | null;
   objects: SceneObject[];
+  onBgColorChange: (color: string) => void;
   onExportReady: (handler: (preset: ExportPreset) => Promise<void>) => void;
   resetCameraVersion: number;
   uiTheme: UiTheme;
@@ -318,9 +320,14 @@ export default function MockupCanvas(props: MockupCanvasProps) {
   const [viewportControls, setViewportControls] =
     useState<ViewportControlsApi | null>(null);
 
+  const stageClass = props.canvasBgColor
+    ? "mockup-stage relative flex-1 h-screen"
+    : `mockup-stage relative flex-1 h-screen ${props.uiTheme === "dark" ? "mockup-stage-dark" : "mockup-stage-light"}`;
+
   return (
     <div
-      className={`mockup-stage relative flex-1 h-screen ${props.uiTheme === "dark" ? "mockup-stage-dark" : "mockup-stage-light"}`}
+      className={stageClass}
+      style={props.canvasBgColor ? { background: props.canvasBgColor } : undefined}
     >
       <Canvas
         camera={{ fov: CAMERA_FOV, position: CAMERA_POSITION }}
@@ -335,9 +342,12 @@ export default function MockupCanvas(props: MockupCanvasProps) {
 
       <div className="canvas-stage-overlay">
         <FloatingCanvasControls
+          bgColor={props.canvasBgColor}
+          onBgColorChange={props.onBgColorChange}
           onFitToScene={() => viewportControls?.fitToScene()}
           onZoomIn={() => viewportControls?.zoomIn()}
           onZoomOut={() => viewportControls?.zoomOut()}
+          uiTheme={props.uiTheme}
         />
       </div>
     </div>

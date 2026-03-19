@@ -1,3 +1,7 @@
+"use client";
+
+import { useRef } from "react";
+import type { UiTheme } from "../lib/i18n";
 import {
   ArrowDownIcon,
   ArrowLeftIcon,
@@ -10,16 +14,35 @@ import {
 } from "./Icons";
 
 type FloatingCanvasControlsProps = {
+  bgColor: string | null;
+  onBgColorChange: (color: string) => void;
   onFitToScene: () => void;
   onZoomIn: () => void;
   onZoomOut: () => void;
+  uiTheme: UiTheme;
+};
+
+const DEFAULT_BG: Record<UiTheme, string> = {
+  dark: "#2e2b28",
+  light: "#f2ebe0",
 };
 
 export default function FloatingCanvasControls({
+  bgColor,
+  onBgColorChange,
   onFitToScene,
   onZoomIn,
   onZoomOut,
+  uiTheme,
 }: FloatingCanvasControlsProps) {
+  const colorInputRef = useRef<HTMLInputElement>(null);
+
+  const displayColor = bgColor ?? DEFAULT_BG[uiTheme];
+  const circleBorder =
+    uiTheme === "dark"
+      ? "1.5px solid rgba(255,255,255,0.28)"
+      : "1.5px solid rgba(0,0,0,0.18)";
+
   return (
     <div className="canvas-floating-toolbar">
       <div className="canvas-floating-cluster">
@@ -82,6 +105,39 @@ export default function FloatingCanvasControls({
         >
           <ZoomInIcon className="h-4 w-4" />
         </button>
+
+        <div style={{ position: "relative" }}>
+          <button
+            type="button"
+            className="canvas-fab"
+            aria-label="Canvas background color"
+            title="Canvas background color"
+            onClick={() => colorInputRef.current?.click()}
+          >
+            <div
+              style={{
+                width: "1rem",
+                height: "1rem",
+                borderRadius: "50%",
+                background: displayColor,
+                border: circleBorder,
+              }}
+            />
+          </button>
+          <input
+            ref={colorInputRef}
+            type="color"
+            value={displayColor}
+            onChange={(e) => onBgColorChange(e.target.value)}
+            style={{
+              position: "absolute",
+              opacity: 0,
+              pointerEvents: "none",
+              width: 0,
+              height: 0,
+            }}
+          />
+        </div>
       </div>
 
       <button

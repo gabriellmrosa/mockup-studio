@@ -55,6 +55,7 @@ export default function Home() {
       name: "Object 1",
     }),
   ]);
+  const [canvasBgColor, setCanvasBgColor] = useState<string | null>(null);
   const [selectedObjectId, setSelectedObjectId] = useState("");
   const [, setExportHandler] =
     useState<((preset: ExportPreset) => Promise<void>) | null>(null);
@@ -240,7 +241,9 @@ export default function Home() {
       />
 
       <MockupCanvas
+        canvasBgColor={canvasBgColor}
         objects={sceneObjects}
+        onBgColorChange={setCanvasBgColor}
         onExportReady={(handler) => setExportHandler(() => handler)}
         resetCameraVersion={resetCameraVersion}
         uiTheme={uiTheme}
