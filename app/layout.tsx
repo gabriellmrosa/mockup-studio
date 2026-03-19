@@ -1,5 +1,12 @@
 import type { Metadata } from "next";
+import { Abhaya_Libre } from "next/font/google";
 import "./globals.css";
+
+const abhayaLibre = Abhaya_Libre({
+  subsets: ["latin"],
+  variable: "--font-brand",
+  weight: "800",
+});
 
 export const metadata: Metadata = {
   title: "Mockup Studio",
@@ -13,7 +20,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR" data-theme="dark">
-      <body>{children}</body>
+      <body className={abhayaLibre.variable}>{children}</body>
     </html>
   );
 }

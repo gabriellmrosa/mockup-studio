@@ -10,6 +10,8 @@ import { readFileAsDataUrl } from "./lib/mockup-image";
 import {
   changeSceneObjectModel,
   createSceneObject,
+  getPlaceholderImageUrl,
+  isPlaceholderImageUrl,
   resetSceneObject,
   type SceneObject,
 } from "./lib/scene-objects";
@@ -20,12 +22,43 @@ const EXPORT_PRESETS: ExportPreset[] = [
   { height: 1440, label: "mockup-1440p", width: 2560 },
 ];
 
+function detectBrowserLocale(): Locale {
+  const preferredLocales = navigator.languages?.length
+    ? navigator.languages
+    : [navigator.language];
+
+  for (const browserLocale of preferredLocales) {
+    const normalizedLocale = browserLocale.toLowerCase();
+
+    if (normalizedLocale.startsWith("pt-br") || normalizedLocale.startsWith("pt")) {
+      return "pt-BR";
+    }
+
+    if (normalizedLocale.startsWith("en-us") || normalizedLocale.startsWith("en")) {
+      return "en-US";
+    }
+  }
+
+  return "en-US";
+}
+
+function detectBrowserTheme(): UiTheme {
+  return window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
+}
+
 export default function Home() {
   const [locale, setLocale] = useState<Locale>("pt-BR");
   const [uiTheme, setUiTheme] = useState<UiTheme>("dark");
   const [uploadError, setUploadError] = useState("");
   const [sceneObjects, setSceneObjects] = useState<SceneObject[]>(() => [
-    createSceneObject({ deletable: false, name: "Object 1" }),
+    createSceneObject({
+      deletable: false,
+      id: "base-object",
+      locale: "pt-BR",
+      name: "Object 1",
+    }),
   ]);
   const [selectedObjectId, setSelectedObjectId] = useState("");
   const [exportHandler, setExportHandler] =
@@ -41,15 +74,33 @@ export default function Home() {
   useEffect(() => {
     const storedLocale = window.localStorage.getItem("mock-photo-locale");
     const storedUiTheme = window.localStorage.getItem("mock-photo-ui-theme");
+    const browserLocale = detectBrowserLocale();
+    const browserTheme = detectBrowserTheme();
 
     if (storedLocale === "pt-BR" || storedLocale === "en-US") {
       setLocale(storedLocale);
+    } else {
+      setLocale(browserLocale);
     }
 
     if (storedUiTheme === "dark" || storedUiTheme === "light") {
       setUiTheme(storedUiTheme);
+    } else {
+      setUiTheme(browserTheme);
     }
   }, []);
+
+  useEffect(() => {
+    const localizedPlaceholder = getPlaceholderImageUrl(locale);
+
+    setSceneObjects((current) =>
+      current.map((object) =>
+        isPlaceholderImageUrl(object.imageUrl)
+          ? { ...object, imageUrl: localizedPlaceholder }
+          : object,
+      ),
+    );
+  }, [locale]);
 
   useEffect(() => {
     window.localStorage.setItem("mock-photo-locale", locale);
@@ -103,6 +154,7 @@ export default function Home() {
 
   function handleAddObject() {
     const nextObject = createSceneObject({
+      locale,
       name: `Object ${sceneObjects.length + 1}`,
     });
 
@@ -158,7 +210,7 @@ export default function Home() {
     setSceneObjects((current) =>
       current.map((object) =>
         object.id === selectedObject.id
-          ? changeSceneObjectModel(object, modelId)
+          ? changeSceneObjectModel(object, locale, modelId)
           : object,
       ),
     );
@@ -205,6 +257,7 @@ export default function Home() {
         objects={sceneObjects}
         onAddObject={handleAddObject}
         onLocaleChange={setLocale}
+        onRenameObject={(id, name) => updateSceneObject(id, { name })}
         onRemoveObject={handleRemoveObject}
         onSelectObject={setSelectedObjectId}
         onUiThemeChange={setUiTheme}
@@ -243,9 +296,6 @@ export default function Home() {
           updateSceneObject(selectedObject.id, {
             showDeviceShell: !selectedObject.showDeviceShell,
           })
-        }
-        onUpdateName={(name) =>
-          selectedObject && updateSceneObject(selectedObject.id, { name })
         }
         onUpdatePosition={(positionPatch) =>
           selectedObject && updateSceneObject(selectedObject.id, positionPatch)

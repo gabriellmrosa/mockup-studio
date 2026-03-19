@@ -19,7 +19,7 @@ import {
   OBJECT_POSITION_MULTIPLIER,
 } from "../lib/scene-presets";
 import { DEVICE_MODELS } from "../models/device-models";
-import { FocusIcon, ZoomInIcon, ZoomOutIcon } from "./Icons";
+import FloatingCanvasControls from "./FloatingCanvasControls";
 
 export type ExportPreset = {
   height: number;
@@ -36,6 +36,7 @@ type MockupCanvasProps = {
 
 type ViewportControlsApi = {
   fitToScene: () => void;
+  resetToInitial: () => void;
   zoomIn: () => void;
   zoomOut: () => void;
 };
@@ -215,6 +216,28 @@ function BoundsResetController({
   sceneRef: { current: THREE.Group | null };
 }) {
   const bounds = useBounds();
+  const hasCapturedInitialState = useRef(false);
+
+  useEffect(() => {
+    const controls = controlsRef.current;
+    const sceneGroup = sceneRef.current;
+
+    if (!controls || !sceneGroup || hasCapturedInitialState.current) {
+      return;
+    }
+
+    let frameId = 0;
+
+    frameId = requestAnimationFrame(() => {
+      bounds.refresh(sceneGroup).reset().clip();
+      controls.saveState();
+      hasCapturedInitialState.current = true;
+    });
+
+    return () => {
+      cancelAnimationFrame(frameId);
+    };
+  }, [bounds, controlsRef, sceneRef]);
 
   useEffect(() => {
     const controls = controlsRef.current;
@@ -247,6 +270,10 @@ function BoundsResetController({
 
         bounds.refresh(sceneGroup).reset().clip();
       },
+      resetToInitial: () => {
+        controls.reset();
+        controls.update();
+      },
       zoomIn: () => {
         runZoom("out");
       },
@@ -275,7 +302,8 @@ function BoundsResetController({
         return;
       }
 
-      bounds.refresh(sceneGroup).reset().clip();
+      controls.reset();
+      controls.update();
     });
 
     return () => {
@@ -305,34 +333,12 @@ export default function MockupCanvas(props: MockupCanvasProps) {
         />
       </Canvas>
 
-      <div className="canvas-zoom-controls">
-        <button
-          type="button"
-          className="canvas-zoom-button"
-          aria-label="Zoom out"
-          title="Zoom out"
-          onClick={() => viewportControls?.zoomOut()}
-        >
-          <ZoomOutIcon className="h-4 w-4" />
-        </button>
-        <button
-          type="button"
-          className="canvas-zoom-button"
-          aria-label="Reset camera"
-          title="Reset camera"
-          onClick={() => viewportControls?.fitToScene()}
-        >
-          <FocusIcon className="h-4 w-4" />
-        </button>
-        <button
-          type="button"
-          className="canvas-zoom-button"
-          aria-label="Zoom in"
-          title="Zoom in"
-          onClick={() => viewportControls?.zoomIn()}
-        >
-          <ZoomInIcon className="h-4 w-4" />
-        </button>
+      <div className="canvas-stage-overlay">
+        <FloatingCanvasControls
+          onFitToScene={() => viewportControls?.fitToScene()}
+          onZoomIn={() => viewportControls?.zoomIn()}
+          onZoomOut={() => viewportControls?.zoomOut()}
+        />
       </div>
     </div>
   );

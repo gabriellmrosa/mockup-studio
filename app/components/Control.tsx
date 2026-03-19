@@ -1,46 +1,49 @@
+import type { CSSProperties } from "react";
+
 export default function Control({
+  displayValue,
   label,
-  uiTheme,
   value,
   setValue,
   min,
   max,
   step = 1,
 }: {
+  displayValue?: number;
   label: string;
-  uiTheme: "dark" | "light";
   value: number;
   setValue: (v: number) => void;
   min: number;
   max: number;
   step?: number;
 }) {
-  return (
-    <div className="flex flex-col gap-1.5">
-      <div className="flex items-center justify-between gap-3">
-        <span className="text-[11px] uppercase tracking-[0.18em] text-[var(--sidebar-muted)]">
-          {label}
-        </span>
-        <span className="text-xs font-mono text-[var(--sidebar-value)]">
-          {value.toFixed(step < 1 ? 2 : 0)}
-        </span>
-      </div>
+  const resolvedDisplayValue = displayValue ?? value;
+  const rangeProgress = ((resolvedDisplayValue - min) / (max - min)) * 100;
 
-      <div className="flex items-center gap-3">
+  return (
+    <div className="transform-control">
+      <span className="transform-control-label">{label}</span>
+
+      <div className="transform-control-row">
         <input
           type="range"
           min={min}
           max={max}
           step={step}
-          value={value}
+          value={resolvedDisplayValue}
           onChange={(e) => setValue(Number(e.target.value))}
-          className={`flex-1 ${uiTheme === "dark" ? "accent-white" : "accent-black"}`}
+          className="editor-range flex-1"
+          style={
+            {
+              "--range-progress": `${rangeProgress}%`,
+            } as CSSProperties
+          }
         />
 
         <input
           type="number"
-          className="editor-input w-18 rounded-md px-2 py-1 text-xs focus:outline-none"
-          value={value}
+          className="editor-input transform-value-input focus:outline-none"
+          value={resolvedDisplayValue}
           step={step}
           min={min}
           max={max}

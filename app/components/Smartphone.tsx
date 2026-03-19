@@ -188,9 +188,13 @@ function ScreenWithTexture({
     }
 
     const imgW =
-      img instanceof HTMLImageElement ? img.naturalWidth || img.width : img.width;
+      img instanceof HTMLImageElement
+        ? img.naturalWidth || img.width
+        : img.width;
     const imgH =
-      img instanceof HTMLImageElement ? img.naturalHeight || img.height : img.height;
+      img instanceof HTMLImageElement
+        ? img.naturalHeight || img.height
+        : img.height;
     const canvas = buildScreenCanvas(
       img,
       imgW,
@@ -334,7 +338,9 @@ function SmartphoneImpl({
   }
 
   const effectiveImageUrl =
-    imageUrl && imageUrl !== "/placeholder.png" ? imageUrl : "/placeholder.png";
+    imageUrl && imageUrl !== "/placeholder-enus.png"
+      ? imageUrl
+      : "/placeholder-enus.png";
 
   return (
     <group {...props} dispose={null}>

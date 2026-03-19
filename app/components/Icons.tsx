@@ -24,6 +24,24 @@ export function PlusIcon({ className }: IconProps) {
   );
 }
 
+export function MoreVerticalIcon({ className }: IconProps) {
+  return (
+    <svg {...iconProps(className)}>
+      <circle cx="12" cy="5" r="1.4" fill="currentColor" stroke="none" />
+      <circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none" />
+      <circle cx="12" cy="19" r="1.4" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+export function ChevronDownIcon({ className }: IconProps) {
+  return (
+    <svg {...iconProps(className)}>
+      <path d="m6 9 6 6 6-6" />
+    </svg>
+  );
+}
+
 export function TrashIcon({ className }: IconProps) {
   return (
     <svg {...iconProps(className)}>
@@ -94,6 +112,55 @@ export function FocusIcon({ className }: IconProps) {
       <path d="M19 15v4h-4" />
       <path d="M5 15v4h4" />
       <circle cx="12" cy="12" r="2.5" />
+    </svg>
+  );
+}
+
+export function ArrowUpIcon({ className }: IconProps) {
+  return (
+    <svg {...iconProps(className)}>
+      <path d="m12 5-5 5" />
+      <path d="m12 5 5 5" />
+      <path d="M12 5v14" />
+    </svg>
+  );
+}
+
+export function ArrowDownIcon({ className }: IconProps) {
+  return (
+    <svg {...iconProps(className)}>
+      <path d="m12 19-5-5" />
+      <path d="m12 19 5-5" />
+      <path d="M12 5v14" />
+    </svg>
+  );
+}
+
+export function ArrowLeftIcon({ className }: IconProps) {
+  return (
+    <svg {...iconProps(className)}>
+      <path d="m5 12 5-5" />
+      <path d="m5 12 5 5" />
+      <path d="M5 12h14" />
+    </svg>
+  );
+}
+
+export function ArrowRightIcon({ className }: IconProps) {
+  return (
+    <svg {...iconProps(className)}>
+      <path d="m19 12-5-5" />
+      <path d="m19 12-5 5" />
+      <path d="M5 12h14" />
+    </svg>
+  );
+}
+
+export function CameraIcon({ className }: IconProps) {
+  return (
+    <svg {...iconProps(className)}>
+      <path d="M4 8h3l1.6-2h6.8L17 8h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2Z" />
+      <circle cx="12" cy="13" r="3.2" />
     </svg>
   );
 }

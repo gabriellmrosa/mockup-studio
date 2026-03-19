@@ -32,8 +32,7 @@ export type AppCopy = {
   sceneSectionHint: string;
   screenSectionTitle: string;
   uploadImage: string;
-  screenSectionHintLine1: string;
-  screenSectionHintLine2: string;
+  screenSectionHint: string;
   themesSectionTitle: string;
   bodyColorSectionTitle: string;
   bodyColorLabel: string;
@@ -86,8 +85,7 @@ export const APP_COPY: Record<Locale, AppCopy> = {
       "Desligue a casca para trabalhar apenas com a textura da tela, sem moldura de dispositivo ao redor.",
     screenSectionTitle: "Tela do App",
     uploadImage: "Upload imagem",
-    screenSectionHintLine1: "Proporcao recomendada: 9:19.3.",
-    screenSectionHintLine2: "Export final sempre em PNG com fundo transparente.",
+    screenSectionHint: "Recommended 1290x2755",
     themesSectionTitle: "Temas",
     bodyColorSectionTitle: "Cor do Body",
     bodyColorLabel: "Body",
@@ -144,8 +142,7 @@ export const APP_COPY: Record<Locale, AppCopy> = {
       "Turn the shell off to work only with the screen texture, without the device frame around it.",
     screenSectionTitle: "App Screen",
     uploadImage: "Upload image",
-    screenSectionHintLine1: "Recommended ratio: 9:19.3.",
-    screenSectionHintLine2: "Final export is always a PNG with transparent background.",
+    screenSectionHint: "Recommended 1290x2755",
     themesSectionTitle: "Themes",
     bodyColorSectionTitle: "Body Color",
     bodyColorLabel: "Body",

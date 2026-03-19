@@ -7,7 +7,9 @@ import type { ThemeName } from "./Smartphone";
 import type { AppCopy, UiTheme } from "../lib/i18n";
 import type { SceneObject } from "../lib/scene-objects";
 import { DEVICE_MODEL_LIST } from "../models/device-models";
+import { IconButton, PanelHeader, PanelSection } from "./EditorPrimitives";
 import {
+  ChevronDownIcon,
   DownloadIcon,
   RotateCcwIcon,
   UploadIcon,
@@ -28,7 +30,6 @@ type InspectorPanelProps = {
   onThemeChange: (themeId: ThemeName) => void;
   onToggleDebugMode: () => void;
   onToggleDeviceShell: () => void;
-  onUpdateName: (name: string) => void;
   onUpdateRotation: (
     patch: Pick<SceneObject, "rotationX" | "rotationY" | "rotationZ">,
   ) => void;
@@ -54,7 +55,6 @@ export default function InspectorPanel({
   onThemeChange,
   onToggleDebugMode,
   onToggleDeviceShell,
-  onUpdateName,
   onUpdatePosition,
   onUpdateRotation,
   uiTheme,
@@ -62,72 +62,50 @@ export default function InspectorPanel({
 }: InspectorPanelProps) {
   if (!object) {
     return (
-      <aside className="editor-sidebar w-[320px] h-screen flex flex-col shrink-0" />
+      <aside className="editor-sidebar inspector-sidebar h-screen w-[19rem] shrink-0" />
     );
   }
 
   const model = DEVICE_MODEL_LIST.find((item) => item.id === object.modelId);
 
   return (
-    <aside className="editor-sidebar w-[320px] h-screen flex flex-col overflow-y-auto shrink-0">
-      <div className="px-5 py-4 border-b border-[var(--sidebar-border)]">
-        <h2 className="text-sm font-semibold tracking-[0.22em] uppercase">
-          {copy.objectSectionTitle}
-        </h2>
-        <p className="editor-sidebar-muted text-xs mt-1">{object.name}</p>
-      </div>
+    <aside className="editor-sidebar inspector-sidebar h-screen w-[19rem] shrink-0 overflow-y-auto">
+      <PanelHeader
+        eyebrow="Properties"
+        title={object.name}
+        titleClassName="panel-title-object"
+      />
 
-      <div className="flex flex-col gap-5 px-5 py-5">
-        <section>
-          <p className="editor-sidebar-label mb-3">{copy.objectNameLabel}</p>
-          <input
-            className="editor-input w-full rounded-lg px-3 py-2 text-sm focus:outline-none"
-            value={object.name}
-            onChange={(event) => onUpdateName(event.target.value)}
-          />
-        </section>
-
-        <section>
-          <p className="editor-sidebar-label mb-3">{copy.modelLabel}</p>
-          <select
-            className="editor-input w-full rounded-lg px-3 py-2 text-sm focus:outline-none"
-            value={object.modelId}
-            onChange={(event) =>
-              onModelChange(event.target.value as SceneObject["modelId"])
-            }
-          >
-            {DEVICE_MODEL_LIST.map((device) => (
-              <option key={device.id} value={device.id}>
-                {device.name}
-              </option>
-            ))}
-          </select>
-          {model ? (
-            <p className="editor-sidebar-muted text-[10px] mt-2">
-              {model.name}
-            </p>
-          ) : null}
-        </section>
-
-        <section>
-          <div className="flex items-center justify-between mb-3">
-            <p className="editor-sidebar-label">{copy.sceneSectionTitle}</p>
-            <button
-              onClick={onToggleDeviceShell}
-              className={`editor-toggle ${object.showDeviceShell ? "editor-toggle-inactive" : "editor-toggle-active"}`}
+      <div className="flex flex-col">
+        <PanelSection title={copy.modelLabel}>
+          <div className="select-wrapper">
+            <select
+              className="editor-input w-full appearance-none rounded-[0.75rem] px-4 py-3 pr-10 text-sm focus:outline-none"
+              value={object.modelId}
+              onChange={(event) =>
+                onModelChange(event.target.value as SceneObject["modelId"])
+              }
             >
-              {object.showDeviceShell ? copy.shellOn : copy.screenOnly}
-            </button>
+              {DEVICE_MODEL_LIST.map((device) => (
+                <option key={device.id} value={device.id}>
+                  {device.name}
+                </option>
+              ))}
+            </select>
+            <ChevronDownIcon className="select-chevron h-4 w-4" />
           </div>
-          <p className="editor-sidebar-muted text-[10px] leading-relaxed">
-            {copy.sceneSectionHint}
-          </p>
-        </section>
+          <label className="mt-2 flex items-start gap-2 text-[0.6875rem] leading-relaxed text-[var(--sidebar-muted)]">
+            <input
+              type="checkbox"
+              checked={object.showDeviceShell}
+              onChange={onToggleDeviceShell}
+              className="mt-[0.125rem] h-3.5 w-3.5 rounded-[0.25rem] border border-[var(--input-border)] bg-[var(--input-bg)] accent-[var(--foreground)]"
+            />
+            <span>{copy.sceneSectionHint}</span>
+          </label>
+        </PanelSection>
 
-        <section>
-          <p className="editor-sidebar-label mb-3">
-            {copy.screenSectionTitle}
-          </p>
+        <PanelSection title={copy.screenSectionTitle}>
           <label className="upload-card">
             <UploadIcon className="h-4 w-4" />
             {copy.uploadImage}
@@ -139,21 +117,16 @@ export default function InspectorPanel({
             />
           </label>
           <p className="editor-sidebar-muted text-[10px] mt-2 leading-relaxed">
-            {copy.screenSectionHintLine1}
-            <br />
-            {copy.screenSectionHintLine2}
+            {copy.screenSectionHint}
           </p>
           {uploadError ? (
             <p className="text-[11px] text-red-400 mt-2">{uploadError}</p>
           ) : null}
-        </section>
+        </PanelSection>
 
         {!object.debugMode ? (
           <>
-            <section>
-              <p className="editor-sidebar-label mb-3">
-                {copy.themesSectionTitle}
-              </p>
+            <PanelSection title={copy.themesSectionTitle}>
               <div className="grid grid-cols-3 gap-2">
                 {model?.themeOptions.map((theme) => (
                   <button
@@ -172,23 +145,22 @@ export default function InspectorPanel({
                   </button>
                 ))}
               </div>
-            </section>
-
-            <section>
-              <p className="editor-sidebar-label mb-3">
-                {copy.bodyColorSectionTitle}
-              </p>
-              <ColorRow
-                label={copy.bodyColorLabel}
-                uiTheme={uiTheme}
-                value={object.colors.body}
-                onChange={onColorChange}
-              />
-            </section>
+              <div className="theme-color-inline">
+                <span className="theme-color-inline-label">
+                  {copy.bodyColorLabel}
+                </span>
+                <ColorRow
+                  label=""
+                  uiTheme={uiTheme}
+                  value={object.colors.body}
+                  onChange={onColorChange}
+                  compact
+                />
+              </div>
+            </PanelSection>
           </>
         ) : (
-          <section>
-            <p className="editor-sidebar-label mb-3">{copy.debugSectionTitle}</p>
+          <PanelSection title={copy.debugSectionTitle}>
             <div className="panel-card flex flex-col gap-2 p-3">
               {Object.entries(object.debugPartColors).map(([part, color]) => (
                 <ColorRow
@@ -200,26 +172,29 @@ export default function InspectorPanel({
                 />
               ))}
             </div>
-          </section>
+          </PanelSection>
         )}
 
-        <section>
-          <div className="flex items-center justify-between mb-3">
-            <p className="editor-sidebar-label">{copy.transformSectionTitle}</p>
-            <button
-              onClick={onResetObject}
-              className="editor-icon-button"
-              aria-label={copy.resetObjectButton}
-              title={copy.resetObjectButton}
-            >
-              <RotateCcwIcon className="h-3.5 w-3.5" />
-            </button>
-          </div>
-          <div className="space-y-3">
-            <div className="panel-card space-y-3 p-3">
+        <PanelSection
+          title={copy.transformSectionTitle}
+          action={
+            <div className="transform-reset-wrap">
+              <span className="transform-reset-label">Reset</span>
+              <IconButton
+                onClick={onResetObject}
+                aria-label={copy.resetObjectButton}
+                title={copy.resetObjectButton}
+                className="transform-reset-button"
+              >
+                <RotateCcwIcon className="h-4 w-4" />
+              </IconButton>
+            </div>
+          }
+        >
+          <div className="transform-groups">
+            <div className="transform-group">
               <Control
                 label={copy.positionX}
-                uiTheme={uiTheme}
                 value={object.positionX}
                 setValue={(value) =>
                   onUpdatePosition({
@@ -234,7 +209,6 @@ export default function InspectorPanel({
               />
               <Control
                 label={copy.positionY}
-                uiTheme={uiTheme}
                 value={object.positionY}
                 setValue={(value) =>
                   onUpdatePosition({
@@ -249,7 +223,6 @@ export default function InspectorPanel({
               />
               <Control
                 label={copy.positionZ}
-                uiTheme={uiTheme}
                 value={object.positionZ}
                 setValue={(value) =>
                   onUpdatePosition({
@@ -264,10 +237,9 @@ export default function InspectorPanel({
               />
             </div>
 
-            <div className="panel-card space-y-3 p-3">
+            <div className="transform-group transform-group-offset">
               <Control
                 label={copy.rotationX}
-                uiTheme={uiTheme}
                 value={object.rotationX}
                 setValue={(value) =>
                   onUpdateRotation({
@@ -280,22 +252,21 @@ export default function InspectorPanel({
                 max={45}
               />
               <Control
-                label={copy.rotationY}
-                uiTheme={uiTheme}
+                label="ROTATON Y"
                 value={object.rotationY}
+                displayValue={object.rotationY - 180}
                 setValue={(value) =>
                   onUpdateRotation({
                     rotationX: object.rotationX,
-                    rotationY: value,
+                    rotationY: value + 180,
                     rotationZ: object.rotationZ,
                   })
                 }
-                min={135}
-                max={225}
+                min={-45}
+                max={45}
               />
               <Control
                 label={copy.rotationZ}
-                uiTheme={uiTheme}
                 value={object.rotationZ}
                 setValue={(value) =>
                   onUpdateRotation({
@@ -312,29 +283,29 @@ export default function InspectorPanel({
           <p className="editor-sidebar-muted text-[10px] mt-2 leading-relaxed">
             {copy.transformSectionHint}
           </p>
-        </section>
+        </PanelSection>
 
-        <section>
+        <PanelSection title={copy.debugSectionTitle}>
           <button
             onClick={onToggleDebugMode}
             className={`w-full py-2 rounded-lg text-xs font-medium transition border ${object.debugMode ? "bg-yellow-500/15 border-yellow-500 text-yellow-300" : "editor-button editor-button-muted"}`}
           >
             {object.debugMode ? copy.debugOn : copy.debugOff}
           </button>
-        </section>
+        </PanelSection>
 
-        <section>
-          <div className="flex items-center justify-between mb-3">
-            <p className="editor-sidebar-label">{copy.exportSectionTitle}</p>
-            <button
+        <PanelSection
+          title={copy.exportSectionTitle}
+          action={
+            <IconButton
               onClick={onResetCamera}
-              className="editor-icon-button"
               aria-label={copy.resetCameraButton}
               title={copy.resetCameraButton}
             >
               <RotateCcwIcon className="h-3.5 w-3.5" />
-            </button>
-          </div>
+            </IconButton>
+          }
+        >
           <div className="grid grid-cols-2 gap-2">
             {exportPresets.map((preset) => (
               <button
@@ -351,7 +322,7 @@ export default function InspectorPanel({
           <p className="editor-sidebar-muted text-[10px] mt-2 leading-relaxed">
             {copy.exportSectionHint}
           </p>
-        </section>
+        </PanelSection>
       </div>
     </aside>
   );

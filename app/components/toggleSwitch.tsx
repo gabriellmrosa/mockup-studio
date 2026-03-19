@@ -45,6 +45,7 @@ export default function ToggleSwitch<T extends string>({
             role="radio"
             aria-checked={isActive}
             aria-label={option.label}
+            title={option.label}
             onClick={() => onChange(option.value)}
             className="toggle-switch-option"
             data-active={isActive}

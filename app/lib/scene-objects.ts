@@ -5,6 +5,7 @@ import {
   type DeviceModelId,
 } from "../models/device-models";
 import type { PhoneColors, ThemeName } from "../components/Smartphone";
+import type { Locale } from "./i18n";
 import { DEFAULT_OBJECT_TRANSFORM } from "./scene-presets";
 
 export type SceneObject = {
@@ -26,14 +27,29 @@ export type SceneObject = {
   showDeviceShell: boolean;
 };
 
-const DEFAULT_IMAGE_URL = "/placeholder.png";
+const PLACEHOLDER_BY_LOCALE: Record<Locale, string> = {
+  "pt-BR": "/placeholder-ptbr.png",
+  "en-US": "/placeholder-enus.png",
+};
+
+export function getPlaceholderImageUrl(locale: Locale) {
+  return PLACEHOLDER_BY_LOCALE[locale];
+}
+
+export function isPlaceholderImageUrl(imageUrl: string) {
+  return Object.values(PLACEHOLDER_BY_LOCALE).includes(imageUrl);
+}
 
 export function createSceneObject({
   deletable = true,
+  id,
+  locale = "en-US",
   modelId = "smartphone",
   name,
 }: {
   deletable?: boolean;
+  id?: string;
+  locale?: Locale;
   modelId?: DeviceModelId;
   name: string;
 }): SceneObject {
@@ -45,8 +61,8 @@ export function createSceneObject({
     debugPartColors: { ...model.initialDebugColors },
     deletable,
     deviceTheme: model.defaultTheme,
-    id: crypto.randomUUID(),
-    imageUrl: DEFAULT_IMAGE_URL,
+    id: id ?? crypto.randomUUID(),
+    imageUrl: getPlaceholderImageUrl(locale),
     modelId,
     name,
     ...DEFAULT_OBJECT_TRANSFORM,
@@ -55,21 +71,15 @@ export function createSceneObject({
 }
 
 export function resetSceneObject(object: SceneObject): SceneObject {
-  const model = DEVICE_MODELS[object.modelId];
-
   return {
     ...object,
-    colors: { ...model.themes[model.defaultTheme] },
-    debugMode: false,
-    debugPartColors: { ...model.initialDebugColors },
-    deviceTheme: model.defaultTheme,
     ...DEFAULT_OBJECT_TRANSFORM,
-    showDeviceShell: true,
   };
 }
 
 export function changeSceneObjectModel(
   object: SceneObject,
+  locale: Locale,
   modelId: DeviceModelId,
 ): SceneObject {
   const model = DEVICE_MODELS[modelId];
@@ -80,7 +90,7 @@ export function changeSceneObjectModel(
     debugMode: false,
     debugPartColors: { ...model.initialDebugColors },
     deviceTheme: model.defaultTheme,
-    imageUrl: DEFAULT_IMAGE_URL,
+    imageUrl: getPlaceholderImageUrl(locale),
     modelId,
     ...DEFAULT_OBJECT_TRANSFORM,
     showDeviceShell: true,
