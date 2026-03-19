@@ -22,12 +22,14 @@ Ja implementado:
 - controles de rotacao X, Y e Z por objeto;
 - reset das transformacoes do objeto selecionado;
 - reset global de camera;
+- color picker de cor de fundo do canvas na toolbar flutuante;
 - export PNG transparente em `1920x1080` e `2560x1440`;
 - modo debug de cores por parte por objeto;
 - modo `So tela`, que remove a casca do dispositivo e deixa apenas a textura da tela;
 - toggle global de `dark/light`;
 - toggle global de idioma `pt-BR/en-US`;
-- arquitetura inicial de catalogo de dispositivos.
+- arquitetura inicial de catalogo de dispositivos;
+- design system com variaveis CSS semanticas para dark e light mode.
 
 ## Decisoes de Produto Ja Tomadas
 
@@ -64,11 +66,7 @@ As alteracoes recentes foram feitas na branch:
 
 ## Onde Paramos
 
-A base de cena multiobjeto foi implementada e esta funcional, mas ainda estamos validando comportamento fino e UX antes de expandir o catalogo de devices.
-
-A ultima feature implementada foi:
-
-- separacao da interface em `LayersPanel + Canvas + InspectorPanel`, com multiplos smartphones simultaneos em cena e estado isolado por objeto.
+Design system revisado e estabilizado: contraste corrigido no dark mode (transform controls, capture button, brand title), codigo legado removido (EditorSidebar, icones e chaves i18n orfas), icone de reset padronizado entre camera e transform, e color picker de background do canvas adicionado na toolbar flutuante.
 
 ## Proximo Passo Sugerido
 
