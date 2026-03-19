@@ -9,7 +9,7 @@ const abhayaLibre = Abhaya_Libre({
 });
 
 export const metadata: Metadata = {
-  title: "Mockup Studio",
+  title: "Mock Studio",
   description: "Editor de mockups com export transparente em PNG",
 };
 

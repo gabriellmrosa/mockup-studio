@@ -17,11 +17,6 @@ import {
 } from "./lib/scene-objects";
 import { DEVICE_MODELS } from "./models/device-models";
 
-const EXPORT_PRESETS: ExportPreset[] = [
-  { height: 1080, label: "mockup-1080p", width: 1920 },
-  { height: 1440, label: "mockup-1440p", width: 2560 },
-];
-
 function detectBrowserLocale(): Locale {
   const preferredLocales = navigator.languages?.length
     ? navigator.languages
@@ -61,10 +56,9 @@ export default function Home() {
     }),
   ]);
   const [selectedObjectId, setSelectedObjectId] = useState("");
-  const [exportHandler, setExportHandler] =
+  const [, setExportHandler] =
     useState<((preset: ExportPreset) => Promise<void>) | null>(null);
-  const [isExporting, setIsExporting] = useState(false);
-  const [resetCameraVersion, setResetCameraVersion] = useState(0);
+  const resetCameraVersion = 0;
   const copy = APP_COPY[locale];
   const selectedObject =
     sceneObjects.find((object) => object.id === selectedObjectId) ??
@@ -229,26 +223,6 @@ export default function Home() {
     );
   }
 
-  function handleResetCamera() {
-    setResetCameraVersion((current) => current + 1);
-  }
-
-  async function exportImage(preset: ExportPreset) {
-    if (!exportHandler || isExporting) {
-      return;
-    }
-
-    try {
-      setIsExporting(true);
-      await exportHandler(preset);
-    } catch (error) {
-      console.error(error);
-      setUploadError(copy.exportImageError);
-    } finally {
-      setIsExporting(false);
-    }
-  }
-
   return (
     <main className="app-shell min-h-screen relative flex">
       <LayersPanel
@@ -274,15 +248,11 @@ export default function Home() {
 
       <InspectorPanel
         copy={copy}
-        exportPresets={EXPORT_PRESETS}
-        isExporting={isExporting}
         object={selectedObject}
         onColorChange={handleColorChange}
         onDebugColorChange={handleDebugColorChange}
-        onExport={exportImage}
         onImageUpload={handleImageUpload}
         onModelChange={handleModelChange}
-        onResetCamera={handleResetCamera}
         onResetObject={handleResetObject}
         onThemeChange={handleThemeChange}
         onToggleDebugMode={() =>

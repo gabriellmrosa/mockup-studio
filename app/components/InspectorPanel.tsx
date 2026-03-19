@@ -2,7 +2,6 @@
 
 import ColorRow from "./ColorRow";
 import Control from "./Control";
-import type { ExportPreset } from "./MockupCanvas";
 import type { ThemeName } from "./Smartphone";
 import type { AppCopy, UiTheme } from "../lib/i18n";
 import type { SceneObject } from "../lib/scene-objects";
@@ -10,22 +9,17 @@ import { DEVICE_MODEL_LIST } from "../models/device-models";
 import { IconButton, PanelHeader, PanelSection } from "./EditorPrimitives";
 import {
   ChevronDownIcon,
-  DownloadIcon,
   RotateCcwIcon,
   UploadIcon,
 } from "./Icons";
 
 type InspectorPanelProps = {
   copy: AppCopy;
-  exportPresets: ExportPreset[];
-  isExporting: boolean;
   object: SceneObject | null;
   onColorChange: (hex: string) => void;
   onDebugColorChange: (part: string, hex: string) => void;
-  onExport: (preset: ExportPreset) => Promise<void>;
   onImageUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onModelChange: (modelId: SceneObject["modelId"]) => void;
-  onResetCamera: () => void;
   onResetObject: () => void;
   onThemeChange: (themeId: ThemeName) => void;
   onToggleDebugMode: () => void;
@@ -42,15 +36,11 @@ type InspectorPanelProps = {
 
 export default function InspectorPanel({
   copy,
-  exportPresets,
-  isExporting,
   object,
   onColorChange,
   onDebugColorChange,
-  onExport,
   onImageUpload,
   onModelChange,
-  onResetCamera,
   onResetObject,
   onThemeChange,
   onToggleDebugMode,
@@ -177,6 +167,7 @@ export default function InspectorPanel({
 
         <PanelSection
           title={copy.transformSectionTitle}
+          className="transform-section"
           action={
             <div className="transform-reset-wrap">
               <span className="transform-reset-label">Reset</span>
@@ -252,7 +243,7 @@ export default function InspectorPanel({
                 max={45}
               />
               <Control
-                label="ROTATON Y"
+                label={copy.rotationY}
                 value={object.rotationY}
                 displayValue={object.rotationY - 180}
                 setValue={(value) =>
@@ -280,9 +271,6 @@ export default function InspectorPanel({
               />
             </div>
           </div>
-          <p className="editor-sidebar-muted text-[10px] mt-2 leading-relaxed">
-            {copy.transformSectionHint}
-          </p>
         </PanelSection>
 
         <PanelSection title={copy.debugSectionTitle}>
@@ -292,36 +280,6 @@ export default function InspectorPanel({
           >
             {object.debugMode ? copy.debugOn : copy.debugOff}
           </button>
-        </PanelSection>
-
-        <PanelSection
-          title={copy.exportSectionTitle}
-          action={
-            <IconButton
-              onClick={onResetCamera}
-              aria-label={copy.resetCameraButton}
-              title={copy.resetCameraButton}
-            >
-              <RotateCcwIcon className="h-3.5 w-3.5" />
-            </IconButton>
-          }
-        >
-          <div className="grid grid-cols-2 gap-2">
-            {exportPresets.map((preset) => (
-              <button
-                key={preset.label}
-                onClick={() => void onExport(preset)}
-                disabled={isExporting}
-                className="editor-button inline-flex items-center justify-center gap-2 px-3 py-2 text-xs disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <DownloadIcon className="h-3.5 w-3.5" />
-                {preset.width}x{preset.height}
-              </button>
-            ))}
-          </div>
-          <p className="editor-sidebar-muted text-[10px] mt-2 leading-relaxed">
-            {copy.exportSectionHint}
-          </p>
         </PanelSection>
       </div>
     </aside>

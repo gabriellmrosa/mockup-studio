@@ -34,16 +34,18 @@ export function PanelHeader({
 type PanelSectionProps = {
   action?: ReactNode;
   children: ReactNode;
+  className?: string;
   title: string;
 };
 
 export function PanelSection({
   action,
   children,
+  className,
   title,
 }: PanelSectionProps) {
   return (
-    <section className="panel-section">
+    <section className={`panel-section ${className ?? ""}`.trim()}>
       <div className="panel-section-header">
         <p className="editor-sidebar-label">{title}</p>
         {action ? <div className="shrink-0">{action}</div> : null}

@@ -57,7 +57,7 @@ export type AppCopy = {
 
 export const APP_COPY: Record<Locale, AppCopy> = {
   "pt-BR": {
-    appTitle: "Mockup Studio",
+    appTitle: "Mock Studio",
     appSubtitle: "MVP de 1 objeto com export transparente",
     addObject: "Adicionar objeto",
     baseObject: "Objeto base",
@@ -114,7 +114,7 @@ export const APP_COPY: Record<Locale, AppCopy> = {
     },
   },
   "en-US": {
-    appTitle: "Mockup Studio",
+    appTitle: "Mock Studio",
     appSubtitle: "Single-object MVP with transparent export",
     addObject: "Add object",
     baseObject: "Base object",

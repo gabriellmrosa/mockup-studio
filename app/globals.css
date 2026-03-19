@@ -29,7 +29,10 @@
   --canvas-toolbar: rgba(57, 53, 49, 0.92);
   --canvas-shadow: 0 20px 50px rgba(0, 0, 0, 0.18);
   --control-strong: #383838;
-  --control-track: #a9abae;
+  --control-track: #7f7972;
+  --control-input-bg: #45403b;
+  --control-input-border: #6a645d;
+  --control-reset-border: #6a645d;
 }
 
 @theme inline {
@@ -69,7 +72,10 @@
   --canvas-toolbar: rgba(245, 237, 227, 0.94);
   --canvas-shadow: 0 16px 40px rgba(120, 102, 85, 0.16);
   --control-strong: #383838;
-  --control-track: #b8bcc0;
+  --control-track: #dad3ca;
+  --control-input-bg: #faf6f1;
+  --control-input-border: #dad3ca;
+  --control-reset-border: #d8d0c6;
 }
 
 * {
@@ -511,14 +517,14 @@ body {
       var(--control-track) 100%
     );
   border-radius: 999px;
-  height: 0.1875rem;
+  height: 0.25rem;
   outline: none;
 }
 
 .editor-range::-webkit-slider-runnable-track {
   appearance: none;
   background: transparent;
-  height: 0.1875rem;
+  height: 0.25rem;
 }
 
 .editor-range::-webkit-slider-thumb {
@@ -527,24 +533,23 @@ body {
   background: var(--control-strong);
   border: 0;
   border-radius: 999px;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.02);
   cursor: pointer;
-  height: 1.125rem;
-  margin-top: -0.46875rem;
-  width: 1.125rem;
+  height: 1.25rem;
+  margin-top: -0.5rem;
+  width: 1.25rem;
 }
 
 .editor-range::-moz-range-track {
   background: var(--control-track);
   border: 0;
   border-radius: 999px;
-  height: 0.1875rem;
+  height: 0.25rem;
 }
 
 .editor-range::-moz-range-progress {
   background: var(--control-strong);
   border-radius: 999px;
-  height: 0.1875rem;
+  height: 0.25rem;
 }
 
 .editor-range::-moz-range-thumb {
@@ -552,8 +557,8 @@ body {
   border: 0;
   border-radius: 999px;
   cursor: pointer;
-  height: 1.125rem;
-  width: 1.125rem;
+  height: 1.25rem;
+  width: 1.25rem;
 }
 
 .mockup-stage {
@@ -743,24 +748,40 @@ body {
   margin-bottom: 0.75rem;
 }
 
+.transform-section {
+  padding: 1.5rem;
+}
+
+.transform-section .panel-section-header {
+  margin-bottom: 1.5rem;
+}
+
+.transform-section .editor-sidebar-label {
+  color: var(--control-strong);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
 .transform-reset-wrap {
   align-items: center;
   display: flex;
-  gap: 0.75rem;
+  gap: 0.5rem;
 }
 
 .transform-reset-label {
-  color: var(--foreground);
-  font-size: 0.75rem;
+  color: var(--sidebar-muted);
+  font-size: 0.875rem;
+  font-weight: 400;
   line-height: 1;
 }
 
 .transform-reset-button {
-  background: transparent;
-  border-color: var(--panel-border);
+  background: color-mix(in srgb, var(--control-input-bg) 68%, transparent);
+  border: 1.5px solid var(--control-reset-border);
   color: var(--control-strong);
-  height: 3rem;
-  width: 3rem;
+  height: 2.5rem;
+  width: 2.5rem;
 }
 
 .transform-groups {
@@ -771,7 +792,7 @@ body {
 .transform-group {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 1.5rem;
 }
 
 .transform-group-offset {
@@ -781,28 +802,31 @@ body {
 .transform-control {
   display: flex;
   flex-direction: column;
-  gap: 0.875rem;
+  gap: 0.5rem;
 }
 
 .transform-control-label {
   color: var(--sidebar-muted);
   font-size: 0.625rem;
-  font-weight: 700;
-  letter-spacing: 0.22em;
+  font-weight: 600;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 
 .transform-control-row {
   align-items: center;
   display: flex;
-  gap: 1rem;
+  gap: 0.75rem;
 }
 
 .transform-value-input {
+  background: var(--control-input-bg);
+  border-color: var(--control-input-border);
   border-radius: 0.75rem;
-  font-size: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 400;
   min-width: 5.5rem;
-  padding: 0.75rem 0.875rem;
+  padding: 0.75rem;
 }
 
 .floating-menu {
