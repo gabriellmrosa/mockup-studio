@@ -1,17 +1,14 @@
 "use client";
 
-import ColorRow from "./ColorRow";
-import Control from "./Control";
-import type { ThemeName } from "./Smartphone";
-import type { AppCopy, UiTheme } from "../lib/i18n";
-import type { SceneObject } from "../lib/scene-objects";
-import { DEVICE_MODEL_LIST } from "../models/device-models";
-import { IconButton, PanelHeader, PanelSection } from "./EditorPrimitives";
-import {
-  ChevronDownIcon,
-  RotateCcwIcon,
-  UploadIcon,
-} from "./Icons";
+import "./InspectorPanel.css";
+import ColorRow from "../ColorRow/ColorRow";
+import Control from "../Control/Control";
+import type { ThemeName } from "../Smartphone";
+import type { AppCopy, UiTheme } from "../../lib/i18n";
+import type { SceneObject } from "../../lib/scene-objects";
+import { DEVICE_MODEL_LIST } from "../../models/device-models";
+import { IconButton, PanelHeader, PanelSection } from "../EditorPrimitives/EditorPrimitives";
+import { ChevronDownIcon, RotateCcwIcon, UploadIcon } from "../Icons";
 
 type InspectorPanelProps = {
   copy: AppCopy;
@@ -67,10 +64,13 @@ export default function InspectorPanel({
       />
 
       <div className="flex flex-col">
-        <PanelSection title={copy.modelLabel}>
+        <PanelSection
+          title={copy.modelLabel}
+          className="--without-border-bottom"
+        >
           <div className="select-wrapper">
             <select
-              className="editor-input w-full appearance-none rounded-[0.75rem] px-4 py-3 pr-10 text-sm focus:outline-none"
+              className="editor-input w-full appearance-none rounded-[var(--radius-sm)] px-2 py-1 pr-10 text-sm focus:outline-none"
               value={object.modelId}
               onChange={(event) =>
                 onModelChange(event.target.value as SceneObject["modelId"])
@@ -84,18 +84,21 @@ export default function InspectorPanel({
             </select>
             <ChevronDownIcon className="select-chevron h-4 w-4" />
           </div>
-          <label className="mt-2 flex items-start gap-2 text-[0.6875rem] leading-relaxed text-[var(--sidebar-muted)]">
+          <label className="mt-2 flex justify-end items-center gap-2 text-[0.6875rem] leading-relaxed text-[var(--sidebar-muted)]">
+            <span className="text-right">{copy.sceneSectionHint}</span>
             <input
               type="checkbox"
               checked={object.showDeviceShell}
               onChange={onToggleDeviceShell}
-              className="mt-[0.125rem] h-3.5 w-3.5 rounded-[0.25rem] border border-[var(--input-border)] bg-[var(--input-bg)] accent-[var(--foreground)]"
+              className="mt-[0.125rem] h-3.5 w-3.5 rounded-[var(--radius-xs)] border border-[var(--input-border)] bg-[var(--input-bg)] accent-[var(--foreground)]"
             />
-            <span>{copy.sceneSectionHint}</span>
           </label>
         </PanelSection>
 
-        <PanelSection title={copy.screenSectionTitle}>
+        <PanelSection
+          title={copy.screenSectionTitle}
+          className="--without-border-bottom"
+        >
           <label className="upload-card">
             <UploadIcon className="h-4 w-4" />
             {copy.uploadImage}
@@ -106,7 +109,7 @@ export default function InspectorPanel({
               className="hidden"
             />
           </label>
-          <p className="editor-sidebar-muted text-[10px] mt-2 leading-relaxed">
+          <p className="editor-sidebar-muted text-[10px] mt-2 leading-relaxed text-right">
             {copy.screenSectionHint}
           </p>
           {uploadError ? (
@@ -116,7 +119,10 @@ export default function InspectorPanel({
 
         {!object.debugMode ? (
           <>
-            <PanelSection title={copy.themesSectionTitle}>
+            <PanelSection
+              title={copy.themesSectionTitle}
+              className="--without-border-bottom"
+            >
               <div className="grid grid-cols-3 gap-2">
                 {model?.themeOptions.map((theme) => (
                   <button
@@ -176,6 +182,7 @@ export default function InspectorPanel({
                 aria-label={copy.resetObjectButton}
                 title={copy.resetObjectButton}
                 className="transform-reset-button"
+                style={{ borderRadius: "50%" }}
               >
                 <RotateCcwIcon className="h-4 w-4" />
               </IconButton>

@@ -1,3 +1,4 @@
+import "./EditorPrimitives.css";
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 
 type PanelHeaderProps = {

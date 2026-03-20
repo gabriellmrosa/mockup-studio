@@ -1,7 +1,8 @@
 "use client";
 
+import "./FloatingCanvasControls.css";
 import { useRef } from "react";
-import type { UiTheme } from "../lib/i18n";
+import type { UiTheme } from "../../lib/i18n";
 import {
   ArrowDownIcon,
   ArrowLeftIcon,
@@ -11,7 +12,7 @@ import {
   RotateCcwIcon,
   ZoomInIcon,
   ZoomOutIcon,
-} from "./Icons";
+} from "../Icons";
 
 type FloatingCanvasControlsProps = {
   bgColor: string | null;
@@ -118,7 +119,7 @@ export default function FloatingCanvasControls({
               style={{
                 width: "1rem",
                 height: "1rem",
-                borderRadius: "50%",
+                borderRadius: "var(--radius-xs)",
                 background: displayColor,
                 border: circleBorder,
               }}

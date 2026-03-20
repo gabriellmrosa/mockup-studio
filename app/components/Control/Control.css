@@ -1,0 +1,88 @@
+/* =========================================
+   Control — range + number input pair
+   ========================================= */
+
+.transform-control {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.transform-control-label {
+  color: var(--sidebar-muted);
+  font-size: 0.525rem;
+  font-weight: var(--font-semibold);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.transform-control-row {
+  align-items: center;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.transform-value-input {
+  background: var(--control-input-bg);
+  border-color: var(--control-input-border);
+  border-radius: var(--radius-xs);
+  font-size: 0.875rem;
+  font-weight: var(--font-regular);
+}
+
+/* --- Range slider --- */
+
+.editor-range {
+  appearance: none;
+  background: linear-gradient(
+    to right,
+    var(--control-strong) 0,
+    var(--control-strong) var(--range-progress),
+    var(--control-track) var(--range-progress),
+    var(--control-track) 100%
+  );
+  border-radius: var(--radius-full);
+  height: 0.25rem;
+  outline: none;
+  flex: 3;
+}
+
+.editor-range::-webkit-slider-runnable-track {
+  appearance: none;
+  background: transparent;
+  height: 0.25rem;
+}
+
+.editor-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--control-strong);
+  border: 0;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  margin-top: -0.35rem;
+  height: 1rem;
+  width: 1rem;
+}
+
+.editor-range::-moz-range-track {
+  background: var(--control-track);
+  border: 0;
+  border-radius: var(--radius-full);
+  height: 0.25rem;
+}
+
+.editor-range::-moz-range-progress {
+  background: var(--control-strong);
+  border-radius: var(--radius-full);
+  height: 0.25rem;
+}
+
+.editor-range::-moz-range-thumb {
+  background: var(--control-strong);
+  border: 0;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  height: 1.25rem;
+  width: 1.25rem;
+}

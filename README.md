@@ -29,7 +29,7 @@ Ja implementado:
 - toggle global de `dark/light`;
 - toggle global de idioma `pt-BR/en-US`;
 - arquitetura inicial de catalogo de dispositivos;
-- design system com variaveis CSS semanticas para dark e light mode.
+- design system com tokens primitivos de cor (`--black-000` a `--black-980`, `--gray-*`, `--ink-*`), border-radius (`--radius-xs` a `--radius-full`) e font-weight (`--font-regular` a `--font-bold`) para dark e light mode.
 
 ## Decisoes de Produto Ja Tomadas
 
@@ -48,9 +48,12 @@ Ja implementado:
 ## Estrutura Relevante
 
 - [app/page.tsx](/Users/gabrielrosa/Desktop/dev/mock-photo/app/page.tsx): orquestra o estado do editor, lista de objetos da cena e selecao ativa.
-- [app/components/LayersPanel.tsx](/Users/gabrielrosa/Desktop/dev/mock-photo/app/components/LayersPanel.tsx): painel esquerdo com camadas/objetos e preferencias globais.
-- [app/components/InspectorPanel.tsx](/Users/gabrielrosa/Desktop/dev/mock-photo/app/components/InspectorPanel.tsx): painel direito com configuracoes do objeto selecionado.
-- [app/components/MockupCanvas.tsx](/Users/gabrielrosa/Desktop/dev/mock-photo/app/components/MockupCanvas.tsx): canvas 3D, orbit controls, reset de camera, export e renderizacao de multiplos objetos.
+- [app/styles/tokens.css](/Users/gabrielrosa/Desktop/dev/mock-photo/app/styles/tokens.css): tokens primitivos de cor, border-radius e font-weight.
+- [app/globals.css](/Users/gabrielrosa/Desktop/dev/mock-photo/app/globals.css): tokens semanticos (`--background`, `--sidebar-bg`...) que referenciam os primitivos, resets globais e `.app-shell`.
+- [app/components/LayersPanel/](/Users/gabrielrosa/Desktop/dev/mock-photo/app/components/LayersPanel/): painel esquerdo com camadas/objetos e preferencias globais.
+- [app/components/InspectorPanel/](/Users/gabrielrosa/Desktop/dev/mock-photo/app/components/InspectorPanel/): painel direito com configuracoes do objeto selecionado.
+- [app/components/MockupCanvas/](/Users/gabrielrosa/Desktop/dev/mock-photo/app/components/MockupCanvas/): canvas 3D, orbit controls, reset de camera, export e renderizacao de multiplos objetos.
+- [app/components/EditorPrimitives/](/Users/gabrielrosa/Desktop/dev/mock-photo/app/components/EditorPrimitives/): componentes primitivos compartilhados (`PanelHeader`, `PanelSection`, `IconButton`) e seus estilos base.
 - [app/components/Smartphone.tsx](/Users/gabrielrosa/Desktop/dev/mock-photo/app/components/Smartphone.tsx): modelo atual do smartphone, tela com textura e modo sem casca.
 - [app/models/device-models.ts](/Users/gabrielrosa/Desktop/dev/mock-photo/app/models/device-models.ts): catalogo de dispositivos e metadados do modelo ativo.
 - [app/lib/scene-objects.ts](/Users/gabrielrosa/Desktop/dev/mock-photo/app/lib/scene-objects.ts): helpers para criar, resetar e trocar o modelo de objetos da cena.
@@ -66,7 +69,7 @@ As alteracoes recentes foram feitas na branch:
 
 ## Onde Paramos
 
-Design system revisado e estabilizado: contraste corrigido no dark mode (transform controls, capture button, brand title), codigo legado removido (EditorSidebar, icones e chaves i18n orfas), icone de reset padronizado entre camera e transform, e color picker de background do canvas adicionado na toolbar flutuante.
+Refatoracao de estrutura e design system: cada componente ganhou sua propria pasta com `.tsx` e `.css` co-localizados. O `globals.css` foi simplificado para tokens semanticos e resets globais. Tokens primitivos centralizados em `app/styles/tokens.css` — cor (`--black-000` a `--black-980`), border-radius (`--radius-xs` a `--radius-full`) e font-weight (`--font-regular` a `--font-bold`). Icones passaram a usar `--icon-fg` (branco no dark, preto no light).
 
 ## Proximo Passo Sugerido
 

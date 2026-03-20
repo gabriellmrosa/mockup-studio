@@ -1,0 +1,162 @@
+/* =========================================
+   LayersPanel — left sidebar
+   ========================================= */
+
+.layers-sidebar {
+  border-right: 1px solid var(--sidebar-border);
+}
+
+/* --- Section helpers --- */
+
+.section-objects {
+  flex: 1;
+}
+
+/* --- Layer cards --- */
+
+.layer-card {
+  align-items: center;
+  border-radius: var(--radius-xs);
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+  padding: 0.5rem 0rem 0.5rem 0.5rem;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    background-color 160ms ease,
+    color 160ms ease;
+  width: 100%;
+}
+
+.layer-card-active {
+  background: var(--surface-active);
+  border-color: var(--button-border);
+  color: var(--foreground);
+}
+
+.layer-card-inactive {
+  background: transparent;
+  color: var(--button-fg);
+}
+
+.layer-card-inactive:hover {
+  background: var(--surface-hover);
+  border-color: var(--button-border);
+  transform: translateY(-1px);
+}
+
+.layer-card-title {
+  font-size: 0.75rem;
+  font-weight: var(--font-regular);
+  line-height: 1.1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.layer-card-subtitle {
+  color: var(--sidebar-muted);
+  font-size: 0.625rem;
+  margin-top: 0.25rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.layer-card-name-input {
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: var(--font-semibold);
+  line-height: 1.1;
+  max-width: 8rem;
+  padding: 0.25rem 0.5rem;
+}
+
+.layer-badge {
+  background: color-mix(in srgb, var(--surface-raised) 90%, transparent);
+  border: 1px solid var(--button-border);
+  border-radius: var(--radius-full);
+  color: var(--sidebar-muted);
+  font-size: 0.5rem;
+  font-weight: var(--font-bold);
+  letter-spacing: 0.08em;
+  padding: 0.1875rem 0.375rem;
+  text-transform: uppercase;
+}
+
+.layer-menu-trigger {
+  opacity: 0.8;
+}
+
+/* --- Device card (future use) --- */
+
+.device-card {
+  align-items: center;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--button-border);
+  display: flex;
+  justify-content: space-between;
+  padding: 0.65rem 0.75rem;
+  text-align: left;
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease,
+    color 160ms ease;
+}
+
+.device-card-active {
+  background: var(--button-active-bg);
+  border-color: var(--button-active-bg);
+  color: var(--button-active-fg);
+}
+
+.device-card-inactive {
+  background: var(--button-bg);
+  color: var(--button-fg);
+}
+
+.device-card-inactive:hover {
+  border-color: var(--button-border-hover);
+}
+
+/* --- Floating preferences menu --- */
+
+.floating-menu {
+  background: var(--surface-raised);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--canvas-shadow);
+  padding: 0.75rem;
+  position: absolute;
+  right: 1rem;
+  top: 5.25rem;
+  width: 9rem;
+  z-index: 20;
+}
+
+.floating-menu-block + .floating-menu-block {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--sidebar-border);
+}
+
+.floating-menu-label {
+  color: var(--sidebar-muted);
+  font-size: 0.625rem;
+  font-weight: var(--font-bold);
+  letter-spacing: 0.18em;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+}
+
+/* --- Footer --- */
+
+.sidebar-footer {
+  color: var(--sidebar-muted);
+  font-size: 0.625rem;
+  letter-spacing: 0.02em;
+  line-height: 1.6;
+  padding: 0.75rem 1rem 1rem;
+  text-transform: uppercase;
+}

@@ -1,9 +1,9 @@
 "use client";
 
 import { ChangeEvent, useEffect, useState } from "react";
-import InspectorPanel from "./components/InspectorPanel";
-import LayersPanel from "./components/LayersPanel";
-import MockupCanvas, { type ExportPreset } from "./components/MockupCanvas";
+import InspectorPanel from "./components/InspectorPanel/InspectorPanel";
+import LayersPanel from "./components/LayersPanel/LayersPanel";
+import MockupCanvas, { type ExportPreset } from "./components/MockupCanvas/MockupCanvas";
 import { type ThemeName } from "./components/Smartphone";
 import { APP_COPY, type Locale, type UiTheme } from "./lib/i18n";
 import { readFileAsDataUrl } from "./lib/mockup-image";

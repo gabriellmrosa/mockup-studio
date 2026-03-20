@@ -1,5 +1,6 @@
 "use client";
 
+import "./toggleSwitch.css";
 import Image from "next/image";
 
 type ToggleOption<T extends string> = {

@@ -1,5 +1,6 @@
 "use client";
 
+import "./MockupCanvas.css";
 import { Suspense, useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { Canvas, useThree } from "@react-three/fiber";
@@ -12,14 +13,14 @@ import {
   type OrbitControlsProps,
 } from "@react-three/drei";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
-import type { UiTheme } from "../lib/i18n";
-import type { SceneObject } from "../lib/scene-objects";
+import type { UiTheme } from "../../lib/i18n";
+import type { SceneObject } from "../../lib/scene-objects";
 import {
   AUTO_OBJECT_POSITIONS,
   OBJECT_POSITION_MULTIPLIER,
-} from "../lib/scene-presets";
-import { DEVICE_MODELS } from "../models/device-models";
-import FloatingCanvasControls from "./FloatingCanvasControls";
+} from "../../lib/scene-presets";
+import { DEVICE_MODELS } from "../../models/device-models";
+import FloatingCanvasControls from "../FloatingCanvasControls/FloatingCanvasControls";
 
 export type ExportPreset = {
   height: number;

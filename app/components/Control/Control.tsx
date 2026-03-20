@@ -1,3 +1,4 @@
+import "./Control.css";
 import type { CSSProperties } from "react";
 
 export default function Control({
@@ -32,7 +33,7 @@ export default function Control({
           step={step}
           value={resolvedDisplayValue}
           onChange={(e) => setValue(Number(e.target.value))}
-          className="editor-range flex-1"
+          className="editor-range"
           style={
             {
               "--range-progress": `${rangeProgress}%`,

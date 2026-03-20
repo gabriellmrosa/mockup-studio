@@ -1,0 +1,46 @@
+:root {
+  /* =====================
+     COLOR PRIMITIVES
+     Warm scale: darkest (000) → lightest (980)
+     ===================== */
+  --black-true: #000;
+  --white-true: #fff;
+  --black-000: #2a2927;
+  --black-100: #34312e;
+  --black-200: #3b3834;
+  --black-300: #403b36;
+  --black-400: #514b45;
+  --black-500: #635c55;
+  --black-600: #7f7972;
+  --black-700: #b8b0a6;
+  --black-800: #d7cec3;
+  --black-900: #efe6db;
+  --black-950: #f5ede3;
+  --black-980: #fbf7f2;
+
+  /* Neutral grays */
+  --gray-400: #75706a;
+  --gray-500: #808080;
+  --gray-600: #b2b2b2;
+
+  /* Ink — text and high-contrast accents */
+  --ink-dark: #383838;
+  --ink-light: #eee6db;
+
+  /* =====================
+     FONT WEIGHT SCALE
+     ===================== */
+  --font-regular: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+
+  /* =====================
+     BORDER RADIUS SCALE
+     ===================== */
+  --radius-xs: 0.25rem; /* 4px  — checkboxes, tiny tags */
+  --radius-sm: 0.4rem; /* 6px  — cards, inputs, compact elements */
+  --radius-md: 0.75rem; /* 12px — buttons, panels */
+  --radius-lg: 1rem; /* 16px — large cards, modals */
+  --radius-full: 999px; /* pill / circle */
+}

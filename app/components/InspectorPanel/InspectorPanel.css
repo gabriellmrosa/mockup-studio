@@ -1,0 +1,141 @@
+/* =========================================
+   InspectorPanel — right sidebar
+   ========================================= */
+
+.inspector-sidebar {
+  border-left: 1px solid var(--sidebar-border);
+}
+
+/* --- Model select --- */
+
+.select-wrapper {
+  position: relative;
+}
+
+.select-chevron {
+  color: var(--sidebar-muted);
+  pointer-events: none;
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* --- Upload card --- */
+
+.upload-card {
+  align-items: center;
+  background: color-mix(in srgb, var(--button-bg) 75%, transparent);
+  border: 2px dashed var(--button-border);
+  border-radius: var(--radius-sm);
+  color: var(--button-muted-fg);
+  cursor: pointer;
+  display: flex;
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  gap: 0.75rem;
+  justify-content: center;
+  padding: 1rem;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    background-color 160ms ease,
+    color 160ms ease;
+}
+
+.upload-card:hover {
+  border-color: var(--button-border-hover);
+  background: var(--surface-hover);
+  transform: translateY(-1px);
+}
+
+/* --- Theme cards --- */
+
+.theme-card {
+  align-items: center;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--button-border);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-height: 4.5rem;
+  padding: 0.75rem 0.5rem;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    background-color 160ms ease,
+    color 160ms ease;
+}
+
+.theme-card-active {
+  background: var(--surface-active);
+  border-color: var(--button-border-hover);
+  color: var(--button-fg);
+}
+
+.theme-card-inactive {
+  background: transparent;
+  color: var(--button-fg);
+}
+
+.theme-card-inactive:hover {
+  border-color: var(--button-border-hover);
+  background: var(--surface-hover);
+  transform: translateY(-1px);
+}
+
+.theme-color-inline {
+  align-items: center;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  margin-top: 0.75rem;
+}
+
+.theme-color-inline-label {
+  color: var(--sidebar-muted);
+  font-size: 0.6875rem;
+  line-height: 1;
+}
+
+/* --- Transform section --- */
+
+.transform-section {
+  padding: 1.5rem;
+}
+
+.transform-reset-wrap {
+  align-items: center;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.transform-reset-label {
+  color: var(--sidebar-muted);
+  font-size: 0.875rem;
+  font-weight: var(--font-regular);
+  line-height: 1;
+}
+
+.transform-reset-button {
+  background: color-mix(in srgb, var(--control-input-bg) 68%, transparent);
+  border: 1.5px solid var(--control-reset-border);
+  color: var(--control-strong);
+  height: 2.5rem;
+  width: 2.5rem;
+}
+
+.transform-groups {
+  display: flex;
+  flex-direction: column;
+}
+
+.transform-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.transform-group-offset {
+  margin-top: 2rem;
+}
