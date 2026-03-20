@@ -7,8 +7,8 @@ import type { ThemeName } from "../Smartphone";
 import type { AppCopy, UiTheme } from "../../lib/i18n";
 import type { SceneObject } from "../../lib/scene-objects";
 import { DEVICE_MODEL_LIST } from "../../models/device-models";
-import { IconButton, PanelHeader, PanelSection } from "../EditorPrimitives/EditorPrimitives";
-import { ChevronDownIcon, RotateCcwIcon, UploadIcon } from "../Icons";
+import { PanelHeader, PanelSection } from "../EditorPrimitives/EditorPrimitives";
+import { ChevronDown, RotateCcw, Upload } from "lucide-react";
 
 type InspectorPanelProps = {
   copy: AppCopy;
@@ -82,7 +82,7 @@ export default function InspectorPanel({
                 </option>
               ))}
             </select>
-            <ChevronDownIcon className="select-chevron h-4 w-4" />
+            <ChevronDown className="select-chevron h-4 w-4" />
           </div>
           <label className="mt-2 flex justify-end items-center gap-2 text-[0.6875rem] leading-relaxed text-[var(--sidebar-muted)]">
             <span className="text-right">{copy.sceneSectionHint}</span>
@@ -100,7 +100,7 @@ export default function InspectorPanel({
           className="--without-border-bottom"
         >
           <label className="upload-card">
-            <UploadIcon className="h-4 w-4" />
+            <Upload className="h-4 w-4" />
             {copy.uploadImage}
             <input
               type="file"
@@ -184,7 +184,7 @@ export default function InspectorPanel({
                 title={copy.resetObjectButton}
                 className="editor-fab"
               >
-                <RotateCcwIcon className="h-4 w-4" />
+                <RotateCcw className="h-4 w-4" />
               </button>
             </div>
           }

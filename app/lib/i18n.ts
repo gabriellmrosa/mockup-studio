@@ -16,6 +16,7 @@ export type AppCopy = {
   portuguese: string;
   english: string;
   deleteObject: string;
+  renameObject: string;
   modelLabel: string;
   sceneSectionHint: string;
   screenSectionTitle: string;
@@ -44,12 +45,13 @@ export const APP_COPY: Record<Locale, AppCopy> = {
     addObject: "Adicionar objeto",
     baseObject: "Objeto base",
     languageLabel: "Idioma",
-    themeLabel: "Interface",
+    themeLabel: "Tema",
     darkMode: "Dark",
     lightMode: "Light",
     portuguese: "PT-BR",
     english: "EN-US",
     deleteObject: "Excluir",
+    renameObject: "Renomear",
     modelLabel: "Modelo",
     sceneSectionHint:
       "Você pode ativar ou desativar a casca 3D",
@@ -82,12 +84,13 @@ export const APP_COPY: Record<Locale, AppCopy> = {
     addObject: "Add object",
     baseObject: "Base object",
     languageLabel: "Language",
-    themeLabel: "Interface",
+    themeLabel: "Theme",
     darkMode: "Dark",
     lightMode: "Light",
     portuguese: "PT-BR",
     english: "EN-US",
     deleteObject: "Delete",
+    renameObject: "Rename",
     modelLabel: "Model",
     sceneSectionHint:
       "You can toggle the 3D shell",

@@ -4,15 +4,15 @@ import "./FloatingCanvasControls.css";
 import { useRef } from "react";
 import type { UiTheme } from "../../lib/i18n";
 import {
-  ArrowDownIcon,
-  ArrowLeftIcon,
-  ArrowRightIcon,
-  ArrowUpIcon,
-  CameraIcon,
-  RotateCcwIcon,
-  ZoomInIcon,
-  ZoomOutIcon,
-} from "../Icons";
+  ArrowDown,
+  ArrowLeft,
+  ArrowRight,
+  ArrowUp,
+  Camera,
+  RotateCcw,
+  ZoomIn,
+  ZoomOut,
+} from "lucide-react";
 
 type FloatingCanvasControlsProps = {
   bgColor: string | null;
@@ -54,7 +54,7 @@ export default function FloatingCanvasControls({
           title="Reset camera"
           onClick={onFitToScene}
         >
-          <RotateCcwIcon className="h-4 w-4" />
+          <RotateCcw className="h-4 w-4" />
         </button>
         <button
           type="button"
@@ -62,7 +62,7 @@ export default function FloatingCanvasControls({
           aria-label="Move up"
           title="Move up"
         >
-          <ArrowUpIcon className="h-4 w-4" />
+          <ArrowUp className="h-4 w-4" />
         </button>
         <button
           type="button"
@@ -70,7 +70,7 @@ export default function FloatingCanvasControls({
           aria-label="Move down"
           title="Move down"
         >
-          <ArrowDownIcon className="h-4 w-4" />
+          <ArrowDown className="h-4 w-4" />
         </button>
         <button
           type="button"
@@ -78,7 +78,7 @@ export default function FloatingCanvasControls({
           aria-label="Move left"
           title="Move left"
         >
-          <ArrowLeftIcon className="h-4 w-4" />
+          <ArrowLeft className="h-4 w-4" />
         </button>
         <button
           type="button"
@@ -86,7 +86,7 @@ export default function FloatingCanvasControls({
           aria-label="Move right"
           title="Move right"
         >
-          <ArrowRightIcon className="h-4 w-4" />
+          <ArrowRight className="h-4 w-4" />
         </button>
         <button
           type="button"
@@ -95,7 +95,7 @@ export default function FloatingCanvasControls({
           title="Zoom out"
           onClick={onZoomOut}
         >
-          <ZoomOutIcon className="h-4 w-4" />
+          <ZoomOut className="h-4 w-4" />
         </button>
         <button
           type="button"
@@ -104,7 +104,7 @@ export default function FloatingCanvasControls({
           title="Zoom in"
           onClick={onZoomIn}
         >
-          <ZoomInIcon className="h-4 w-4" />
+          <ZoomIn className="h-4 w-4" />
         </button>
 
         <div style={{ position: "relative" }}>
@@ -147,7 +147,7 @@ export default function FloatingCanvasControls({
         aria-label="Take photo"
         title="Take photo"
       >
-        <CameraIcon className="h-4 w-4" />
+        <Camera className="h-4 w-4" />
         <span>Take photo</span>
       </button>
     </div>

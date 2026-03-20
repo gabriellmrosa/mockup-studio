@@ -120,35 +120,6 @@
   border-color: var(--button-border-hover);
 }
 
-/* --- Floating preferences menu --- */
-
-.floating-menu {
-  background: var(--surface-raised);
-  border: 1px solid var(--panel-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--canvas-shadow);
-  padding: 0.75rem;
-  position: absolute;
-  right: 1rem;
-  top: 5.25rem;
-  width: 9rem;
-  z-index: 20;
-}
-
-.floating-menu-block + .floating-menu-block {
-  margin-top: 0.75rem;
-  padding-top: 0.75rem;
-  border-top: 1px solid var(--sidebar-border);
-}
-
-.floating-menu-label {
-  color: var(--sidebar-muted);
-  font-size: 0.625rem;
-  font-weight: var(--font-bold);
-  letter-spacing: 0.18em;
-  margin-bottom: 0.5rem;
-  text-transform: uppercase;
-}
 
 /* --- Footer --- */
 

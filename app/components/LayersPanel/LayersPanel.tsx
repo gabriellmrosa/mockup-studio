@@ -4,10 +4,9 @@ import "./LayersPanel.css";
 import { KeyboardEvent, useState } from "react";
 import type { AppCopy, Locale, UiTheme } from "../../lib/i18n";
 import type { SceneObject } from "../../lib/scene-objects";
-import { DEVICE_MODELS } from "../../models/device-models";
 import { IconButton, PanelHeader, PanelSection } from "../EditorPrimitives/EditorPrimitives";
-import { MoreVerticalIcon, PlusIcon } from "../Icons";
-import ToggleSwitch from "../toggleSwitch/toggleSwitch";
+import { MoreVertical, Plus } from "lucide-react";
+import ContextMenu from "../ContextMenu/ContextMenu";
 
 type LayersPanelProps = {
   copy: AppCopy;
@@ -36,7 +35,6 @@ export default function LayersPanel({
   selectedObjectId,
   uiTheme,
 }: LayersPanelProps) {
-  const [isPreferencesOpen, setIsPreferencesOpen] = useState(false);
   const [editingObjectId, setEditingObjectId] = useState<string | null>(null);
   const [draftName, setDraftName] = useState("");
 
@@ -81,69 +79,59 @@ export default function LayersPanel({
             subtitle="Version 1.0"
             titleClassName="panel-title panel-title-brand"
             action={
-              <IconButton
-                aria-expanded={isPreferencesOpen}
-                aria-label="Open preferences"
-                title="Open preferences"
-                active={isPreferencesOpen}
-                onClick={() => setIsPreferencesOpen((current) => !current)}
-              >
-                <MoreVerticalIcon className="h-4 w-4" />
-              </IconButton>
+              <ContextMenu
+                items={[
+                  {
+                    type: "submenu",
+                    label: copy.themeLabel,
+                    options: [
+                      {
+                        label: copy.darkMode,
+                        value: "dark",
+                        checked: uiTheme === "dark",
+                        onClick: () => onUiThemeChange("dark"),
+                      },
+                      {
+                        label: copy.lightMode,
+                        value: "light",
+                        checked: uiTheme === "light",
+                        onClick: () => onUiThemeChange("light"),
+                      },
+                    ],
+                  },
+                  {
+                    type: "submenu",
+                    label: copy.languageLabel,
+                    options: [
+                      {
+                        label: copy.portuguese,
+                        value: "pt-BR",
+                        checked: locale === "pt-BR",
+                        onClick: () => onLocaleChange("pt-BR"),
+                      },
+                      {
+                        label: copy.english,
+                        value: "en-US",
+                        checked: locale === "en-US",
+                        onClick: () => onLocaleChange("en-US"),
+                      },
+                    ],
+                  },
+                ]}
+                trigger={({ open, onClick }) => (
+                  <IconButton
+                    aria-expanded={open}
+                    aria-label="Open preferences"
+                    title="Open preferences"
+                    active={open}
+                    onClick={onClick}
+                  >
+                    <MoreVertical className="h-4 w-4" />
+                  </IconButton>
+                )}
+              />
             }
           />
-
-          {isPreferencesOpen ? (
-            <div className="floating-menu">
-              <div className="floating-menu-block">
-                <p className="floating-menu-label">{copy.themeLabel}</p>
-                <ToggleSwitch
-                  ariaLabel={copy.themeLabel}
-                  value={uiTheme}
-                  onChange={onUiThemeChange}
-                  options={[
-                    {
-                      value: "dark",
-                      label: copy.darkMode,
-                      iconAlt: copy.darkMode,
-                      iconSrc: "/icons/moon-and-stars.png",
-                    },
-                    {
-                      value: "light",
-                      label: copy.lightMode,
-                      iconAlt: copy.lightMode,
-                      iconSrc: "/icons/sun.png",
-                    },
-                  ]}
-                />
-              </div>
-
-              <div className="floating-menu-block">
-                <p className="floating-menu-label">{copy.languageLabel}</p>
-                <ToggleSwitch
-                  ariaLabel={copy.languageLabel}
-                  value={locale}
-                  onChange={onLocaleChange}
-                  options={[
-                    {
-                      value: "pt-BR",
-                      label: copy.portuguese,
-                      iconAlt: copy.portuguese,
-                      iconClassName: "toggle-switch-icon-flag",
-                      iconSrc: "/icons/brazil-flag.png",
-                    },
-                    {
-                      value: "en-US",
-                      label: copy.english,
-                      iconAlt: copy.english,
-                      iconClassName: "toggle-switch-icon-flag",
-                      iconSrc: "/icons/eua-flag.png",
-                    },
-                  ]}
-                />
-              </div>
-            </div>
-          ) : null}
         </div>
 
         <div className="flex flex-col flex-1 overflow-y-auto">
@@ -157,13 +145,12 @@ export default function LayersPanel({
                 aria-label={copy.addObject}
                 title={copy.addObject}
               >
-                <PlusIcon className="h-4 w-4" />
+                <Plus className="h-4 w-4" />
               </button>
             }
           >
             <div className="flex flex-col gap-2">
               {objects.map((object) => {
-                const model = DEVICE_MODELS[object.modelId];
                 const isSelected = object.id === selectedObjectId;
 
                 return (
@@ -212,17 +199,39 @@ export default function LayersPanel({
                         )}
                       </div>
                     </div>
-                    <IconButton
-                      className="layer-menu-trigger"
-                      aria-label={copy.deleteObject}
-                      title={copy.deleteObject}
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        void onRemoveObject;
-                      }}
-                    >
-                      <MoreVerticalIcon className="h-4 w-4" />
-                    </IconButton>
+                    <ContextMenu
+                      items={[
+                        {
+                          type: "action",
+                          label: copy.renameObject,
+                          onClick: () => startEditing(object),
+                        },
+                        ...(object.deletable
+                          ? [
+                              {
+                                type: "action" as const,
+                                label: copy.deleteObject,
+                                variant: "danger" as const,
+                                onClick: () => onRemoveObject(object.id),
+                              },
+                            ]
+                          : []),
+                      ]}
+                      trigger={({ open, onClick }) => (
+                        <IconButton
+                          className="layer-menu-trigger"
+                          aria-label="Object options"
+                          title="Object options"
+                          active={open}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onClick();
+                          }}
+                        >
+                          <MoreVertical className="h-4 w-4" />
+                        </IconButton>
+                      )}
+                    />
                   </div>
                 );
               })}

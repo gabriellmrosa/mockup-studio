@@ -1,0 +1,98 @@
+/* =========================================
+   ContextMenu — cascading flyout menu
+   ========================================= */
+
+.context-menu-root {
+  display: inline-block;
+  position: relative;
+}
+
+.context-menu-panel {
+  animation: context-menu-appear 120ms ease;
+  background: var(--surface-raised);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--canvas-shadow);
+  padding: 0.25rem;
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  width: 9.5rem;
+  z-index: 30;
+}
+
+.context-submenu-panel {
+  animation: context-submenu-appear 100ms ease;
+  background: var(--surface-raised);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--canvas-shadow);
+  padding: 0.25rem;
+  position: absolute;
+  left: calc(100% + 4px);
+  width: 8.5rem;
+}
+
+.context-menu-row {
+  align-items: center;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--foreground);
+  cursor: pointer;
+  display: flex;
+  font-size: 0.75rem;
+  font-weight: var(--font-regular);
+  justify-content: space-between;
+  padding: 0.4rem 0.5rem;
+  text-align: left;
+  transition: background 100ms ease;
+  width: 100%;
+}
+
+.context-menu-row:hover,
+.context-menu-row-active {
+  background: var(--surface-hover);
+}
+
+.context-menu-row-danger {
+  color: #f87171;
+}
+
+.context-menu-row-danger:hover {
+  background: rgba(239, 68, 68, 0.12);
+}
+
+.context-menu-row-chevron {
+  color: var(--sidebar-muted);
+  flex-shrink: 0;
+}
+
+.context-menu-check {
+  color: var(--foreground);
+  flex-shrink: 0;
+}
+
+@keyframes context-menu-appear {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes context-submenu-appear {
+  from {
+    opacity: 0;
+    transform: translateX(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
