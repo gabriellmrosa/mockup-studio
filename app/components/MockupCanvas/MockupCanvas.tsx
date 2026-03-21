@@ -18,6 +18,7 @@ import type { SceneObject } from "../../lib/scene-objects";
 import {
   AUTO_OBJECT_POSITIONS,
   OBJECT_POSITION_MULTIPLIER,
+  OBJECT_POSITION_MULTIPLIER_Z,
 } from "../../lib/scene-presets";
 import { DEVICE_MODELS } from "../../models/device-models";
 import FloatingCanvasControls from "../FloatingCanvasControls/FloatingCanvasControls";
@@ -34,6 +35,8 @@ type MockupCanvasProps = {
   onBgColorChange: (color: string) => void;
   onExportReady: (handler: (preset: ExportPreset) => Promise<void>) => void;
   resetCameraVersion: number;
+  scaleOverrides: ScaleOverrides;
+  spawnOverrides: SpawnOverrides;
   uiTheme: UiTheme;
 };
 
@@ -48,8 +51,13 @@ type ViewportControlsApi = {
   zoomOut: () => void;
 };
 
+export type SpawnOverrides = Record<number, [number, number, number]>;
+export type ScaleOverrides = Record<number, number>;
+
 type SceneBridgeProps = MockupCanvasProps & {
   onViewportControlsReady: (api: ViewportControlsApi | null) => void;
+  sceneFitKey: string;
+  spawnOverrides: SpawnOverrides;
 };
 
 const DEFAULT_BG: Record<UiTheme, string> = { dark: "#2e2b28", light: "#f2ebe0" };
@@ -74,11 +82,12 @@ const ANGLE_LIMITS = {
   minAzimuthAngle: -0.85,
   minPolarAngle: Math.PI * 0.32,
 };
-function getObjectPosition(index: number): [number, number, number] {
-  if (AUTO_OBJECT_POSITIONS[index]) {
-    return AUTO_OBJECT_POSITIONS[index];
-  }
-
+function getObjectPosition(
+  index: number,
+  overrides: SpawnOverrides,
+): [number, number, number] {
+  if (overrides[index]) return overrides[index];
+  if (AUTO_OBJECT_POSITIONS[index]) return AUTO_OBJECT_POSITIONS[index];
   const side = index % 2 === 0 ? 1 : -1;
   const ring = Math.floor(index / 2);
   return [side * (0.7 + ring * 0.28), 0, side * 0.12];
@@ -87,13 +96,16 @@ function getObjectPosition(index: number): [number, number, number] {
 function getResolvedObjectPosition(
   object: SceneObject,
   index: number,
+  overrides: SpawnOverrides,
+  modelSpawnOffset: [number, number, number],
 ): [number, number, number] {
-  const [baseX, baseY, baseZ] = getObjectPosition(index);
+  const [baseX, baseY, baseZ] = getObjectPosition(index, overrides);
+  const [offX, offY, offZ] = modelSpawnOffset;
 
   return [
-    baseX + object.positionX * OBJECT_POSITION_MULTIPLIER,
-    baseY + object.positionY * OBJECT_POSITION_MULTIPLIER,
-    baseZ + object.positionZ * OBJECT_POSITION_MULTIPLIER,
+    baseX + offX + object.positionX * OBJECT_POSITION_MULTIPLIER,
+    baseY + offY + object.positionY * OBJECT_POSITION_MULTIPLIER,
+    baseZ + offZ + object.positionZ * OBJECT_POSITION_MULTIPLIER_Z,
   ];
 }
 
@@ -103,6 +115,9 @@ function SceneBridge({
   onExportReady,
   onViewportControlsReady,
   resetCameraVersion,
+  scaleOverrides,
+  sceneFitKey,
+  spawnOverrides,
   uiTheme,
 }: SceneBridgeProps) {
   const controlsRef = useRef<CameraControlsImpl | null>(null);
@@ -177,47 +192,54 @@ function SceneBridge({
         fadeStrength={1.5}
         infiniteGrid
       />
-      <Suspense fallback={null}>
-        <Bounds margin={1.18}>
-          <Center>
-            <group ref={sceneRef}>
-              {objects.map((object, index) => {
-                const model = DEVICE_MODELS[object.modelId];
+      <Bounds margin={1.18}>
+        <Center>
+          <group ref={sceneRef}>
+            {objects.map((object, index) => {
+              const model = DEVICE_MODELS[object.modelId];
 
-                return (
+              return (
+                <Suspense key={object.id} fallback={null}>
                   <group
-                    key={object.id}
-                    position={getResolvedObjectPosition(object, index)}
+                    position={getResolvedObjectPosition(object, index, spawnOverrides, model.modelSpawnOffset)}
                     rotation={[
                       (object.rotationX * Math.PI) / 180,
                       (object.rotationY * Math.PI) / 180,
                       (object.rotationZ * Math.PI) / 180,
                     ]}
+                    scale={object.scale}
                   >
-                    <model.component
-                      bodyColor={object.colors.body}
-                      buttonsColor={object.colors.buttons}
-                      debugPartColors={
-                        object.debugMode ? object.debugPartColors : undefined
-                      }
-                      imageUrl={object.imageUrl}
-                      screenPosition={model.screenPosition}
-                      screenSize={model.screenSize}
-                      showDeviceShell={object.showDeviceShell}
-                    />
+                    <group
+                      rotation={model.baseRotation}
+                      scale={model.modelScale.map((s) => s * (scaleOverrides[index] ?? 1)) as [number, number, number]}
+                    >
+                      <group position={model.pivotOffset}>
+                      <model.component
+                        colors={object.colors}
+                        debugPartColors={
+                          object.debugMode ? object.debugPartColors : undefined
+                        }
+                        imageUrl={object.imageUrl}
+                        screenPosition={model.screenPosition}
+                        screenSize={model.screenSize}
+                        showDeviceShell={object.showDeviceShell}
+                      />
+                      </group>
+                    </group>
                   </group>
-                );
-              })}
-            </group>
-          </Center>
-          <BoundsResetController
-            controlsRef={controlsRef}
-            onViewportControlsReady={onViewportControlsReady}
-            resetCameraVersion={resetCameraVersion}
-            sceneRef={sceneRef}
-          />
-        </Bounds>
-      </Suspense>
+                </Suspense>
+              );
+            })}
+          </group>
+        </Center>
+        <BoundsResetController
+          controlsRef={controlsRef}
+          sceneFitKey={sceneFitKey}
+          onViewportControlsReady={onViewportControlsReady}
+          resetCameraVersion={resetCameraVersion}
+          sceneRef={sceneRef}
+        />
+      </Bounds>
       <CameraControls
         ref={controlsRef}
         makeDefault
@@ -232,18 +254,19 @@ function SceneBridge({
 
 function BoundsResetController({
   controlsRef,
+  sceneFitKey,
   onViewportControlsReady,
   resetCameraVersion,
   sceneRef,
 }: {
   controlsRef: { current: CameraControlsImpl | null };
+  sceneFitKey: string;
   onViewportControlsReady: (api: ViewportControlsApi | null) => void;
   resetCameraVersion: number;
   sceneRef: { current: THREE.Group | null };
 }) {
   const bounds = useBounds();
   const { camera } = useThree();
-  const hasCapturedInitialState = useRef(false);
   const initialLookAt = useRef<{
     px: number; py: number; pz: number;
     tx: number; ty: number; tz: number;
@@ -253,7 +276,7 @@ function BoundsResetController({
     const controls = controlsRef.current;
     const sceneGroup = sceneRef.current;
 
-    if (!controls || !sceneGroup || hasCapturedInitialState.current) {
+    if (!controls || !sceneGroup) {
       return;
     }
 
@@ -268,7 +291,6 @@ function BoundsResetController({
       camera.far = distance * 100;
       camera.updateProjectionMatrix();
 
-      hasCapturedInitialState.current = true;
       initialLookAt.current = {
         px: center.x, py: center.y, pz: center.z + distance,
         tx: center.x, ty: center.y, tz: center.z,
@@ -284,7 +306,7 @@ function BoundsResetController({
     return () => {
       cancelAnimationFrame(frameId);
     };
-  }, [bounds, camera, controlsRef, sceneRef]);
+  }, [bounds, camera, controlsRef, sceneFitKey, sceneRef]);
 
   useEffect(() => {
     const controls = controlsRef.current;
@@ -333,7 +355,7 @@ function BoundsResetController({
     return () => {
       onViewportControlsReady(null);
     };
-  }, [bounds, controlsRef, onViewportControlsReady, sceneRef]);
+  }, [controlsRef, onViewportControlsReady, sceneRef]);
 
   useEffect(() => {
     if (resetCameraVersion === 0) {
@@ -406,6 +428,7 @@ export default function MockupCanvas(props: MockupCanvasProps) {
         <SceneBridge
           {...props}
           onViewportControlsReady={setViewportControls}
+          sceneFitKey={props.objects.map((o) => o.id).join(",")}
         />
       </Canvas>
 

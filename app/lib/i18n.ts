@@ -1,7 +1,5 @@
 "use client";
 
-import type { ThemeName } from "../components/Smartphone";
-
 export type Locale = "pt-BR" | "en-US";
 export type UiTheme = "dark" | "light";
 
@@ -33,10 +31,11 @@ export type AppCopy = {
   rotationX: string;
   rotationY: string;
   rotationZ: string;
+  scale: string;
   debugOn: string;
   debugOff: string;
   uploadImageError: string;
-  themeNames: Record<ThemeName, string>;
+  themeNames: Record<string, string>;
 };
 
 export const APP_COPY: Record<Locale, AppCopy> = {
@@ -69,6 +68,7 @@ export const APP_COPY: Record<Locale, AppCopy> = {
     rotationX: "Rotação X",
     rotationY: "Rotação Y",
     rotationZ: "Rotação Z",
+    scale: "Escala",
     debugOn: "Debug interativo: ON",
     debugOff: "Debug interativo: OFF",
     uploadImageError: "Nao foi possivel preparar essa imagem.",
@@ -108,6 +108,7 @@ export const APP_COPY: Record<Locale, AppCopy> = {
     rotationX: "Rotation X",
     rotationY: "Rotation Y",
     rotationZ: "Rotation Z",
+    scale: "Scale",
     debugOn: "Interactive debug: ON",
     debugOff: "Interactive debug: OFF",
     uploadImageError: "Could not prepare this image.",

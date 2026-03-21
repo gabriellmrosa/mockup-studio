@@ -4,16 +4,15 @@ import {
   DEVICE_MODELS,
   type DeviceModelId,
 } from "../models/device-models";
-import type { PhoneColors, ThemeName } from "../components/Smartphone";
 import type { Locale } from "./i18n";
 import { DEFAULT_OBJECT_TRANSFORM } from "./scene-presets";
 
 export type SceneObject = {
-  colors: PhoneColors;
+  colors: Record<string, string>;
   debugMode: boolean;
   debugPartColors: Record<string, string>;
   deletable: boolean;
-  deviceTheme: ThemeName | "";
+  deviceTheme: string;
   id: string;
   imageUrl: string;
   modelId: DeviceModelId;
@@ -24,6 +23,7 @@ export type SceneObject = {
   rotationX: number;
   rotationY: number;
   rotationZ: number;
+  scale: number;
   showDeviceShell: boolean;
 };
 
@@ -56,7 +56,7 @@ export function createSceneObject({
   const model = DEVICE_MODELS[modelId];
 
   return {
-    colors: { ...model.themes[model.defaultTheme] },
+    colors: { ...(model.themes[model.defaultTheme] ?? {}) },
     debugMode: false,
     debugPartColors: { ...model.initialDebugColors },
     deletable,
@@ -86,7 +86,7 @@ export function changeSceneObjectModel(
 
   return {
     ...object,
-    colors: { ...model.themes[model.defaultTheme] },
+    colors: { ...(model.themes[model.defaultTheme] ?? {}) },
     debugMode: false,
     debugPartColors: { ...model.initialDebugColors },
     deviceTheme: model.defaultTheme,

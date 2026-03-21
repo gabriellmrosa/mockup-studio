@@ -1,39 +1,70 @@
 "use client";
 
 import {
-  DEFAULT_THEME,
   Smartphone,
-  THEMES,
   type DebugPartKey,
-  type PhoneColors,
-  type ThemeName,
 } from "../components/Smartphone";
+import { Smartphone2, type Smartphone2DebugPartKey } from "../components/Smartphone2";
+import { Smartwatch, type SmartwatchDebugPartKey, SMARTWATCH_MESH_NAMES } from "../components/Smartwatch";
+import { Notebook } from "../components/Notebook";
+import {
+  SMARTPHONE_DEFAULT_THEME,
+  SMARTPHONE_THEMES,
+  buildSmartphoneColorsFromPrimary,
+  type SmartphoneThemeName,
+} from "../lib/3d-tokens/smartphone";
+import {
+  SMARTWATCH_DEFAULT_THEME,
+  SMARTWATCH_THEMES,
+  buildSmartwatchColorsFromPrimary,
+} from "../lib/3d-tokens/smartwatch";
+import {
+  NOTEBOOK_DEFAULT_THEME,
+  NOTEBOOK_THEMES,
+  buildNotebookColorsFromPrimary,
+} from "../lib/3d-tokens/notebook";
 
-export type DeviceModelId = "smartphone";
+export type DeviceModelId = "smartphone" | "smartphone2" | "smartwatch" | "notebook";
 
 export type DeviceThemeOption = {
-  id: ThemeName;
+  id: string;
   label: string;
   preview: string;
 };
 
 export type DeviceModelDefinition = {
-  component: typeof Smartphone;
-  defaultTheme: ThemeName;
+  // Chave do objeto colors que representa a cor primária — exibida no color picker do InspectorPanel.
+  // undefined = modelo ainda sem temas definidos, color picker não aparece.
+  primaryColorKey?: string;
+  baseRotation: [number, number, number];
+  buildColorsFromPrimary: (hex: string) => Record<string, string>;
+  component: typeof Smartphone | typeof Smartphone2 | typeof Smartwatch | typeof Notebook;
+  defaultTheme: string;
   id: DeviceModelId;
-  initialDebugColors: Record<DebugPartKey, string>;
+  initialDebugColors: Record<string, string>;
+  modelScale: [number, number, number];
+  // Offset base em world units adicionado ao AUTO_OBJECT_POSITIONS de cada índice.
+  // Usado para centralizar visualmente modelos cujo pivot nativo não coincide com a origem.
+  modelSpawnOffset: [number, number, number];
   name: string;
+  // Offset em unidades GLTF (antes do scale) para centralizar a geometria na origem do grupo,
+  // garantindo que o pivot de rotação coincida com o centro visual do modelo.
+  // Calcular como: negativo do centro do bounding box visível em espaço GLTF.
+  pivotOffset: [number, number, number];
   screenPosition: [number, number, number];
   screenSize: [number, number];
   themeOptions: DeviceThemeOption[];
-  themes: Record<ThemeName, PhoneColors>;
+  themes: Record<string, Record<string, string>>;
 };
 
+// ---------------------------------------------------------------------------
+// Smartphone
+// ---------------------------------------------------------------------------
 const SMARTPHONE_THEME_OPTIONS: DeviceThemeOption[] = [
-  { id: "gray", label: "Cinza", preview: "#8A8A8E" },
-  { id: "black", label: "Preto", preview: "#1C1C1E" },
+  { id: "gray",       label: "Cinza",      preview: "#8A8A8E" },
+  { id: "black",      label: "Preto",      preview: "#1C1C1E" },
   { id: "light-gray", label: "Light Gray", preview: "#d1d1d1" },
-  { id: "blood", label: "Blood", preview: "#6a2525" },
+  { id: "blood",      label: "Blood",      preview: "#6a2525" },
 ];
 
 const SMARTPHONE_DEBUG_COLORS: Record<DebugPartKey, string> = {
@@ -66,19 +97,117 @@ const SMARTPHONE_DEBUG_COLORS: Record<DebugPartKey, string> = {
   behindOrHideElement7: "#ffdd00",
 };
 
+// ---------------------------------------------------------------------------
+// Smartphone2 — cores de debug para identificação visual das partes
+// Nomes baseados nos materiais do GLTF, renomear após debug visual
+// ---------------------------------------------------------------------------
+const SMARTPHONE2_DEBUG_COLORS: Record<Smartphone2DebugPartKey, string> = {
+  color1Part:    "#ff0066",
+  blackPart:     "#00ff99",
+  color2Part:    "#ff6600",
+  black3Part:    "#0066ff",
+  black2Part:    "#ffcc00",
+  cameraLensPart:"#cc00ff",
+  whitePart:     "#00ffff",
+};
+
+// ---------------------------------------------------------------------------
+// Smartwatch — cores de debug (Object_2 a Object_11)
+// ---------------------------------------------------------------------------
+const SMARTWATCH_DEBUG_COLORS: Record<SmartwatchDebugPartKey, string> = {
+  Object_2:  "#ff0066",
+  Object_3:  "#00ff99",
+  Object_4:  "#ff6600",
+  Object_5:  "#0066ff",
+  Object_6:  "#ffcc00",
+  Object_7:  "#cc00ff",
+  Object_8:  "#00ffff",
+  Object_9:  "#ff4400",
+  Object_10: "#66ff00",
+  Object_11: "#ff0099",
+};
+
+// ---------------------------------------------------------------------------
 export const DEVICE_MODELS: Record<DeviceModelId, DeviceModelDefinition> = {
   smartphone: {
+    primaryColorKey: "smartphoneBody",
+    baseRotation: [0, 0, 0],
+    buildColorsFromPrimary: buildSmartphoneColorsFromPrimary,
     component: Smartphone,
-    defaultTheme: DEFAULT_THEME,
+    defaultTheme: SMARTPHONE_DEFAULT_THEME,
     id: "smartphone",
     initialDebugColors: SMARTPHONE_DEBUG_COLORS,
+    modelScale: [1, 1, 1],
+    modelSpawnOffset: [0, 0, 0],
     name: "Smartphone",
+    pivotOffset: [0, 0, 0],
     screenPosition: [-125, 314.85, -195],
     screenSize: [220, 470],
     themeOptions: SMARTPHONE_THEME_OPTIONS,
-    themes: THEMES,
+    themes: SMARTPHONE_THEMES,
+  },
+  smartphone2: {
+    // primaryColorKey: undefined — sem temas definidos ainda, color picker oculto
+    baseRotation: [0, Math.PI, 0],
+    buildColorsFromPrimary: (_hex) => ({}),
+    component: Smartphone2,
+    defaultTheme: "",
+    id: "smartphone2",
+    initialDebugColors: SMARTPHONE2_DEBUG_COLORS,
+    modelScale: [102.6, 102.6, 102.6],
+    modelSpawnOffset: [115, 50, 180],
+    name: "Smartphone 2",
+    pivotOffset: [0, 0, 0],
+    screenPosition: [0, 0, 0],
+    screenSize: [220, 470],
+    themeOptions: [],
+    themes: {},
+  },
+  smartwatch: {
+    // primaryColorKey: undefined — temas não definidos ainda, color picker oculto
+    // GLTF tem -PI/2 X baked. +PI/2 X cancela → modelo nativo deitado.
+    // Z -PI/2 ergue o relógio do chão; Y PI enfrenta a câmera.
+    baseRotation: [0, -Math.PI / 2, 0],
+    buildColorsFromPrimary: buildSmartwatchColorsFromPrimary,
+    component: Smartwatch,
+    defaultTheme: SMARTWATCH_DEFAULT_THEME,
+    id: "smartwatch",
+    initialDebugColors: SMARTWATCH_DEBUG_COLORS,
+    // GLTF bounding box: [14.509, 8.231, 15.128]. Após -PI/2 X baked na cena:
+    // altura Three.js = 15.128. Scale alvo: ~490 / 15.128 ≈ 32.4
+    modelScale: [19.44, 19.44, 19.44],
+    modelSpawnOffset: [130, 40, 270],
+    name: "Smartwatch",
+    pivotOffset: [0, 0, 0],
+    screenPosition: [0, 0, 0],
+    screenSize: [0, 0],
+    themeOptions: [],
+    themes: SMARTWATCH_THEMES,
+  },
+  notebook: {
+    // primaryColorKey: undefined — temas não definidos ainda, color picker oculto
+    // Notebook está de costas com baseRotation=[0,0,0] — mesma correção do smartphone2.
+    baseRotation: [0, Math.PI, 0],
+    buildColorsFromPrimary: buildNotebookColorsFromPrimary,
+    component: Notebook,
+    defaultTheme: NOTEBOOK_DEFAULT_THEME,
+    id: "notebook",
+    initialDebugColors: {},
+    // GLTF com scale=0.01 baked. Bounds efetivos: [0.312, 0.300, 0.212] world units.
+    // Após PI/2 X rotation: altura = 0.212. Scale alvo: ~490 / 0.212 ≈ 2311
+    modelScale: [2311, 2311, 2311],
+    modelSpawnOffset: [120, 100, 0],
+    name: "Notebook",
+    pivotOffset: [0, 0, 0],
+    screenPosition: [0, 0, 0],
+    screenSize: [0, 0],
+    themeOptions: [],
+    themes: NOTEBOOK_THEMES,
   },
 };
 
 export const DEVICE_MODEL_LIST = Object.values(DEVICE_MODELS);
 export const DEFAULT_DEVICE_MODEL = DEVICE_MODELS.smartphone;
+
+// Re-export para compatibilidade com imports existentes
+export type { SmartphoneThemeName };

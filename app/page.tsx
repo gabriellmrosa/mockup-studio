@@ -1,10 +1,10 @@
 "use client";
 
 import { ChangeEvent, useEffect, useRef, useState } from "react";
+import type { ScaleOverrides, SpawnOverrides } from "./components/MockupCanvas/MockupCanvas";
 import InspectorPanel from "./components/InspectorPanel/InspectorPanel";
 import LayersPanel from "./components/LayersPanel/LayersPanel";
 import MockupCanvas, { type ExportPreset } from "./components/MockupCanvas/MockupCanvas";
-import { type ThemeName } from "./components/Smartphone";
 import { APP_COPY, type Locale, type UiTheme } from "./lib/i18n";
 import { readFileAsDataUrl } from "./lib/mockup-image";
 import {
@@ -61,6 +61,8 @@ export default function Home() {
   const [, setExportHandler] =
     useState<((preset: ExportPreset) => Promise<void>) | null>(null);
   const [resetCameraVersion] = useState(0);
+  const [scaleOverrides, setScaleOverrides] = useState<ScaleOverrides>({});
+  const [spawnOverrides, setSpawnOverrides] = useState<SpawnOverrides>({});
   const copy = APP_COPY[locale];
   const selectedObject =
     sceneObjects.find((object) => object.id === selectedObjectId) ??
@@ -164,7 +166,7 @@ export default function Home() {
     setSceneObjects((current) => current.filter((object) => object.id !== id));
   }
 
-  function handleThemeChange(themeId: ThemeName) {
+  function handleThemeChange(themeId: string) {
     if (!selectedObject) {
       return;
     }
@@ -181,9 +183,10 @@ export default function Home() {
       return;
     }
 
+    const model = DEVICE_MODELS[selectedObject.modelId];
     updateSceneObject(selectedObject.id, {
-      colors: { ...selectedObject.colors, body: hex },
-      deviceTheme: "" as ThemeName,
+      colors: model.buildColorsFromPrimary(hex),
+      deviceTheme: "",
     });
   }
 
@@ -249,17 +252,28 @@ export default function Home() {
         onBgColorChange={setCanvasBgColor}
         onExportReady={(handler) => setExportHandler(() => handler)}
         resetCameraVersion={resetCameraVersion}
+        scaleOverrides={scaleOverrides}
+        spawnOverrides={spawnOverrides}
         uiTheme={uiTheme}
       />
 
       <InspectorPanel
         copy={copy}
         object={selectedObject}
+        selectedObjectIndex={sceneObjects.findIndex((o) => o.id === selectedObject?.id)}
+        scaleOverrides={scaleOverrides}
+        spawnOverrides={spawnOverrides}
         onColorChange={handleColorChange}
         onDebugColorChange={handleDebugColorChange}
         onImageUpload={handleImageUpload}
         onModelChange={handleModelChange}
         onResetObject={handleResetObject}
+        onScaleOverrideChange={(index, scale) =>
+          setScaleOverrides((prev: ScaleOverrides) => ({ ...prev, [index]: scale }))
+        }
+        onSpawnOverrideChange={(index, pos) =>
+          setSpawnOverrides((prev: SpawnOverrides) => ({ ...prev, [index]: pos }))
+        }
         onThemeChange={handleThemeChange}
         onToggleDebugMode={() =>
           selectedObject &&
@@ -278,6 +292,9 @@ export default function Home() {
         }
         onUpdateRotation={(rotationPatch) =>
           selectedObject && updateSceneObject(selectedObject.id, rotationPatch)
+        }
+        onUpdateScale={(scale) =>
+          selectedObject && updateSceneObject(selectedObject.id, { scale })
         }
         uiTheme={uiTheme}
         uploadError={uploadError}

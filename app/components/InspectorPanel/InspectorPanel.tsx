@@ -3,10 +3,11 @@
 import "./InspectorPanel.css";
 import ColorRow from "../ColorRow/ColorRow";
 import Control from "../Control/Control";
-import type { ThemeName } from "../Smartphone";
 import type { AppCopy, UiTheme } from "../../lib/i18n";
 import type { SceneObject } from "../../lib/scene-objects";
 import { DEVICE_MODEL_LIST } from "../../models/device-models";
+import { AUTO_OBJECT_POSITIONS } from "../../lib/scene-presets";
+import type { ScaleOverrides, SpawnOverrides } from "../MockupCanvas/MockupCanvas";
 import {
   InspectorPanelHeader,
   PanelSection,
@@ -16,12 +17,17 @@ import { ChevronDown, RotateCcw, Upload } from "lucide-react";
 type InspectorPanelProps = {
   copy: AppCopy;
   object: SceneObject | null;
+  selectedObjectIndex: number;
+  scaleOverrides: ScaleOverrides;
+  spawnOverrides: SpawnOverrides;
   onColorChange: (hex: string) => void;
   onDebugColorChange: (part: string, hex: string) => void;
   onImageUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onModelChange: (modelId: SceneObject["modelId"]) => void;
   onResetObject: () => void;
-  onThemeChange: (themeId: ThemeName) => void;
+  onScaleOverrideChange: (index: number, scale: number) => void;
+  onSpawnOverrideChange: (index: number, pos: [number, number, number]) => void;
+  onThemeChange: (themeId: string) => void;
   onToggleDebugMode: () => void;
   onToggleDeviceShell: () => void;
   onUpdateRotation: (
@@ -30,6 +36,7 @@ type InspectorPanelProps = {
   onUpdatePosition: (
     patch: Pick<SceneObject, "positionX" | "positionY" | "positionZ">,
   ) => void;
+  onUpdateScale: (scale: number) => void;
   uiTheme: UiTheme;
   uploadError: string;
 };
@@ -37,16 +44,22 @@ type InspectorPanelProps = {
 export default function InspectorPanel({
   copy,
   object,
+  selectedObjectIndex,
+  scaleOverrides,
+  spawnOverrides,
   onColorChange,
   onDebugColorChange,
   onImageUpload,
   onModelChange,
   onResetObject,
+  onScaleOverrideChange,
+  onSpawnOverrideChange,
   onThemeChange,
   onToggleDebugMode,
   onToggleDeviceShell,
   onUpdatePosition,
   onUpdateRotation,
+  onUpdateScale,
   uiTheme,
   uploadError,
 }: InspectorPanelProps) {
@@ -144,18 +157,20 @@ export default function InspectorPanel({
                   </button>
                 ))}
               </div>
-              <div className="theme-color-inline">
-                <span className="theme-color-inline-label">
-                  {copy.bodyColorLabel}
-                </span>
-                <ColorRow
-                  label=""
-                  uiTheme={uiTheme}
-                  value={object.colors.body}
-                  onChange={onColorChange}
-                  compact
-                />
-              </div>
+              {model?.primaryColorKey ? (
+                <div className="theme-color-inline">
+                  <span className="theme-color-inline-label">
+                    {copy.bodyColorLabel}
+                  </span>
+                  <ColorRow
+                    label=""
+                    uiTheme={uiTheme}
+                    value={object.colors[model.primaryColorKey] ?? ""}
+                    onChange={onColorChange}
+                    compact
+                  />
+                </div>
+              ) : null}
             </PanelSection>
           </>
         ) : (
@@ -204,8 +219,8 @@ export default function InspectorPanel({
                     positionZ: object.positionZ,
                   })
                 }
-                min={-2}
-                max={2}
+                min={-5}
+                max={5}
                 step={0.01}
               />
               <Control
@@ -218,8 +233,8 @@ export default function InspectorPanel({
                     positionZ: object.positionZ,
                   })
                 }
-                min={-2}
-                max={2}
+                min={-5}
+                max={5}
                 step={0.01}
               />
               <Control
@@ -232,8 +247,8 @@ export default function InspectorPanel({
                     positionZ: value,
                   })
                 }
-                min={-1}
-                max={1}
+                min={-3}
+                max={3}
                 step={0.01}
               />
             </div>
@@ -280,6 +295,17 @@ export default function InspectorPanel({
                 max={25}
               />
             </div>
+
+            <div className="transform-group transform-group-offset">
+              <Control
+                label={copy.scale}
+                value={object.scale}
+                setValue={onUpdateScale}
+                min={0.1}
+                max={3}
+                step={0.01}
+              />
+            </div>
           </div>
         </PanelSection>
 
@@ -290,6 +316,47 @@ export default function InspectorPanel({
           >
             {object.debugMode ? copy.debugOn : copy.debugOff}
           </button>
+        </PanelSection>
+
+        <PanelSection title="DEBUG: Spawn Position">
+          {(["X", "Y", "Z"] as const).map((axis, ai) => {
+            const base = spawnOverrides[selectedObjectIndex] ?? AUTO_OBJECT_POSITIONS[selectedObjectIndex] ?? [0, 0, 0];
+            return (
+              <div key={axis} className="flex items-center gap-2 mt-1">
+                <span className="text-xs w-4 text-[var(--sidebar-muted)]">{axis}</span>
+                <input
+                  type="number"
+                  step={10}
+                  value={base[ai]}
+                  onChange={(e) => {
+                    const cur: [number, number, number] = [
+                      spawnOverrides[selectedObjectIndex]?.[0] ?? AUTO_OBJECT_POSITIONS[selectedObjectIndex]?.[0] ?? 0,
+                      spawnOverrides[selectedObjectIndex]?.[1] ?? AUTO_OBJECT_POSITIONS[selectedObjectIndex]?.[1] ?? 0,
+                      spawnOverrides[selectedObjectIndex]?.[2] ?? AUTO_OBJECT_POSITIONS[selectedObjectIndex]?.[2] ?? 0,
+                    ];
+                    cur[ai] = parseFloat(e.target.value) || 0;
+                    onSpawnOverrideChange(selectedObjectIndex, cur);
+                  }}
+                  className="editor-input w-full text-xs"
+                />
+              </div>
+            );
+          })}
+          <div className="flex items-center gap-2 mt-1">
+            <span className="text-xs w-4 text-[var(--sidebar-muted)]">S</span>
+            <input
+              type="number"
+              step={0.1}
+              value={scaleOverrides[selectedObjectIndex] ?? 1}
+              onChange={(e) => {
+                onScaleOverrideChange(selectedObjectIndex, parseFloat(e.target.value) || 1);
+              }}
+              className="editor-input w-full text-xs"
+            />
+          </div>
+          <p className="text-[10px] text-[var(--sidebar-muted)] mt-2">
+            Obj {selectedObjectIndex} — anote e passe para hardcodar em AUTO_OBJECT_POSITIONS
+          </p>
         </PanelSection>
       </div>
     </aside>

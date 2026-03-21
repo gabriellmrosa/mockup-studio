@@ -4,7 +4,7 @@ Editor de mockups em Next.js + React Three Fiber para compor imagens de app em d
 
 ## Estado Atual
 
-O projeto esta funcional como um MVP de composicao com multiobjeto basico em cena, ainda com apenas 1 modelo 3D real: `smartphone`.
+O projeto esta funcional como um editor de composicao multiobjeto com catalogo de 4 modelos 3D reais.
 
 Ja implementado:
 
@@ -20,6 +20,7 @@ Ja implementado:
 - ajuste manual da cor do body por objeto;
 - controles de posicao X, Y e Z por objeto;
 - controles de rotacao X, Y e Z por objeto;
+- controle de escala uniforme por objeto;
 - reset das transformacoes do objeto selecionado;
 - reset global de camera;
 - color picker de cor de fundo do canvas na toolbar flutuante;
@@ -28,83 +29,93 @@ Ja implementado:
 - modo `So tela`, que remove a casca do dispositivo e deixa apenas a textura da tela;
 - toggle global de `dark/light`;
 - toggle global de idioma `pt-BR/en-US`;
-- arquitetura inicial de catalogo de dispositivos;
-- design system com tokens primitivos de cor (`--black-000` a `--black-980`, `--gray-*`, `--ink-*`), border-radius (`--radius-xs` a `--radius-full`) e font-weight (`--font-regular` a `--font-bold`) para dark e light mode, incluindo token `--input-border-error` para estados de erro;
-- menu de preferencias com submenus cascata (Theme e Language) com checkmark no item ativo, hover com delay para nao fechar ao mover o mouse entre paineis, e fechar ao clicar fora;
-- menu de contexto por layer (3 pontos) com opcoes de Renomear e Deletar — delete so aparece em layers adicionadas pelo usuario (a layer base nao pode ser deletada);
-- `ContextMenu` como componente reutilizavel com suporte a action items e submenu items, renderizado via React Portal para evitar clipping por `overflow`;
-- icones migrados de SVGs inline para `lucide-react`;
-- controle de camera migrado de `OrbitControls` para `CameraControls` (`camera-controls`), habilitando pan programatico;
-- botoes de seta no toolbar flutuante movem a camera (pan) proporcionalmente a distancia atual via `controls.truck()`;
-- setas do teclado tambem acionam o pan da camera (desativado quando foco esta em input de texto);
-- animacao suave de entrada da camera ao carregar a cena;
-- grid de profundidade infinito no canvas (`drei <Grid>`) com cor adaptativa baseada em luminancia do fundo;
-- input de hex no `ColorRow` com suporte a digitacao e colagem livre (com ou sem `#`), normalizacao automatica no blur, debounce de 350ms e feedback visual de erro para valores invalidos.
+- catalogo com 4 modelos 3D: `smartphone`, `smartphone2`, `smartwatch` e `notebook`;
+- arquitetura multimodelo com `modelScale`, `baseRotation`, `pivotOffset` e `modelSpawnOffset` por modelo;
+- override de escala e posicao por objeto no painel de debug de spawn (para calibracao de novos modelos);
+- design system com tokens primitivos de cor (`--black-000` a `--black-980`, `--gray-*`, `--ink-*`), border-radius (`--radius-xs` a `--radius-full`) e font-weight (`--font-regular` a `--font-bold`) para dark e light mode;
+- menu de preferencias com submenus cascata (Theme e Language) com checkmark no item ativo;
+- menu de contexto por layer (3 pontos) com opcoes de Renomear e Deletar;
+- `ContextMenu` renderizado via React Portal para evitar clipping por `overflow`;
+- icones via `lucide-react`;
+- controle de camera via `CameraControls` com pan programatico;
+- botoes de seta no toolbar flutuante movem a camera (pan) proporcionalmente a distancia atual;
+- setas do teclado tambem acionam o pan da camera;
+- grid de profundidade infinito no canvas com cor adaptativa baseada em luminancia do fundo;
+- input de hex no `ColorRow` com debounce, normalizacao e feedback visual de erro;
+- `Suspense` por objeto para isolar o carregamento de textura sem disparar re-fit da camera;
+- camera re-ajusta apenas quando objetos sao adicionados ou removidos (nao em mudancas de propriedade).
+
+## Catalogo de Modelos
+
+| Modelo | Arquivo GLB | modelScale | baseRotation | modelSpawnOffset |
+|---|---|---|---|---|
+| smartphone | smartphone.glb | [1, 1, 1] | [0, 0, 0] | [0, 0, 0] |
+| smartphone2 | smartphone2.glb | [102.6, 102.6, 102.6] | [0, π, 0] | [115, 50, 180] |
+| smartwatch | smartwatch.glb | [19.44, 19.44, 19.44] | [0, -π/2, 0] | [130, 40, 270] |
+| notebook | notebook.glb | [2311, 2311, 2311] | [0, π, 0] | [120, 100, 0] |
 
 ## Decisoes de Produto Ja Tomadas
 
-- foco atual: validar bem o fluxo multiobjeto antes de expandir o catalogo;
+- foco atual: catalogo de modelos e composicao multiobjeto;
 - export: somente PNG com fundo transparente;
-- transformacoes liberadas nesta etapa: posicao X/Y/Z e rotacao X/Y/Z por objeto;
+- transformacoes por objeto: posicao X/Y/Z, rotacao X/Y/Z e escala uniforme;
 - camera continua global da cena;
 - o giro com mouse no canvas atua na camera via `CameraControls`, nao no estado de rotacao do objeto;
 - cada objeto possui sua propria imagem e sua propria configuracao;
 - o objeto inicial da cena nao pode ser deletado;
 - novos objetos entram com leve deslocamento automatico para nao sobrepor totalmente o objeto base;
-- ao trocar o modelo de um objeto, a imagem da tela deve ser resetada para placeholder;
-- por enquanto, seguimos com apenas 1 modelo real para validar a arquitetura multiobjeto;
-- multiobjeto, novos modelos e video serao tratados em etapas separadas.
+- ao trocar o modelo de um objeto, a imagem da tela e resetada para placeholder.
 
 ## Estrutura Relevante
 
-- [app/page.tsx](/Users/gabrielrosa/Desktop/dev/mock-photo/app/page.tsx): orquestra o estado do editor, lista de objetos da cena e selecao ativa.
-- [app/styles/tokens.css](/Users/gabrielrosa/Desktop/dev/mock-photo/app/styles/tokens.css): tokens primitivos de cor, border-radius e font-weight.
-- [app/globals.css](/Users/gabrielrosa/Desktop/dev/mock-photo/app/globals.css): tokens semanticos (`--background`, `--sidebar-bg`...) que referenciam os primitivos, resets globais e `.app-shell`.
-- [app/components/LayersPanel/](/Users/gabrielrosa/Desktop/dev/mock-photo/app/components/LayersPanel/): painel esquerdo com camadas/objetos e preferencias globais.
-- [app/components/InspectorPanel/](/Users/gabrielrosa/Desktop/dev/mock-photo/app/components/InspectorPanel/): painel direito com configuracoes do objeto selecionado.
-- [app/components/MockupCanvas/](/Users/gabrielrosa/Desktop/dev/mock-photo/app/components/MockupCanvas/): canvas 3D, CameraControls, grid de profundidade, reset de camera, export e renderizacao de multiplos objetos.
-- [app/components/ContextMenu/](/Users/gabrielrosa/Desktop/dev/mock-photo/app/components/ContextMenu/): menu de contexto reutilizavel com suporte a action items e submenus cascata.
-- [app/components/EditorPrimitives/](/Users/gabrielrosa/Desktop/dev/mock-photo/app/components/EditorPrimitives/): componentes primitivos compartilhados (`LayersPanelHeader`, `InspectorPanelHeader`, `PanelSection`, `IconButton`) e seus estilos base.
-- [app/components/Smartphone.tsx](/Users/gabrielrosa/Desktop/dev/mock-photo/app/components/Smartphone.tsx): modelo atual do smartphone, tela com textura e modo sem casca.
-- [app/models/device-models.ts](/Users/gabrielrosa/Desktop/dev/mock-photo/app/models/device-models.ts): catalogo de dispositivos e metadados do modelo ativo.
-- [app/lib/scene-objects.ts](/Users/gabrielrosa/Desktop/dev/mock-photo/app/lib/scene-objects.ts): helpers para criar, resetar e trocar o modelo de objetos da cena.
-- [app/lib/scene-presets.ts](/Users/gabrielrosa/Desktop/dev/mock-photo/app/lib/scene-presets.ts): presets padrao de transformacao e offsets automaticos da cena.
-- [app/lib/mockup-image.ts](/Users/gabrielrosa/Desktop/dev/mock-photo/app/lib/mockup-image.ts): utilitarios da textura/imagem da tela.
-- [app/lib/i18n.ts](/Users/gabrielrosa/Desktop/dev/mock-photo/app/lib/i18n.ts): copy da interface em `pt-BR` e `en-US`.
+- [app/page.tsx](app/page.tsx): orquestra o estado do editor, lista de objetos da cena e selecao ativa.
+- [app/styles/tokens.css](app/styles/tokens.css): tokens primitivos de cor, border-radius e font-weight.
+- [app/globals.css](app/globals.css): tokens semanticos e resets globais.
+- [app/components/LayersPanel/](app/components/LayersPanel/): painel esquerdo com camadas/objetos e preferencias globais.
+- [app/components/InspectorPanel/](app/components/InspectorPanel/): painel direito com configuracoes do objeto selecionado (transform, temas, debug).
+- [app/components/MockupCanvas/](app/components/MockupCanvas/): canvas 3D, CameraControls, grid, export e renderizacao de multiplos objetos.
+- [app/components/Smartphone.tsx](app/components/Smartphone.tsx): modelo smartphone com tela texturizada.
+- [app/components/Smartphone2.tsx](app/components/Smartphone2.tsx): modelo smartphone2 com correcao de UV atlas na tela.
+- [app/components/Smartwatch.tsx](app/components/Smartwatch.tsx): modelo smartwatch.
+- [app/components/Notebook.tsx](app/components/Notebook.tsx): modelo notebook.
+- [app/models/device-models.ts](app/models/device-models.ts): catalogo de dispositivos com metadados de escala, rotacao e offset.
+- [app/lib/3d-tokens/](app/lib/3d-tokens/): tokens de cores e temas por modelo.
+- [app/lib/scene-objects.ts](app/lib/scene-objects.ts): helpers para criar, resetar e trocar modelo de objetos da cena.
+- [app/lib/scene-presets.ts](app/lib/scene-presets.ts): presets padrao de transformacao e posicoes automaticas da cena.
+- [app/lib/mockup-image.ts](app/lib/mockup-image.ts): utilitarios da textura/imagem da tela.
+- [app/lib/i18n.ts](app/lib/i18n.ts): copy da interface em `pt-BR` e `en-US`.
+- [CLAUDE.md](CLAUDE.md): guia tecnico para adicionar novos modelos 3D ao catalogo.
 
 ## Branch de Trabalho
-
-As alteracoes recentes foram feitas na branch:
 
 - `work-with-codex`
 
 ## Onde Paramos
 
-Input de hex do `ColorRow` reescrito com suporte a digitacao e colagem livre, normalizacao automatica e feedback visual de erro. Preferencia de camera invertida removida (controles sempre no modo normal).
+Catalogo expandido para 4 dispositivos. Arquitetura multimodelo consolidada com `modelScale`, `baseRotation`, `pivotOffset` e `modelSpawnOffset` por modelo. Controle de escala uniforme por objeto adicionado ao Transform. Painel de debug de spawn position/escala para calibracao de novos modelos.
 
-**Bug conhecido pendente:** o reset de camera restaura posicao, zoom e rotacao vertical corretamente, mas a rotacao horizontal (azimute) nao retorna ao estado inicial. Causa: breaking change do `camera-controls` v3 no tratamento de normalizacao de angulo. Investigado com `normalizeRotations()` e correcao manual de path — sem solucao definitiva ainda.
+**Bug conhecido pendente:** reset de camera restaura posicao e zoom corretamente, mas o azimute nao retorna ao estado inicial (`camera-controls` v3).
 
 ## Proximo Passo Sugerido
 
-- investigar bug de reset do azimute da camera (`camera-controls` v3);
-- adicionar o segundo modelo real ao catalogo;
-- refinar os controles de composicao por objeto;
+- calibrar posicao/escala padrao do notebook;
+- definir temas de cores para `smartphone2`, `smartwatch` e `notebook`;
+- identificar mesh da tela no `smartwatch` e `notebook` para suporte a textura;
+- investigar bug de reset do azimute da camera;
 - refinar UX de camadas (reorder, lock ou visibilidade).
 
 ## Observacoes Tecnicas
 
-- a textura da tela ja foi corrigida e nao deve mais deformar sozinha;
-- o reset da secao `Transform` atua apenas no objeto selecionado;
-- o botao de reset da camera usa `setLookAt()` direto com `normalizeRotations()` — nao usa `controls.reset()`;
-- `controls.truck(distance * 0.08, ...)` garante pan sempre visivel independente do zoom atual;
-- o grid usa `infiniteGrid` do drei com `cellSize=50` e `sectionSize=200` (escala do modelo em centenas de unidades), posicionado em `y=-300`;
-- a cor do grid e recalculada via luminancia do hex de fundo a cada mudanca de cor do canvas;
-- presets padrao de transformacao e offsets automaticos da cena foram centralizados em uma fonte unica para evitar valores soltos;
-- o offset automatico entre objetos continua ajudando a evitar sobreposicao total ao adicionar novos itens, mesmo com os controles manuais de posicao ja expostos no inspector;
-- existe apenas 1 modelo real no catalogo neste momento: `smartphone`;
-- `npm run lint` passa;
-- `npx next build --webpack` passa;
-- o `next build` com Turbopack pode falhar no sandbox, entao usar `--webpack` para validacao local quando necessario.
+- `SkeletonUtils.clone` + `<primitive object={clone}/>` para modelos carregados via GLTF;
+- nos com `scale=[0,0,0]` no GLTF sao ocultados para nao distorcer o bounding box;
+- `Suspense` por objeto (nao global) evita re-fit da camera ao carregar texturas;
+- `sceneFitKey` baseado apenas nos IDs dos objetos garante re-fit so em add/remove;
+- `modelSpawnOffset` e somado ao `AUTO_OBJECT_POSITIONS` por indice;
+- `scaleOverrides` e `spawnOverrides` no painel DEBUG sao temporarios para calibracao;
+- `OBJECT_POSITION_MULTIPLIER = 140` (X/Y) e `OBJECT_POSITION_MULTIPLIER_Z = 420` (Z);
+- grid em `y=-300` com `infiniteGrid`, `cellSize=50`, `sectionSize=200`;
+- `npm run lint` deve passar;
+- `npx next build --webpack` para validacao de build.
 
 ## Como Rodar
 
