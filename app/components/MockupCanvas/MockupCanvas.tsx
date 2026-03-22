@@ -3,7 +3,7 @@
 import "./MockupCanvas.css";
 import { Suspense, useEffect, useRef, useState } from "react";
 import * as THREE from "three";
-import { Canvas, useThree } from "@react-three/fiber";
+import { Canvas, type ThreeEvent, useThree } from "@react-three/fiber";
 import {
   Bounds,
   CameraControls,
@@ -12,7 +12,7 @@ import {
   Grid,
   useBounds,
 } from "@react-three/drei";
-import type CameraControlsImpl from "camera-controls";
+import CameraControlsImpl from "camera-controls";
 import type { AppCopy, UiTheme } from "../../lib/i18n";
 import type { SceneObject } from "../../lib/scene-objects";
 import {
@@ -34,6 +34,7 @@ type MockupCanvasProps = {
   copy: AppCopy;
   objects: SceneObject[];
   onBgColorChange: (color: string) => void;
+  onSelectObject: (id: string) => void;
   resetCameraVersion: number;
   scaleOverrides: ScaleOverrides;
   spawnOverrides: SpawnOverrides;
@@ -60,6 +61,7 @@ type SceneBridgeProps = MockupCanvasProps & {
   ) => void;
   onObjectLoadStateChange: (id: string, isLoading: boolean) => void;
   onObjectResolved: (id: string) => void;
+  onSelectObject: (id: string) => void;
   onViewportControlsReady: (api: ViewportControlsApi | null) => void;
   sceneFitKey: string;
   spawnOverrides: SpawnOverrides;
@@ -125,6 +127,7 @@ function SceneBridge({
   onExportReady,
   onObjectLoadStateChange,
   onObjectResolved,
+  onSelectObject,
   onViewportControlsReady,
   resetCameraVersion,
   scaleOverrides,
@@ -135,6 +138,14 @@ function SceneBridge({
   const controlsRef = useRef<CameraControlsImpl | null>(null);
   const sceneRef = useRef<THREE.Group | null>(null);
   const { camera, gl, scene, size } = useThree();
+
+  function handleObjectDoubleClick(
+    event: ThreeEvent<MouseEvent>,
+    objectId: string,
+  ) {
+    event.stopPropagation();
+    onSelectObject(objectId);
+  }
 
   useEffect(() => {
     onExportReady(async ({ height, label, width }) => {
@@ -224,6 +235,9 @@ function SceneBridge({
                     onObjectResolved={onObjectResolved}
                   />
                   <group
+                    onDoubleClick={(event) =>
+                      handleObjectDoubleClick(event, object.id)
+                    }
                     position={getResolvedObjectPosition(object, index, spawnOverrides, model.modelSpawnOffset)}
                     rotation={[
                       (object.rotationX * Math.PI) / 180,
@@ -270,7 +284,20 @@ function SceneBridge({
         {...ANGLE_LIMITS}
         dampingFactor={0.08}
         azimuthRotateSpeed={1}
+        dollyToCursor
+        dollySpeed={3}
+        mouseButtons={{
+          left: CameraControlsImpl.ACTION.ROTATE,
+          middle: CameraControlsImpl.ACTION.DOLLY,
+          right: CameraControlsImpl.ACTION.TRUCK,
+          wheel: CameraControlsImpl.ACTION.DOLLY,
+        }}
         polarRotateSpeed={1}
+        touches={{
+          one: CameraControlsImpl.ACTION.TOUCH_ROTATE,
+          two: CameraControlsImpl.ACTION.TOUCH_DOLLY_TRUCK,
+          three: CameraControlsImpl.ACTION.NONE,
+        }}
       />
     </>
   );
@@ -540,6 +567,7 @@ export default function MockupCanvas(props: MockupCanvasProps) {
           }}
           onObjectLoadStateChange={handleObjectLoadStateChange}
           onObjectResolved={handleObjectResolved}
+          onSelectObject={props.onSelectObject}
           onViewportControlsReady={setViewportControls}
           sceneFitKey={props.objects.map((o) => o.id).join(",")}
         />

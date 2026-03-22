@@ -262,6 +262,7 @@ export default function Home() {
         copy={copy}
         objects={sceneObjects}
         onBgColorChange={setCanvasBgColor}
+        onSelectObject={setSelectedObjectId}
         resetCameraVersion={resetCameraVersion}
         scaleOverrides={scaleOverrides}
         spawnOverrides={spawnOverrides}

@@ -15,6 +15,7 @@ Ja implementado:
 - botao para adicionar novos objetos na cena;
 - remocao de objetos adicionados pelo usuario;
 - selecao de objeto ativo por painel de camadas;
+- selecao de objeto ativo tambem por double click direto no objeto 3D no canvas;
 - inspector separado para editar apenas o objeto selecionado;
 - selecao de tema base do device por objeto;
 - customizacao manual de cores por objeto a partir de uma lista reduzida de partes nomeadas;
@@ -49,6 +50,7 @@ Ja implementado:
 - `ContextMenu` renderizado via React Portal para evitar clipping por `overflow`;
 - icones via `lucide-react`;
 - controle de camera via `CameraControls` com pan programatico;
+- configuracao basica de navegacao do canvas ajustada para wheel/trackpad scroll em dolly, pinch/2 dedos em dolly+truck e zoom ao cursor;
 - botoes de seta no toolbar flutuante movem a camera (pan) proporcionalmente a distancia atual;
 - setas do teclado tambem acionam o pan da camera;
 - grid de profundidade infinito no canvas com cor adaptativa baseada em luminancia do fundo;
