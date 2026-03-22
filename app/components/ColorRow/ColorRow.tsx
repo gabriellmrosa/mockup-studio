@@ -31,14 +31,6 @@ export default function ColorRow({
   const [isFocused, setIsFocused] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Sync external value changes (e.g. color picker, undo) only while not typing
-  useEffect(() => {
-    if (!isFocused) {
-      setInputVal(value);
-      setIsInvalid(false);
-    }
-  }, [value, isFocused]);
-
   // Cleanup debounce on unmount
   useEffect(() => {
     return () => {
@@ -60,7 +52,10 @@ export default function ColorRow({
     }
   };
 
-  const handleFocus = () => setIsFocused(true);
+  const handleFocus = () => {
+    setInputVal(value);
+    setIsFocused(true);
+  };
 
   const handleBlur = () => {
     setIsFocused(false);
@@ -79,6 +74,7 @@ export default function ColorRow({
   };
 
   const handleColorPicker = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.value === value) return;
     setInputVal(e.target.value);
     setIsInvalid(false);
     onChange(e.target.value);
@@ -106,7 +102,7 @@ export default function ColorRow({
       </label>
       <input
         type="text"
-        value={inputVal}
+        value={isFocused ? inputVal : value}
         onChange={handleHexInput}
         onFocus={handleFocus}
         onBlur={handleBlur}

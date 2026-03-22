@@ -23,6 +23,7 @@ type InspectorPanelProps = {
   onThemeChange: (themeId: string) => void;
   onToggleDebugMode: () => void;
   onToggleDeviceShell: () => void;
+  onToggleMatteColors: () => void;
   onUpdateRotation: (
     patch: Pick<SceneObject, "rotationX" | "rotationY" | "rotationZ">,
   ) => void;
@@ -45,6 +46,7 @@ export default function InspectorPanel({
   onThemeChange,
   onToggleDebugMode,
   onToggleDeviceShell,
+  onToggleMatteColors,
   onUpdatePosition,
   onUpdateRotation,
   onUpdateScale,
@@ -149,18 +151,29 @@ export default function InspectorPanel({
                 ))}
               </div>
               {model?.primaryColorKey ? (
-                <div className="theme-color-inline">
-                  <span className="theme-color-inline-label">
-                    {copy.bodyColorLabel}
-                  </span>
-                  <ColorRow
-                    label=""
-                    uiTheme={uiTheme}
-                    value={object.colors[model.primaryColorKey] ?? ""}
-                    onChange={onColorChange}
-                    compact
-                  />
-                </div>
+                <>
+                  <div className="theme-color-inline">
+                    <span className="theme-color-inline-label">
+                      {copy.bodyColorLabel}
+                    </span>
+                    <ColorRow
+                      label=""
+                      uiTheme={uiTheme}
+                      value={object.colors[model.primaryColorKey] ?? ""}
+                      onChange={onColorChange}
+                      compact
+                    />
+                  </div>
+                  <label className="mt-2 flex justify-end items-center gap-2 text-[0.6875rem] leading-relaxed text-[var(--sidebar-muted)]">
+                    <span className="text-right">{copy.matteColorLabel}</span>
+                    <input
+                      type="checkbox"
+                      checked={object.matteColors}
+                      onChange={onToggleMatteColors}
+                      className="mt-[0.125rem] h-3.5 w-3.5 rounded-[var(--radius-xs)] border border-[var(--input-border)] bg-[var(--input-bg)] accent-[var(--foreground)]"
+                    />
+                  </label>
+                </>
               ) : null}
             </PanelSection>
           </>

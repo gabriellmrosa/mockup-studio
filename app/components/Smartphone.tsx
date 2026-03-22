@@ -152,9 +152,22 @@ type SmartphoneProps = JSX.IntrinsicElements["group"] & {
   screenSize?: [number, number];
   screenRotation?: [number, number, number];
   colors?: Record<string, string>;
+  matteColors?: boolean;
   debugPartColors?: Partial<Record<string, string>>;
   showDeviceShell?: boolean;
 };
+
+function createFinishMaterial(color: string, matte: boolean) {
+  if (matte) {
+    return new THREE.MeshLambertMaterial({ color });
+  }
+
+  return new THREE.MeshPhongMaterial({
+    color,
+    shininess: 65,
+    specular: new THREE.Color("#555555"),
+  });
+}
 
 // ---------------------------------------------------------------------------
 // Tela com textura
@@ -243,6 +256,7 @@ function SmartphoneImpl({
   screenSize = [220, 470],
   screenRotation = [0, 0, 0],
   colors,
+  matteColors = true,
   debugPartColors,
   showDeviceShell = true,
   ...props
@@ -270,18 +284,17 @@ function SmartphoneImpl({
   const c = colors ?? SMARTPHONE_THEMES[SMARTPHONE_DEFAULT_THEME];
   const partMaterials = useMemo(
     () => ({
-      gradientSound:       new THREE.MeshLambertMaterial({ color: c.gradientSound }),
-      smartphoneBody:      new THREE.MeshLambertMaterial({ color: c.smartphoneBody }),
-      rightBigSideButton:  new THREE.MeshLambertMaterial({ color: c.rightBigSideButton }),
-      leftSmallSideButton: new THREE.MeshLambertMaterial({ color: c.leftSmallSideButton }),
-      CircleTopLeft:       new THREE.MeshLambertMaterial({ color: c.CircleTopLeft }),
-      CircleTopLeftMiddle: new THREE.MeshLambertMaterial({ color: c.CircleTopLeftMiddle }),
-      CircleTopRight:      new THREE.MeshLambertMaterial({ color: c.CircleTopRight }),
-      CircleTopRightMiddle:new THREE.MeshLambertMaterial({ color: c.CircleTopRightMiddle }),
+      gradientSound:       createFinishMaterial(c.gradientSound, matteColors),
+      smartphoneBody:      createFinishMaterial(c.smartphoneBody, matteColors),
+      rightBigSideButton:  createFinishMaterial(c.rightBigSideButton, matteColors),
+      leftSmallSideButton: createFinishMaterial(c.leftSmallSideButton, matteColors),
+      CircleTopLeft:       createFinishMaterial(c.CircleTopLeft, matteColors),
+      CircleTopLeftMiddle: createFinishMaterial(c.CircleTopLeftMiddle, matteColors),
+      CircleTopRight:      createFinishMaterial(c.CircleTopRight, matteColors),
+      CircleTopRightMiddle:createFinishMaterial(c.CircleTopRightMiddle, matteColors),
     }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [c.gradientSound, c.smartphoneBody, c.rightBigSideButton, c.leftSmallSideButton,
-     c.CircleTopLeft, c.CircleTopLeftMiddle, c.CircleTopRight, c.CircleTopRightMiddle],
+     c.CircleTopLeft, c.CircleTopLeftMiddle, c.CircleTopRight, c.CircleTopRightMiddle, matteColors],
   );
 
   useEffect(() => {

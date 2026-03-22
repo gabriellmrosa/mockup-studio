@@ -66,6 +66,7 @@ type GLTFResult = GLTF & {
 type Smartphone2Props = JSX.IntrinsicElements["group"] & {
   imageUrl?: string;
   colors?: Record<string, string>;
+  matteColors?: boolean;
   debugPartColors?: Partial<Record<string, string>>;
   showDeviceShell?: boolean;
   screenPosition?: [number, number, number];
@@ -73,12 +74,25 @@ type Smartphone2Props = JSX.IntrinsicElements["group"] & {
   screenRotation?: [number, number, number];
 };
 
+function createFinishMaterial(color: string, matte: boolean) {
+  if (matte) {
+    return new THREE.MeshLambertMaterial({ color });
+  }
+
+  return new THREE.MeshPhongMaterial({
+    color,
+    shininess: 65,
+    specular: new THREE.Color("#555555"),
+  });
+}
+
 // ---------------------------------------------------------------------------
 // Componente principal
 // ---------------------------------------------------------------------------
 function Smartphone2Impl({
   imageUrl,
   colors,
+  matteColors = true,
   debugPartColors,
   showDeviceShell = true,
   screenPosition: _sp,
@@ -86,6 +100,9 @@ function Smartphone2Impl({
   screenRotation: _sr,
   ...props
 }: Smartphone2Props) {
+  void _sp;
+  void _ss;
+  void _sr;
   const { scene } = useGLTF("/models/smartphone2.glb");
   const clone = useMemo(() => SkeletonUtils.clone(scene), [scene]);
   // useGraph para ter acesso tipado aos nodes caso precisemos no futuro
@@ -147,14 +164,13 @@ function Smartphone2Impl({
   const c: Smartphone2Colors = (colors as Smartphone2Colors) ?? SMARTPHONE2_THEMES[SMARTPHONE2_DEFAULT_THEME];
   const partMaterials = useMemo(
     () => ({
-      sideBody:      new THREE.MeshLambertMaterial({ color: c.sideBody }),
-      chargingPort:  new THREE.MeshLambertMaterial({ color: c.chargingPort }),
-      frontBody:     new THREE.MeshLambertMaterial({ color: c.frontBody }),
-      sideButtons:   new THREE.MeshLambertMaterial({ color: c.sideButtons }),
-      speakerGrille: new THREE.MeshLambertMaterial({ color: c.speakerGrille }),
+      sideBody:      createFinishMaterial(c.sideBody, matteColors),
+      chargingPort:  createFinishMaterial(c.chargingPort, matteColors),
+      frontBody:     createFinishMaterial(c.frontBody, matteColors),
+      sideButtons:   createFinishMaterial(c.sideButtons, matteColors),
+      speakerGrille: createFinishMaterial(c.speakerGrille, matteColors),
     }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [c.sideBody, c.chargingPort, c.frontBody, c.sideButtons, c.speakerGrille],
+    [c.sideBody, c.chargingPort, c.frontBody, c.sideButtons, c.speakerGrille, matteColors],
   );
   useEffect(() => () => Object.values(partMaterials).forEach((m) => m.dispose()), [partMaterials]);
 

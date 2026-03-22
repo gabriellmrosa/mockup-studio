@@ -46,6 +46,7 @@ type GLTFResult = GLTF & {
 type SmartwatchProps = React.ComponentPropsWithoutRef<"group"> & {
   imageUrl?: string;
   colors?: Record<string, string>;
+  matteColors?: boolean;
   debugPartColors?: Partial<Record<string, string>>;
   showDeviceShell?: boolean;
   screenPosition?: [number, number, number];
@@ -57,6 +58,7 @@ const SCREEN_RADIUS = 1.75;
 function cloneShellMaterial(
   template: THREE.Material | THREE.Material[] | undefined,
   color: string,
+  matte: boolean,
 ) {
   const base =
     (Array.isArray(template) ? template[0] : template)?.clone() ??
@@ -66,6 +68,20 @@ function cloneShellMaterial(
     base.color.set(color);
   }
 
+  base.transparent = false;
+  base.opacity = 1;
+  if ("roughness" in base && typeof base.roughness === "number") {
+    base.roughness = matte ? Math.max(base.roughness, 0.78) : Math.min(base.roughness, 0.38);
+  }
+  if ("metalness" in base && typeof base.metalness === "number") {
+    base.metalness = matte ? Math.min(base.metalness, 0.06) : Math.max(base.metalness, 0.12);
+  }
+  if ("clearcoat" in base && typeof base.clearcoat === "number") {
+    base.clearcoat = matte ? Math.min(base.clearcoat, 0.04) : Math.max(base.clearcoat, 0.16);
+  }
+  if ("clearcoatRoughness" in base && typeof base.clearcoatRoughness === "number") {
+    base.clearcoatRoughness = matte ? Math.max(base.clearcoatRoughness, 0.7) : Math.min(base.clearcoatRoughness, 0.3);
+  }
   base.side = THREE.DoubleSide;
   return base;
 }
@@ -107,6 +123,7 @@ function getRoundedRectangleShape(
 function SmartwatchImpl({
   imageUrl,
   colors,
+  matteColors = true,
   debugPartColors,
   showDeviceShell = true,
   screenPosition = [0.02, 14.52, -0.1],
@@ -209,20 +226,20 @@ function SmartwatchImpl({
   const c: SmartwatchColors = (colors as SmartwatchColors) ?? SMARTWATCH_THEMES[SMARTWATCH_DEFAULT_THEME];
   const partMaterials = useMemo(
     () => ({
-      twoSideButtons: cloneShellMaterial(shellMaterialTemplate, c.twoSideButtons),
-      bandClasp:      cloneShellMaterial(shellMaterialTemplate, c.bandClasp),
-      oneSideButton:  cloneShellMaterial(shellMaterialTemplate, c.oneSideButton),
-      body:           cloneShellMaterial(shellMaterialTemplate, c.body),
-      bandDetails:    cloneShellMaterial(shellMaterialTemplate, c.bandDetails),
-      bandBottom:     cloneShellMaterial(shellMaterialTemplate, c.bandBottom),
-      bandDetails2:   cloneShellMaterial(shellMaterialTemplate, c.bandDetails2),
-      crownDetail:    cloneShellMaterial(shellMaterialTemplate, c.crownDetail),
-      bandTop:        cloneShellMaterial(shellMaterialTemplate, c.bandTop),
-      bodyBackground: cloneShellMaterial(shellMaterialTemplate, c.bodyBackground),
+      twoSideButtons: cloneShellMaterial(shellMaterialTemplate, c.twoSideButtons, matteColors),
+      bandClasp:      cloneShellMaterial(shellMaterialTemplate, c.bandClasp, matteColors),
+      oneSideButton:  cloneShellMaterial(shellMaterialTemplate, c.oneSideButton, matteColors),
+      body:           cloneShellMaterial(shellMaterialTemplate, c.body, matteColors),
+      bandDetails:    cloneShellMaterial(shellMaterialTemplate, c.bandDetails, matteColors),
+      bandBottom:     cloneShellMaterial(shellMaterialTemplate, c.bandBottom, matteColors),
+      bandDetails2:   cloneShellMaterial(shellMaterialTemplate, c.bandDetails2, matteColors),
+      crownDetail:    cloneShellMaterial(shellMaterialTemplate, c.crownDetail, matteColors),
+      bandTop:        cloneShellMaterial(shellMaterialTemplate, c.bandTop, matteColors),
+      bodyBackground: cloneShellMaterial(shellMaterialTemplate, c.bodyBackground, matteColors),
     }),
     [c.twoSideButtons, c.bandClasp, c.oneSideButton, c.body,
      c.bandDetails, c.bandBottom, c.bandDetails2, c.crownDetail, c.bandTop,
-     c.bodyBackground, shellMaterialTemplate],
+     c.bodyBackground, shellMaterialTemplate, matteColors],
   );
   useEffect(() => () => Object.values(partMaterials).forEach((m) => m.dispose()), [partMaterials]);
 

@@ -22,6 +22,7 @@ export type AppCopy = {
   screenSectionHintPrefix: string;
   themesSectionTitle: string;
   bodyColorLabel: string;
+  matteColorLabel: string;
   debugSectionTitle: string;
   transformSectionTitle: string;
   resetObjectButton: string;
@@ -59,6 +60,7 @@ export const APP_COPY: Record<Locale, AppCopy> = {
     screenSectionHintPrefix: "Recommended",
     themesSectionTitle: "Temas",
     bodyColorLabel: "Customizar",
+    matteColorLabel: "Cor fosca",
     debugSectionTitle: "Debug",
     transformSectionTitle: "Transform",
     resetObjectButton: "Reset objeto",
@@ -99,6 +101,7 @@ export const APP_COPY: Record<Locale, AppCopy> = {
     screenSectionHintPrefix: "Recommended",
     themesSectionTitle: "Themes",
     bodyColorLabel: "Customize",
+    matteColorLabel: "Matte finish",
     debugSectionTitle: "Debug",
     transformSectionTitle: "Transform",
     resetObjectButton: "Reset object",

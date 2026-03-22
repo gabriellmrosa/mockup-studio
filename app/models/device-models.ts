@@ -11,7 +11,7 @@ import {
   buildSmartphone2ColorsFromPrimary,
 } from "../lib/3d-tokens/smartphone2";
 import { Smartwatch, type SmartwatchDebugPartKey } from "../components/Smartwatch";
-import { Notebook } from "../components/Notebook";
+import { Notebook, type NotebookDebugPartKey } from "../components/Notebook";
 import {
   SMARTPHONE_DEFAULT_THEME,
   SMARTPHONE_THEMES,
@@ -145,6 +145,60 @@ const SMARTWATCH_THEME_OPTIONS = [
   { id: "blood",      label: "Blood",      preview: "#6a2525" },
 ];
 
+const NOTEBOOK_THEME_OPTIONS = [
+  { id: "gray",       label: "Cinza",      preview: "#8A8A8E" },
+  { id: "black",      label: "Preto",      preview: "#1C1C1E" },
+  { id: "light-gray", label: "Light Gray", preview: "#d1d1d1" },
+  { id: "blood",      label: "Blood",      preview: "#6a2525" },
+];
+
+const NOTEBOOK_DEBUG_COLORS: Record<NotebookDebugPartKey, string> = {
+  touchpadBorder: "#ffffff",
+  keyboardBaseOuter: "#ffffff",
+  laptopOpenNotch: "#ffffff",
+  DmUcWNXfiLPcftc: "#0066ff",
+  ELAWKPIQpGuqYuU: "#ffcc00",
+  FmsrGmNZGtSredn: "#cc00ff",
+  jbtMEbemwaBHRTw: "#00ffff",
+  jfSniDGKVWZvpyG: "#66ff00",
+  lZDBMTdjXPebUMa: "#ff0099",
+  ZroMGzfQtHrkgUh: "#ffffff",
+  bckGBpxpLXNHmCa: "#ff3300",
+  JXvTyELxHLGtnWp: "#33ccff",
+  keyboardBacklight: "#ffffff",
+  sIzFavpnYbDfLWk: "#00ff99",
+  sonZrhRIQDlQHcy: "#ff6600",
+  aBJxhjUzVIkBmJN: "#0066ff",
+  mTDvrHXNRqkIrBd: "#ffcc00",
+  fVNvUQeYMdbMNOA: "#cc00ff",
+  IJeReHnhQHJFtgB: "#00ffff",
+  lzNeOaWQWAReGok: "#66ff00",
+  WZqbfOdYdlPMpRs: "#ff0099",
+  speakerGrilles: "#ffffff",
+  bodyBottom: "#ffffff",
+  powerButtonInner: "#ffffff",
+  keyboardDeck: "#ffffff",
+  EBRhBFNqcMTaWWv: "#00ff99",
+  keyboardKeys: "#ffffff",
+  keyboardGlyphs: "#ffffff",
+  touchpad: "#ffffff",
+  rFquJMQWzuecHQa: "#cc00ff",
+  eFpSjyrDhTgtyuf: "#00ffff",
+  LBeBZdkKmrJVhJd: "#66ff00",
+  MwJmMcLbTBwQpxl: "#ff0099",
+  OCxZAMeEkQKexHA: "#ffffff",
+  XodVrcYKiUPGCmX: "#ff3300",
+  screenRubberSeal: "#ffffff",
+  screenBackCover: "#ffffff",
+  hingeRubberSeal: "#ffffff",
+  xiLiwJHfkqIwaTs: "#ff6600",
+  LQtuXuSGFKsUXjP: "#0066ff",
+  screenBezel: "#ffffff",
+  screen: "#ffffff",
+  lowerHingeBar: "#ffffff",
+  QSjoCOCzvxPnLpK: "#66ff00",
+};
+
 // ---------------------------------------------------------------------------
 export const DEVICE_MODELS: Record<DeviceModelId, DeviceModelDefinition> = {
   smartphone: {
@@ -211,24 +265,24 @@ export const DEVICE_MODELS: Record<DeviceModelId, DeviceModelDefinition> = {
     themes: SMARTWATCH_THEMES,
   },
   notebook: {
-    // primaryColorKey: undefined — temas não definidos ainda, color picker oculto
+    primaryColorKey: "keyboardBaseOuter",
     // Notebook está de costas com baseRotation=[0,0,0] — mesma correção do smartphone2.
     baseRotation: [0, Math.PI, 0],
     buildColorsFromPrimary: buildNotebookColorsFromPrimary,
     component: Notebook,
     defaultTheme: NOTEBOOK_DEFAULT_THEME,
     id: "notebook",
-    initialDebugColors: {},
+    initialDebugColors: NOTEBOOK_DEBUG_COLORS,
     // GLTF com scale=0.01 baked. Bounds efetivos: [0.312, 0.300, 0.212] world units.
     // Após PI/2 X rotation: altura = 0.212. Scale alvo: ~490 / 0.212 ≈ 2311
     modelScale: [2311, 2311, 2311],
     modelSpawnOffset: [120, 100, 0],
     name: "Notebook",
     pivotOffset: [0, 0, 0],
-    recommendedUploadSize: "",
+    recommendedUploadSize: "2755x1684",
     screenPosition: [0, 0, 0],
     screenSize: [0, 0],
-    themeOptions: [],
+    themeOptions: NOTEBOOK_THEME_OPTIONS,
     themes: NOTEBOOK_THEMES,
   },
 };

@@ -1,6 +1,7 @@
 "use client";
 
 import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { Leva } from "leva";
 import type { ScaleOverrides, SpawnOverrides } from "./components/MockupCanvas/MockupCanvas";
 import InspectorPanel from "./components/InspectorPanel/InspectorPanel";
 import LayersPanel from "./components/LayersPanel/LayersPanel";
@@ -168,6 +169,9 @@ export default function Home() {
     }
 
     const model = DEVICE_MODELS[selectedObject.modelId];
+    if (selectedObject.colors[model.primaryColorKey ?? ""] === hex) {
+      return;
+    }
     updateSceneObject(selectedObject.id, {
       colors: model.buildColorsFromPrimary(hex),
       deviceTheme: "",
@@ -176,6 +180,10 @@ export default function Home() {
 
   function handleDebugColorChange(part: string, hex: string) {
     if (!selectedObject) {
+      return;
+    }
+
+    if (selectedObject.debugPartColors[part] === hex) {
       return;
     }
 
@@ -216,6 +224,7 @@ export default function Home() {
 
   return (
     <main className="app-shell min-h-screen relative flex">
+      <Leva collapsed />
       <LayersPanel
         copy={copy}
         locale={locale}
@@ -260,6 +269,12 @@ export default function Home() {
           selectedObject &&
           updateSceneObject(selectedObject.id, {
             showDeviceShell: !selectedObject.showDeviceShell,
+          })
+        }
+        onToggleMatteColors={() =>
+          selectedObject &&
+          updateSceneObject(selectedObject.id, {
+            matteColors: !selectedObject.matteColors,
           })
         }
         onUpdatePosition={(positionPatch) =>

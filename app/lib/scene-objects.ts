@@ -16,6 +16,7 @@ export type SceneObject = {
   imageUrl: string;
   modelId: DeviceModelId;
   name: string;
+  matteColors: boolean;
   positionX: number;
   positionY: number;
   positionZ: number;
@@ -30,7 +31,7 @@ const MODEL_PLACEHOLDERS: Record<DeviceModelId, string> = {
   smartphone: "/placeholder-1290x2755.png",
   smartphone2: "/placeholder-1290x2848.png",
   smartwatch: "/placeholder-1290x1452.png",
-  notebook: "/placeholder-1290x2755.png",
+  notebook: "/placeholder-2755x1684.png",
 };
 
 export function getPlaceholderImageUrl(modelId: DeviceModelId = "smartphone") {
@@ -64,6 +65,7 @@ export function createSceneObject({
     imageUrl: getPlaceholderImageUrl(modelId),
     modelId,
     name,
+    matteColors: true,
     ...DEFAULT_OBJECT_TRANSFORM,
     showDeviceShell: true,
   };
@@ -90,6 +92,7 @@ export function changeSceneObjectModel(
     deviceTheme: model.defaultTheme,
     imageUrl: getPlaceholderImageUrl(modelId),
     modelId,
+    matteColors: true,
     ...DEFAULT_OBJECT_TRANSFORM,
     showDeviceShell: true,
   };

@@ -18,6 +18,7 @@ Ja implementado:
 - inspector separado para editar apenas o objeto selecionado;
 - selecao de tema base do device por objeto;
 - ajuste manual da cor do body por objeto;
+- toggle por objeto para acabamento `fosco` ou mais refletivo;
 - controles de posicao X, Y e Z por objeto;
 - controles de rotacao X, Y e Z por objeto;
 - controle de escala uniforme por objeto;
@@ -34,7 +35,8 @@ Ja implementado:
 - catalogo com 4 modelos 3D: `smartphone`, `smartphone2`, `smartwatch` e `notebook`;
 - arquitetura multimodelo com `modelScale`, `baseRotation`, `pivotOffset` e `modelSpawnOffset` por modelo;
 - `smartwatch` com tela texturizada em plano separado, raio calibrado e casco preservando o material fisico do GLB;
-- `smartphone`, `smartphone2` e `smartwatch` iniciam no tema `gray`;
+- `notebook` com tela do app aplicada na malha correta do GLB, placeholder proprio, temas ativos e debug semantico inicial das partes mapeadas;
+- `smartphone`, `smartphone2`, `smartwatch` e `notebook` iniciam no tema `gray`;
 - design system com tokens primitivos de cor (`--black-000` a `--black-980`, `--gray-*`, `--ink-*`), border-radius (`--radius-xs` a `--radius-full`) e font-weight (`--font-regular` a `--font-bold`) para dark e light mode;
 - menu de preferencias com submenus cascata (Theme e Language) com checkmark no item ativo;
 - menu de contexto por layer (3 pontos) com opcoes de Renomear e Deletar;
@@ -55,7 +57,7 @@ Ja implementado:
 | smartphone | smartphone.glb | [1, 1, 1] | [0, 0, 0] | [0, 0, 0] | 1290x2755 |
 | smartphone2 | smartphone2.glb | [102.6, 102.6, 102.6] | [0, π, 0] | [115, 50, 180] | 1290x2848 |
 | smartwatch | smartwatch.glb | [19.44, 19.44, 19.44] | [0, -π/2, 0] | [130, 40, 270] | 1290x1452 |
-| notebook | notebook.glb | [2311, 2311, 2311] | [0, π, 0] | [120, 100, 0] | - |
+| notebook | notebook.glb | [2311, 2311, 2311] | [0, π, 0] | [120, 100, 0] | 2755x1684 |
 
 ## Decisoes de Produto Ja Tomadas
 
@@ -95,16 +97,15 @@ Ja implementado:
 
 ## Onde Paramos
 
-Catalogo expandido para 4 dispositivos. Arquitetura multimodelo consolidada com `modelScale`, `baseRotation`, `pivotOffset` e `modelSpawnOffset` por modelo. `smartwatch` calibrado com tela texturizada funcional, placeholder proprio e material fisico preservado no casco. Placeholders agora sao definidos por modelo, sem troca por idioma. Recomendacao de upload exibida por modelo no inspector. Painel de debug de spawn removido da UI lateral.
+Catalogo expandido para 4 dispositivos. Arquitetura multimodelo consolidada com `modelScale`, `baseRotation`, `pivotOffset` e `modelSpawnOffset` por modelo. `smartwatch` calibrado com tela texturizada funcional, placeholder proprio e material fisico preservado no casco. `notebook` agora aceita a imagem do app na malha correta da tela, tem placeholder proprio, recomendacao `2755x1684`, temas ativos e debug semantico inicial das partes mapeadas. Placeholders agora sao definidos por modelo, sem troca por idioma. O inspector ganhou toggle por objeto para acabamento fosco. Painel de debug de spawn removido da UI lateral.
 
 **Bug conhecido pendente:** reset de camera restaura posicao e zoom corretamente, mas o azimute nao retorna ao estado inicial (`camera-controls` v3).
 
 ## Proximo Passo Sugerido
 
-- implementar debug de cor real no `notebook`;
-- confirmar malha da tela do `notebook` e substituir a textura original pela imagem do app;
-- definir temas de cores do `notebook`;
 - investigar bug de reset do azimute da camera;
+- revisar se os controles temporarios do `leva` para roughness do `notebook` devem virar tokens fixos por tema ou sair da codebase apos calibracao final;
+- continuar o mapeamento semantico das malhas restantes do `notebook`;
 - refinar UX de camadas (reorder, lock ou visibilidade).
 
 ## Aprendizados
@@ -113,8 +114,10 @@ Catalogo expandido para 4 dispositivos. Arquitetura multimodelo consolidada com 
 - aplicar a textura do app diretamente em `Object_11` vaza para o casco e gera aparencia incorreta;
 - a solucao robusta para o `smartwatch` foi usar um plano separado para a tela e preservar o material original do GLB no casco;
 - trocar `MeshPhysicalMaterial` original por `MeshLambertMaterial` no `smartwatch` fazia o corpo parecer oco; clonar o material original e trocar apenas a cor resolveu isso;
-- no `notebook`, o debug de cor ainda nao existe de fato: o componente atual ignora `colors` e `debugPartColors`;
-- o `notebook` parece ja vir com uma tela/material proprio no GLB, entao a proxima etapa deve ser identificar a malha correta antes de sobrescrever materiais.
+- no `notebook`, a malha de tela correta e `tfTbkkzhxqpKRgC`; o contorno preto da tela e `nAIWMiVEtSYdjdZ`, e a barra inferior da dobra e `WyuoVWKMOcOlXJM`;
+- `screenBezel` e `lowerHingeBar` do `notebook` devem permanecer sempre pretos; a borracha de tela/dobra tambem deve ser tratada como detalhe fixo escuro;
+- o controle de `fosco` precisa atuar no material real de cada modelo, nao apenas existir na UI;
+- para depurar brilho/reflexo do `notebook`, expor roughness via `leva` foi mais eficiente do que entupir o inspector principal com controles temporarios.
 
 ## Observacoes Tecnicas
 
@@ -124,6 +127,8 @@ Catalogo expandido para 4 dispositivos. Arquitetura multimodelo consolidada com 
 - `sceneFitKey` baseado apenas nos IDs dos objetos garante re-fit so em add/remove;
 - `modelSpawnOffset` e somado ao `AUTO_OBJECT_POSITIONS` por indice;
 - placeholders agora sao unicos por modelo e nao mudam com o idioma;
+- `notebook` usa placeholder `/placeholder-2755x1684.png`;
+- `leva` foi adicionado para calibracao local de materiais do `notebook`;
 - `OBJECT_POSITION_MULTIPLIER = 140` (X/Y) e `OBJECT_POSITION_MULTIPLIER_Z = 420` (Z);
 - grid em `y=-300` com `infiniteGrid`, `cellSize=50`, `sectionSize=200`;
 - `npm run lint` deve passar;
