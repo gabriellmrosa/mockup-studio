@@ -82,6 +82,12 @@ function cloneShellMaterial(
   if ("clearcoatRoughness" in base && typeof base.clearcoatRoughness === "number") {
     base.clearcoatRoughness = matte ? Math.max(base.clearcoatRoughness, 0.7) : Math.min(base.clearcoatRoughness, 0.3);
   }
+  if ("reflectivity" in base && typeof base.reflectivity === "number") {
+    base.reflectivity = matte ? Math.min(base.reflectivity, 0.04) : Math.max(base.reflectivity, 0.22);
+  }
+  if ("envMapIntensity" in base && typeof base.envMapIntensity === "number") {
+    base.envMapIntensity = matte ? Math.min(base.envMapIntensity, 0.18) : Math.max(base.envMapIntensity, 0.7);
+  }
   base.side = THREE.DoubleSide;
   return base;
 }

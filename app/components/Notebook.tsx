@@ -100,6 +100,12 @@ function applyFinishMaterial(material: THREE.Material, matte: boolean) {
   if ("clearcoatRoughness" in material && typeof material.clearcoatRoughness === "number") {
     material.clearcoatRoughness = matte ? Math.max(material.clearcoatRoughness, 0.72) : Math.min(material.clearcoatRoughness, 0.28);
   }
+  if ("reflectivity" in material && typeof material.reflectivity === "number") {
+    material.reflectivity = matte ? Math.min(material.reflectivity, 0.04) : Math.max(material.reflectivity, 0.18);
+  }
+  if ("envMapIntensity" in material && typeof material.envMapIntensity === "number") {
+    material.envMapIntensity = matte ? Math.min(material.envMapIntensity, 0.16) : Math.max(material.envMapIntensity, 0.62);
+  }
 
   return material;
 }
