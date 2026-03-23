@@ -15,6 +15,7 @@ export type SceneObject = {
   deviceTheme: string;
   id: string;
   imageUrl: string;
+  isVisible: boolean;
   modelId: DeviceModelId;
   name: string;
   matteColors: boolean;
@@ -66,6 +67,7 @@ export function createSceneObject({
     deviceTheme: model.defaultTheme,
     id: id ?? crypto.randomUUID(),
     imageUrl: getPlaceholderImageUrl(modelId),
+    isVisible: true,
     modelId,
     name,
     matteColors: true,

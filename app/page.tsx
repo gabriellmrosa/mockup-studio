@@ -53,9 +53,7 @@ export default function Home() {
       name: "Object 1",
     }),
   ]);
-  const [canvasBgColor, setCanvasBgColor] = useState<string | null>(null);
   const [selectedObjectId, setSelectedObjectId] = useState("");
-  const [resetCameraVersion] = useState(0);
   const [scaleOverrides] = useState<ScaleOverrides>({});
   const [spawnOverrides] = useState<SpawnOverrides>({});
   const copy = APP_COPY[locale];
@@ -146,6 +144,16 @@ export default function Home() {
 
   function handleRemoveObject(id: string) {
     setSceneObjects((current) => current.filter((object) => object.id !== id));
+  }
+
+  function handleToggleObjectVisibility(id: string) {
+    setSceneObjects((current) =>
+      current.map((object) =>
+        object.id === id
+          ? { ...object, isVisible: !object.isVisible }
+          : object,
+      ),
+    );
   }
 
   function handleThemeChange(themeId: string) {
@@ -252,18 +260,16 @@ export default function Home() {
         onRenameObject={(id, name) => updateSceneObject(id, { name })}
         onRemoveObject={handleRemoveObject}
         onSelectObject={setSelectedObjectId}
+        onToggleObjectVisibility={handleToggleObjectVisibility}
         onUiThemeChange={setUiTheme}
         selectedObjectId={selectedObject?.id ?? ""}
         uiTheme={uiTheme}
       />
 
       <MockupCanvas
-        canvasBgColor={canvasBgColor}
         copy={copy}
         objects={sceneObjects}
-        onBgColorChange={setCanvasBgColor}
         onSelectObject={setSelectedObjectId}
-        resetCameraVersion={resetCameraVersion}
         scaleOverrides={scaleOverrides}
         spawnOverrides={spawnOverrides}
         uiTheme={uiTheme}
@@ -279,33 +285,28 @@ export default function Home() {
         onThemeColorChange={handleThemeColorChange}
         onThemeChange={handleThemeChange}
         onToggleCustomColors={() =>
-          selectedObject &&
-          updateSceneObject(selectedObject.id, {
-            customColorsEnabled: !selectedObject.customColorsEnabled,
+          selectedObject && updateSceneObject(selectedObject.id, {
+            customColorsEnabled: !selectedObject?.customColorsEnabled,
           })
         }
         onToggleDebugMode={() =>
-          selectedObject &&
-          updateSceneObject(selectedObject.id, {
-            debugMode: !selectedObject.debugMode,
+          selectedObject && updateSceneObject(selectedObject.id, {
+            debugMode: !selectedObject?.debugMode,
           })
         }
         onToggleDeviceShell={() =>
-          selectedObject &&
-          updateSceneObject(selectedObject.id, {
-            showDeviceShell: !selectedObject.showDeviceShell,
+          selectedObject && updateSceneObject(selectedObject.id, {
+            showDeviceShell: !selectedObject?.showDeviceShell,
           })
         }
         onToggleNotebookKeyboard={() =>
-          selectedObject &&
-          updateSceneObject(selectedObject.id, {
-            showNotebookKeyboard: !selectedObject.showNotebookKeyboard,
+          selectedObject && updateSceneObject(selectedObject.id, {
+            showNotebookKeyboard: !selectedObject?.showNotebookKeyboard,
           })
         }
         onToggleMatteColors={() =>
-          selectedObject &&
-          updateSceneObject(selectedObject.id, {
-            matteColors: !selectedObject.matteColors,
+          selectedObject && updateSceneObject(selectedObject.id, {
+            matteColors: !selectedObject?.matteColors,
           })
         }
         onUpdatePosition={(positionPatch) =>

@@ -5,10 +5,11 @@ import { KeyboardEvent, useState } from "react";
 import type { AppCopy, Locale, UiTheme } from "../../lib/i18n";
 import type { SceneObject } from "../../lib/scene-objects";
 import {
+  IconButton,
   LayersPanelHeader,
   PanelSection,
 } from "../EditorPrimitives/EditorPrimitives";
-import { MoreVertical, Plus } from "lucide-react";
+import { Eye, EyeOff, MoreVertical, Plus } from "lucide-react";
 import ContextMenu from "../ContextMenu/ContextMenu";
 import CreditsModal from "../CreditsModal/CreditsModal";
 
@@ -21,6 +22,7 @@ type LayersPanelProps = {
   onRenameObject: (id: string, name: string) => void;
   onRemoveObject: (id: string) => void;
   onSelectObject: (id: string) => void;
+  onToggleObjectVisibility: (id: string) => void;
   onUiThemeChange: (theme: UiTheme) => void;
   selectedObjectId: string;
   uiTheme: UiTheme;
@@ -35,6 +37,7 @@ export default function LayersPanel({
   onRenameObject,
   onRemoveObject,
   onSelectObject,
+  onToggleObjectVisibility,
   onUiThemeChange,
   selectedObjectId,
   uiTheme,
@@ -154,7 +157,6 @@ export default function LayersPanel({
             <div className="layers-stack">
               {objects.map((object) => {
                 const isSelected = object.id === selectedObjectId;
-
                 return (
                   <div
                     key={object.id}
@@ -170,7 +172,7 @@ export default function LayersPanel({
                     tabIndex={0}
                     aria-pressed={isSelected}
                   >
-                    <div className="min-w-0 flex-1 text-left">
+                    <div className="layer-card-main">
                       <div className="layer-title-row">
                         {editingObjectId === object.id ? (
                           <input
@@ -201,30 +203,44 @@ export default function LayersPanel({
                         )}
                       </div>
                     </div>
-                    <ContextMenu
-                      items={[
-                        {
-                          type: "action",
-                          label: copy.renameObject,
-                          onClick: () => startEditing(object),
-                        },
-                        ...(object.deletable
-                          ? [
-                              {
-                                type: "action" as const,
-                                label: copy.deleteObject,
-                                variant: "danger" as const,
-                                onClick: () => onRemoveObject(object.id),
-                              },
-                            ]
-                          : []),
-                      ]}
-                      triggerAriaLabel="Object options"
-                      triggerClassName="layer-menu-trigger"
-                      triggerStopPropagation
-                      triggerTitle="Object options"
-                      triggerIcon={<MoreVertical size={12} />}
-                    />
+                    <div className="layer-actions">
+                      <IconButton
+                        aria-label={object.isVisible ? copy.hideObject : copy.showObject}
+                        title={object.isVisible ? copy.hideObject : copy.showObject}
+                        className="layer-inline-action"
+                        active={!object.isVisible}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          onToggleObjectVisibility(object.id);
+                        }}
+                      >
+                        {object.isVisible ? <Eye size={14} /> : <EyeOff size={14} />}
+                      </IconButton>
+                      <ContextMenu
+                        items={[
+                          {
+                            type: "action",
+                            label: copy.renameObject,
+                            onClick: () => startEditing(object),
+                          },
+                          ...(object.deletable
+                            ? [
+                                {
+                                  type: "action" as const,
+                                  label: copy.deleteObject,
+                                  variant: "danger" as const,
+                                  onClick: () => onRemoveObject(object.id),
+                                },
+                              ]
+                            : []),
+                        ]}
+                        triggerAriaLabel="Object options"
+                        triggerClassName="layer-menu-trigger"
+                        triggerStopPropagation
+                        triggerTitle="Object options"
+                        triggerIcon={<MoreVertical size={12} />}
+                      />
+                    </div>
                   </div>
                 );
               })}

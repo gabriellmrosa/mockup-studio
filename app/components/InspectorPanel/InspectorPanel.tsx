@@ -186,23 +186,23 @@ export default function InspectorPanel({
                 <>
                   <label className="inspector-inline-toggle">
                     <span className="inspector-inline-toggle-text">{copy.matteColorLabel}</span>
-                    <input
-                      type="checkbox"
-                      checked={object.matteColors}
-                      onChange={onToggleMatteColors}
-                      className="inspector-checkbox"
-                    />
-                  </label>
+                      <input
+                        type="checkbox"
+                        checked={object.matteColors}
+                        onChange={onToggleMatteColors}
+                        className="inspector-checkbox"
+                      />
+                    </label>
 
                   <label className="inspector-inline-toggle">
                     <span className="inspector-inline-toggle-text">{copy.bodyColorLabel}</span>
-                    <input
-                      type="checkbox"
-                      checked={object.customColorsEnabled}
-                      onChange={onToggleCustomColors}
-                      className="inspector-checkbox"
-                    />
-                  </label>
+                      <input
+                        type="checkbox"
+                        checked={object.customColorsEnabled}
+                        onChange={onToggleCustomColors}
+                        className="inspector-checkbox"
+                      />
+                    </label>
 
                   {object.customColorsEnabled ? (
                     <div className="panel-card custom-theme-panel">

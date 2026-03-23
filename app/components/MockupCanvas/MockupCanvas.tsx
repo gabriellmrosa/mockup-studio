@@ -30,12 +30,9 @@ export type ExportPreset = {
 };
 
 type MockupCanvasProps = {
-  canvasBgColor: string | null;
   copy: AppCopy;
   objects: SceneObject[];
-  onBgColorChange: (color: string) => void;
   onSelectObject: (id: string) => void;
-  resetCameraVersion: number;
   scaleOverrides: ScaleOverrides;
   spawnOverrides: SpawnOverrides;
   uiTheme: UiTheme;
@@ -56,6 +53,7 @@ export type SpawnOverrides = Record<number, [number, number, number]>;
 export type ScaleOverrides = Record<number, number>;
 
 type SceneBridgeProps = MockupCanvasProps & {
+  canvasBgColor: string | null;
   onExportReady: (
     handler: ((preset: ExportPreset) => Promise<void>) | null,
   ) => void;
@@ -122,18 +120,17 @@ function getResolvedObjectPosition(
 }
 
 function SceneBridge({
-  canvasBgColor,
   objects,
   onExportReady,
   onObjectLoadStateChange,
   onObjectResolved,
   onSelectObject,
   onViewportControlsReady,
-  resetCameraVersion,
   scaleOverrides,
   sceneFitKey,
   spawnOverrides,
   uiTheme,
+  canvasBgColor,
 }: SceneBridgeProps) {
   const controlsRef = useRef<CameraControlsImpl | null>(null);
   const gridRef = useRef<THREE.Object3D | null>(null);
@@ -233,7 +230,7 @@ function SceneBridge({
       <Bounds margin={1.18}>
         <Center>
           <group ref={sceneRef}>
-            {objects.map((object, index) => {
+            {objects.filter((object) => object.isVisible).map((object, index) => {
               const model = DEVICE_MODELS[object.modelId];
 
               return (
@@ -292,7 +289,6 @@ function SceneBridge({
           controlsRef={controlsRef}
           sceneFitKey={sceneFitKey}
           onViewportControlsReady={onViewportControlsReady}
-          resetCameraVersion={resetCameraVersion}
           sceneRef={sceneRef}
         />
       </Bounds>
@@ -359,21 +355,15 @@ function BoundsResetController({
   controlsRef,
   sceneFitKey,
   onViewportControlsReady,
-  resetCameraVersion,
   sceneRef,
 }: {
   controlsRef: { current: CameraControlsImpl | null };
   sceneFitKey: string;
   onViewportControlsReady: (api: ViewportControlsApi | null) => void;
-  resetCameraVersion: number;
   sceneRef: { current: THREE.Group | null };
 }) {
   const bounds = useBounds();
   const { camera } = useThree();
-  const initialLookAt = useRef<{
-    px: number; py: number; pz: number;
-    tx: number; ty: number; tz: number;
-  } | null>(null);
 
   useEffect(() => {
     const controls = controlsRef.current;
@@ -393,11 +383,6 @@ function BoundsResetController({
       camera.near = distance / 100;
       camera.far = distance * 100;
       camera.updateProjectionMatrix();
-
-      initialLookAt.current = {
-        px: center.x, py: center.y, pz: center.z + distance,
-        tx: center.x, ty: center.y, tz: center.z,
-      };
 
       void controls.setLookAt(
         center.x, center.y, center.z + distance,
@@ -450,24 +435,13 @@ function BoundsResetController({
     };
   }, [controlsRef, onViewportControlsReady, sceneRef]);
 
-  useEffect(() => {
-    if (resetCameraVersion === 0) {
-      return;
-    }
-
-    const s = initialLookAt.current;
-    const controls = controlsRef.current;
-    if (!s || !controls) return;
-
-    void controls.reset(true);
-  }, [controlsRef, resetCameraVersion]);
-
   return null;
 }
 
 export default function MockupCanvas(props: MockupCanvasProps) {
   const [viewportControls, setViewportControls] =
     useState<ViewportControlsApi | null>(null);
+  const [canvasBgColor, setCanvasBgColor] = useState<string | null>(null);
   const exportHandlerRef =
     useRef<((preset: ExportPreset) => Promise<void>) | null>(null);
   const [isExportReady, setIsExportReady] = useState(false);
@@ -505,14 +479,19 @@ export default function MockupCanvas(props: MockupCanvasProps) {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [viewportControls]);
 
-  const stageClass = props.canvasBgColor
+  const stageClass = canvasBgColor
     ? "mockup-stage relative flex-1 h-screen"
     : `mockup-stage relative flex-1 h-screen ${props.uiTheme === "dark" ? "mockup-stage-dark" : "mockup-stage-light"}`;
-  const currentObjectIds = new Set(props.objects.map((object) => object.id));
+  const currentObjectIds = new Set(
+    props.objects
+      .filter((object) => object.isVisible)
+      .map((object) => object.id),
+  );
+  const visibleObjectCount = currentObjectIds.size;
   const activeLoadingObjectIds = loadingObjectIds.filter((id) => currentObjectIds.has(id));
   const activeResolvedObjectIds = resolvedObjectIds.filter((id) => currentObjectIds.has(id));
   const isInitialSceneLoading =
-    props.objects.length > 0 && activeResolvedObjectIds.length === 0;
+    visibleObjectCount > 0 && activeResolvedObjectIds.length === 0;
   const isIncrementalObjectLoading =
     activeLoadingObjectIds.length > 0 && activeResolvedObjectIds.length > 0;
   const showIncrementalLoading =
@@ -570,7 +549,7 @@ export default function MockupCanvas(props: MockupCanvasProps) {
   return (
     <div
       className={stageClass}
-      style={props.canvasBgColor ? { background: props.canvasBgColor } : undefined}
+      style={canvasBgColor ? { background: canvasBgColor } : undefined}
     >
       <Canvas
         camera={{ fov: CAMERA_FOV, position: CAMERA_POSITION }}
@@ -582,6 +561,7 @@ export default function MockupCanvas(props: MockupCanvasProps) {
       >
         <SceneBridge
           {...props}
+          canvasBgColor={canvasBgColor}
           onExportReady={(handler) => {
             exportHandlerRef.current = handler;
             setIsExportReady(Boolean(handler));
@@ -612,9 +592,9 @@ export default function MockupCanvas(props: MockupCanvasProps) {
         ) : null}
 
         <FloatingCanvasControls
-          bgColor={props.canvasBgColor}
+          bgColor={canvasBgColor}
           copy={props.copy}
-          onBgColorChange={props.onBgColorChange}
+          onBgColorChange={setCanvasBgColor}
           onFitToScene={() => viewportControls?.fitToScene()}
           onResetCamera={() => viewportControls?.resetToInitial()}
           onPanDown={() => viewportControls?.panDown()}

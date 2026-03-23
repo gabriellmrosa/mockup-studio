@@ -7,6 +7,9 @@ export type AppCopy = {
   appTitle: string;
   addObject: string;
   baseObject: string;
+  hideObject: string;
+  showObject: string;
+  hiddenObjectLabel: string;
   fitSceneButton: string;
   languageLabel: string;
   themeLabel: string;
@@ -50,6 +53,9 @@ export const APP_COPY: Record<Locale, AppCopy> = {
     appTitle: "Mock Studio",
     addObject: "Adicionar objeto",
     baseObject: "Objeto base",
+    hideObject: "Ocultar",
+    showObject: "Mostrar",
+    hiddenObjectLabel: "Oculto",
     fitSceneButton: "Enquadrar cena",
     languageLabel: "Idioma",
     themeLabel: "Tema",
@@ -96,6 +102,9 @@ export const APP_COPY: Record<Locale, AppCopy> = {
     appTitle: "Mock Studio",
     addObject: "Add object",
     baseObject: "Base object",
+    hideObject: "Hide",
+    showObject: "Show",
+    hiddenObjectLabel: "Hidden",
     fitSceneButton: "Fit scene",
     languageLabel: "Language",
     themeLabel: "Theme",

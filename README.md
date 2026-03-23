@@ -27,6 +27,7 @@ Ja implementado:
 - reset global de camera;
 - `fit scene` separado de `reset camera` na toolbar flutuante;
 - color picker de cor de fundo do canvas na toolbar flutuante;
+- estado da cor de fundo do canvas isolado no `MockupCanvas`, evitando rerender da shell inteira do editor durante drag do color picker;
 - export PNG transparente em `1920x1080` e `2560x1440`;
 - CTA `Take photo` exporta captura PNG `1920x1080` com nome timestamped, fundo transparente real e sem grid;
 - loading inicial central para o primeiro carregamento real do canvas/modelo;
@@ -67,6 +68,7 @@ Ja implementado:
 - convencao de styling consolidada: tokens CSS para design system, Tailwind para layout e CSS de componente para estados/regras locais;
 - `Suspense` por objeto para isolar o carregamento de textura sem disparar re-fit da camera;
 - camera re-ajusta apenas quando objetos sao adicionados ou removidos (nao em mudancas de propriedade).
+- a cor de fundo do canvas fica em estado local do `MockupCanvas` para nao re-renderizar paineis laterais a cada mudanca do color picker;
 
 ## Catalogo de Modelos
 
@@ -112,7 +114,6 @@ Ja implementado:
 - [app/lib/scene-presets.ts](app/lib/scene-presets.ts): presets padrao de transformacao e posicoes automaticas da cena.
 - [app/lib/mockup-image.ts](app/lib/mockup-image.ts): utilitarios da textura/imagem da tela.
 - [app/lib/i18n.ts](app/lib/i18n.ts): copy da interface em `pt-BR` e `en-US`.
-- [AI-GUIDE.md](AI-GUIDE.md): guia tecnico para adicionar novos modelos 3D ao catalogo.
 
 ## Branch de Trabalho
 

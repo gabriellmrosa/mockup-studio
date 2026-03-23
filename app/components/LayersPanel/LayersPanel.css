@@ -34,7 +34,8 @@
 .layer-title-row {
   align-items: center;
   display: flex;
-  gap: var(--space-2);
+  gap: var(--space-1);
+  min-width: 0;
 }
 
 /* --- Layer cards --- */
@@ -52,6 +53,11 @@
     background-color 160ms ease,
     color 160ms ease;
   width: 100%;
+}
+
+.layer-card-main {
+  flex: 1;
+  min-width: 0;
 }
 
 .layer-card-active {
@@ -72,6 +78,7 @@
 }
 
 .layer-card-title {
+  flex: 1;
   font-size: var(--font-size-200);
   font-weight: var(--font-regular);
   line-height: 1.1;
@@ -80,13 +87,17 @@
   white-space: nowrap;
 }
 
-.layer-card-subtitle {
+.layer-status-icon {
   color: var(--sidebar-muted);
-  font-size: var(--font-size-100);
-  margin-top: var(--space-1);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  flex: 0 0 auto;
+}
+
+.layer-actions {
+  align-items: center;
+  display: inline-flex;
+  flex: 0 0 auto;
+  gap: var(--space-1);
+  margin-left: var(--space-2);
 }
 
 .layer-card-name-input {
@@ -108,6 +119,11 @@
   letter-spacing: 0.08em;
   padding: var(--space-1) calc(var(--space-1) + 0.125rem);
   text-transform: uppercase;
+}
+
+.layer-inline-action {
+  height: 1.5rem;
+  width: 1.5rem;
 }
 
 .layer-menu-trigger {
