@@ -1,0 +1,139 @@
+import { fireEvent, render, screen } from "@testing-library/react";
+import type { ReactNode } from "react";
+import LayersPanel from "./LayersPanel";
+import { createSceneObject } from "../../lib/scene-objects";
+import type { AppCopy } from "../../lib/i18n";
+
+jest.mock("../CreditsModal/CreditsModal", () => ({
+  __esModule: true,
+  default: () => null,
+}));
+
+jest.mock("../ContextMenu/ContextMenu", () => ({
+  __esModule: true,
+  default: ({
+    triggerAriaLabel,
+    triggerIcon,
+  }: {
+    triggerAriaLabel: string;
+    triggerIcon: ReactNode;
+  }) => (
+    <button type="button" aria-label={triggerAriaLabel}>
+      {triggerIcon}
+    </button>
+  ),
+}));
+
+const copy: AppCopy = {
+  addObject: "Add object",
+  appTitle: "Mock Studio",
+  baseObject: "Base object",
+  bodyColorLabel: "Customize",
+  canvasInitialLoadingLabel: "Loading",
+  canvasObjectLoadingLabel: "Loading model",
+  darkMode: "Dark",
+  debugOff: "Debug off",
+  debugOn: "Debug on",
+  debugSectionTitle: "Debug",
+  deleteObject: "Delete",
+  english: "EN-US",
+  fitSceneButton: "Fit scene",
+  hideObject: "Hide",
+  hiddenObjectLabel: "Hidden",
+  keyboardToggleLabel: "Keyboard",
+  languageLabel: "Language",
+  lightMode: "Light",
+  matteColorLabel: "Matte",
+  modelLabel: "Model",
+  positionX: "Position X",
+  positionY: "Position Y",
+  positionZ: "Position Z",
+  portuguese: "PT-BR",
+  renameObject: "Rename",
+  resetCameraButton: "Reset camera",
+  resetObjectButton: "Reset object",
+  rotationX: "Rotation X",
+  rotationY: "Rotation Y",
+  rotationZ: "Rotation Z",
+  scale: "Scale",
+  sceneSectionHint: "3D shell",
+  screenSectionHintPrefix: "Recommended",
+  screenSectionTitle: "App Screen",
+  showObject: "Show",
+  takePhotoButton: "Take photo",
+  themeLabel: "Theme",
+  themesSectionTitle: "Themes",
+  transformSectionTitle: "Transform",
+  uploadImage: "Upload image",
+  uploadImageError: "Upload failed",
+  themeNames: {
+    black: "Black",
+    blood: "Red",
+    gray: "Gray",
+    "light-gray": "Light Gray",
+  },
+};
+
+describe("LayersPanel", () => {
+  it("calls visibility toggle from the eye button", () => {
+    const object = createSceneObject({
+      id: "object-1",
+      name: "Object 1",
+    });
+    const onToggleObjectVisibility = jest.fn();
+
+    render(
+      <LayersPanel
+        copy={copy}
+        locale="en-US"
+        objects={[object]}
+        onAddObject={jest.fn()}
+        onLocaleChange={jest.fn()}
+        onRenameObject={jest.fn()}
+        onRemoveObject={jest.fn()}
+        onSelectObject={jest.fn()}
+        onToggleObjectVisibility={onToggleObjectVisibility}
+        onUiThemeChange={jest.fn()}
+        selectedObjectId={object.id}
+        uiTheme="dark"
+      />,
+    );
+
+    fireEvent.click(screen.getByTitle("Hide"));
+
+    expect(onToggleObjectVisibility).toHaveBeenCalledWith("object-1");
+  });
+
+  it("allows renaming an object by double clicking its title", () => {
+    const object = createSceneObject({
+      id: "object-2",
+      name: "Object 2",
+    });
+    const onRenameObject = jest.fn();
+
+    render(
+      <LayersPanel
+        copy={copy}
+        locale="en-US"
+        objects={[object]}
+        onAddObject={jest.fn()}
+        onLocaleChange={jest.fn()}
+        onRenameObject={onRenameObject}
+        onRemoveObject={jest.fn()}
+        onSelectObject={jest.fn()}
+        onToggleObjectVisibility={jest.fn()}
+        onUiThemeChange={jest.fn()}
+        selectedObjectId={object.id}
+        uiTheme="dark"
+      />,
+    );
+
+    fireEvent.doubleClick(screen.getByText("Object 2"));
+
+    const input = screen.getByDisplayValue("Object 2");
+    fireEvent.change(input, { target: { value: "Homepage Mockup" } });
+    fireEvent.blur(input);
+
+    expect(onRenameObject).toHaveBeenCalledWith("object-2", "Homepage Mockup");
+  });
+});
