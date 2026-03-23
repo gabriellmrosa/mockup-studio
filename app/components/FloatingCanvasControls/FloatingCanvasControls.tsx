@@ -9,6 +9,7 @@ import {
   ArrowRight,
   ArrowUp,
   Camera,
+  Download,
   RotateCcw,
   ScanSearch,
   ZoomIn,
@@ -73,6 +74,7 @@ export default function FloatingCanvasControls({
     badgeLabel: option.enabled ? undefined : "Em breve",
     disabled: !option.enabled,
     onClick: onTakePhoto,
+    trailingIcon: option.id === "full-hd" ? <Download size={14} /> : undefined,
   }));
 
   return (

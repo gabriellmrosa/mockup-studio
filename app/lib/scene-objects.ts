@@ -155,7 +155,6 @@ export function changeSceneObjectModel(
     imageUrl: getPlaceholderImageUrl(modelId),
     modelId,
     matteColors: true,
-    ...DEFAULT_OBJECT_TRANSFORM,
     showDeviceShell: true,
     showNotebookKeyboard: true,
   };

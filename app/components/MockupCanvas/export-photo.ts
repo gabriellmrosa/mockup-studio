@@ -5,26 +5,21 @@ import type { ExportPreset } from "./MockupCanvas";
 
 type ExportPhotoArgs = {
   camera: THREE.Camera;
-  gl: {
-    domElement: {
-      toBlob: (callback: (blob: Blob | null) => void, type?: string) => void;
-      toDataURL: (type?: string) => string;
-    };
-    getClearAlpha: () => number;
-    getClearColor: (color: THREE.Color) => THREE.Color;
-    getPixelRatio: () => number;
-    render: (scene: THREE.Scene, camera: THREE.Camera) => void;
-    setClearColor: (color: THREE.Color, alpha?: number) => void;
-    setPixelRatio: (value: number) => void;
-    setSize: (width: number, height: number, updateStyle?: boolean) => void;
-  };
+  gl: Pick<
+    THREE.WebGLRenderer,
+    | "getClearAlpha"
+    | "getClearColor"
+    | "getRenderTarget"
+    | "outputColorSpace"
+    | "readRenderTargetPixels"
+    | "render"
+    | "setClearColor"
+    | "setRenderTarget"
+    | "capabilities"
+  >;
   gridRef: { current: { visible: boolean } | null };
   preset: ExportPreset;
   scene: THREE.Scene;
-  size: {
-    height: number;
-    width: number;
-  };
 };
 
 export async function exportCanvasPhoto({
@@ -33,63 +28,101 @@ export async function exportCanvasPhoto({
   gridRef,
   preset,
   scene,
-  size,
 }: ExportPhotoArgs) {
-  const previousWidth = size.width;
-  const previousHeight = size.height;
-  const previousPixelRatio = gl.getPixelRatio();
   const previousClearAlpha = gl.getClearAlpha();
   const previousClearColor = gl.getClearColor(new THREE.Color()).clone();
+  const previousRenderTarget = gl.getRenderTarget();
   const previousAspect =
     camera instanceof THREE.PerspectiveCamera ? camera.aspect : null;
   const previousSceneBackground = scene.background;
   const previousGridVisible = gridRef.current?.visible ?? true;
-
-  gl.setPixelRatio(1);
-  gl.setSize(preset.width, preset.height, false);
-  gl.setClearColor(previousClearColor, 0);
-  scene.background = null;
-
-  if (gridRef.current) {
-    gridRef.current.visible = false;
-  }
-
-  if (camera instanceof THREE.PerspectiveCamera) {
-    camera.aspect = preset.width / preset.height;
-    camera.updateProjectionMatrix();
-  }
-
-  gl.render(scene, camera);
-
-  await new Promise<void>((resolve) => {
-    requestAnimationFrame(() => resolve());
+  const exportTarget = new THREE.WebGLRenderTarget(preset.width, preset.height, {
+    depthBuffer: true,
+    stencilBuffer: false,
   });
+  exportTarget.samples = gl.capabilities.isWebGL2 ? 4 : 0;
+  exportTarget.texture.colorSpace = gl.outputColorSpace;
+  let blob: Blob | null = null;
 
-  const blob =
-    (await new Promise<Blob | null>((resolve) => {
-      gl.domElement.toBlob(resolve, "image/png");
-    })) ?? dataUrlToBlob(gl.domElement.toDataURL("image/png"));
+  try {
+    gl.setClearColor(previousClearColor, 0);
+    scene.background = null;
 
-  if (gridRef.current) {
-    gridRef.current.visible = previousGridVisible;
+    if (gridRef.current) {
+      gridRef.current.visible = false;
+    }
+
+    if (camera instanceof THREE.PerspectiveCamera) {
+      camera.aspect = preset.width / preset.height;
+      camera.updateProjectionMatrix();
+    }
+
+    gl.setRenderTarget(exportTarget);
+    gl.render(scene, camera);
+
+    await new Promise<void>((resolve) => {
+      requestAnimationFrame(() => resolve());
+    });
+
+    const pixels = new Uint8Array(preset.width * preset.height * 4);
+    gl.readRenderTargetPixels(exportTarget, 0, 0, preset.width, preset.height, pixels);
+    blob = await renderTargetPixelsToBlob(pixels, preset.width, preset.height);
+  } finally {
+    if (gridRef.current) {
+      gridRef.current.visible = previousGridVisible;
+    }
+    scene.background = previousSceneBackground;
+    gl.setClearColor(previousClearColor, previousClearAlpha);
+    gl.setRenderTarget(previousRenderTarget);
+    exportTarget.dispose();
+
+    if (camera instanceof THREE.PerspectiveCamera && previousAspect !== null) {
+      camera.aspect = previousAspect;
+      camera.updateProjectionMatrix();
+    }
+
+    gl.render(scene, camera);
   }
-  scene.background = previousSceneBackground;
-  gl.setClearColor(previousClearColor, previousClearAlpha);
-  gl.setPixelRatio(previousPixelRatio);
-  gl.setSize(previousWidth, previousHeight, false);
-
-  if (camera instanceof THREE.PerspectiveCamera && previousAspect !== null) {
-    camera.aspect = previousAspect;
-    camera.updateProjectionMatrix();
-  }
-
-  gl.render(scene, camera);
 
   if (!blob) {
     throw new Error("Nao foi possivel gerar o PNG.");
   }
 
   downloadBlob(blob, `${preset.label}.png`);
+}
+
+export async function renderTargetPixelsToBlob(
+  pixels: Uint8Array,
+  width: number,
+  height: number,
+) {
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+
+  const context = canvas.getContext("2d");
+  if (!context) {
+    throw new Error("Nao foi possivel preparar a imagem exportada.");
+  }
+
+  const rowLength = width * 4;
+  const flippedPixels = new Uint8ClampedArray(pixels.length);
+
+  for (let row = 0; row < height; row += 1) {
+    const sourceStart = (height - row - 1) * rowLength;
+    const targetStart = row * rowLength;
+    flippedPixels.set(pixels.subarray(sourceStart, sourceStart + rowLength), targetStart);
+  }
+
+  const imageData = context.createImageData(width, height);
+  imageData.data.set(flippedPixels);
+  context.putImageData(imageData, 0, 0);
+
+  return (
+    (await new Promise<Blob | null>((resolve) => {
+      canvas.toBlob(resolve, "image/png");
+    })) ?? dataUrlToBlob(canvas.toDataURL("image/png"))
+  );
 }
 
 export function downloadBlob(blob: Blob, filename: string) {

@@ -1,4 +1,4 @@
-# Mockup Studio
+# Mock Studio
 
 Open source editor for composing app screens inside 3D device mockups with `Next.js`, `React`, `Three.js` and `React Three Fiber`.
 
@@ -9,6 +9,7 @@ Open source editor for composing app screens inside 3D device mockups with `Next
 - per-object transform controls for position, rotation and scale
 - device themes plus manual color customization by semantic part
 - transparent PNG export from the canvas
+- export feedback chip while the PNG is being prepared
 - layered selection flow via list and direct interaction in the 3D scene
 - `pt-BR` and `en-US` UI support
 - dark and light themes
@@ -92,6 +93,8 @@ Checklist:
 - placeholders are model-specific and no longer tied to locale
 - same-model objects spawn side by side to avoid invisible overlap when adding layers
 - export uses a floating resolution menu, with `1920x1080` active and higher presets marked as `Em breve`
+- PNG export now renders offscreen, avoiding visible canvas distortion during capture
+- changing the model of an existing layer preserves its current transform
 - floating menus and list rows use stronger hover contrast in dark mode
 - the infinite grid now stays visible longer during zoom-out before fading
 - `Credits` in the UI contains attribution for the third-party 3D assets used by the project
@@ -101,6 +104,7 @@ Checklist:
 - do not couple placeholders to language; placeholder choice belongs to the model definition
 - floating menus should reuse the shared flyout infrastructure to keep portal, outside-click and contrast behavior consistent
 - when adding repeated models, initial transform values must prevent visual overlap or the editor can look broken even when state changed correctly
+- automatic anti-overlap logic should apply only when creating a new layer, not when editing an existing one
 - dark mode hover states for flyouts need stronger local contrast than the base panel token alone
 
 ## Asset Scripts

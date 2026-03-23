@@ -56,6 +56,7 @@ export type AppCopy = {
   debugOff: string;
   canvasInitialLoadingLabel: string;
   canvasObjectLoadingLabel: string;
+  canvasExportLoadingLabel: string;
   uploadImageError: string;
   creditsLabel: string;
   creditsDescription: string;
@@ -125,6 +126,7 @@ export const APP_COPY: Record<Locale, AppCopy> = {
     debugOff: "Debug interativo: OFF",
     canvasInitialLoadingLabel: "Preparando cena",
     canvasObjectLoadingLabel: "Atualizando visualizacao",
+    canvasExportLoadingLabel: "Tirando a foto",
     uploadImageError: "Nao foi possivel carregar essa imagem.",
     creditsLabel: "CREDITOS",
     creditsDescription: "dos modelos 3D",
@@ -200,6 +202,7 @@ export const APP_COPY: Record<Locale, AppCopy> = {
     debugOff: "Interactive debug: OFF",
     canvasInitialLoadingLabel: "Preparing scene",
     canvasObjectLoadingLabel: "Refreshing preview",
+    canvasExportLoadingLabel: "Taking photo",
     uploadImageError: "Could not load this image.",
     creditsLabel: "CREDITS",
     creditsDescription: "for 3D models",

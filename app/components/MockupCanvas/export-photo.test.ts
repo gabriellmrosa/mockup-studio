@@ -1,8 +1,9 @@
 import * as THREE from "three";
 import {
-  dataUrlToBlob,
   exportCanvasPhoto,
   formatTimestampForFilename,
+  renderTargetPixelsToBlob,
+  dataUrlToBlob,
 } from "./export-photo";
 
 describe("export-photo", () => {
@@ -30,10 +31,30 @@ describe("export-photo", () => {
       .spyOn(HTMLAnchorElement.prototype, "click")
       .mockImplementation(() => {});
     const createdLinks: HTMLAnchorElement[] = [];
+    const putImageData = jest.fn();
+    const toBlob = jest.fn((callback: (value: Blob | null) => void) => callback(blob));
+    const toDataURL = jest.fn();
 
     jest
       .spyOn(document, "createElement")
       .mockImplementation((tagName: string) => {
+        if (tagName === "canvas") {
+          return {
+            getContext: jest.fn(() => ({
+              createImageData: jest.fn((width: number, height: number) => ({
+                data: new Uint8ClampedArray(width * height * 4),
+                height,
+                width,
+              })),
+              putImageData,
+            })),
+            height: 0,
+            toBlob,
+            toDataURL,
+            width: 0,
+          } as unknown as HTMLCanvasElement;
+        }
+
         const element = originalCreateElement(tagName);
 
         if (tagName === "a") {
@@ -49,19 +70,29 @@ describe("export-photo", () => {
     const camera = new THREE.PerspectiveCamera(45, 1280 / 720, 0.1, 1000);
     const updateProjectionMatrixSpy = jest.spyOn(camera, "updateProjectionMatrix");
     const gridRef = { current: { visible: true } };
+    const previousRenderTarget = new THREE.WebGLRenderTarget(320, 180);
     const gl = {
-      domElement: {
-        toBlob: jest.fn((callback: (value: Blob | null) => void) => callback(blob)),
-        toDataURL: jest.fn(),
-      },
+      capabilities: { isWebGL2: true },
       getClearAlpha: jest.fn(() => 1),
       getClearColor: jest.fn((color: THREE.Color) => color.set("#123456")),
-      getPixelRatio: jest.fn(() => 2),
+      getRenderTarget: jest.fn(() => previousRenderTarget),
+      outputColorSpace: THREE.SRGBColorSpace,
+      readRenderTargetPixels: jest.fn(
+        (
+          _target: THREE.RenderTarget,
+          _x: number,
+          _y: number,
+          width: number,
+          height: number,
+          buffer: Uint8Array,
+        ) => {
+          buffer.fill(255, 0, width * height * 4);
+        },
+      ),
       render: jest.fn(),
       setClearColor: jest.fn(),
-      setPixelRatio: jest.fn(),
-      setSize: jest.fn(),
-    };
+      setRenderTarget: jest.fn(),
+    } as unknown as Parameters<typeof exportCanvasPhoto>[0]["gl"];
 
     await exportCanvasPhoto({
       camera,
@@ -73,18 +104,13 @@ describe("export-photo", () => {
         width: 1920,
       },
       scene,
-      size: {
-        height: 720,
-        width: 1280,
-      },
     });
 
-    expect(gl.setPixelRatio).toHaveBeenNthCalledWith(1, 1);
-    expect(gl.setPixelRatio).toHaveBeenLastCalledWith(2);
-    expect(gl.setSize).toHaveBeenNthCalledWith(1, 1920, 1080, false);
-    expect(gl.setSize).toHaveBeenLastCalledWith(1280, 720, false);
     expect(gl.setClearColor).toHaveBeenNthCalledWith(1, expect.any(THREE.Color), 0);
     expect(gl.setClearColor).toHaveBeenLastCalledWith(expect.any(THREE.Color), 1);
+    expect(gl.setRenderTarget).toHaveBeenNthCalledWith(1, expect.any(THREE.WebGLRenderTarget));
+    expect(gl.setRenderTarget).toHaveBeenLastCalledWith(previousRenderTarget);
+    expect(gl.readRenderTargetPixels).toHaveBeenCalledTimes(1);
     expect(gl.render).toHaveBeenCalledTimes(2);
     expect(updateProjectionMatrixSpy).toHaveBeenCalledTimes(2);
     expect(gridRef.current?.visible).toBe(true);
@@ -95,49 +121,40 @@ describe("export-photo", () => {
     expect(global.URL.revokeObjectURL).toHaveBeenCalledWith("blob:mock-photo");
   });
 
-  it("falls back to data URL conversion when toBlob returns null", async () => {
+  it("falls back to data URL conversion when canvas toBlob returns null", async () => {
     const clickSpy = jest
       .spyOn(HTMLAnchorElement.prototype, "click")
       .mockImplementation(() => {});
+    const putImageData = jest.fn();
 
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera();
-    const gridRef = { current: { visible: true } };
-    const gl = {
-      domElement: {
-        toBlob: jest.fn((callback: (value: Blob | null) => void) => callback(null)),
-        toDataURL: jest.fn(() => "data:image/png;base64,cG5n"),
-      },
-      getClearAlpha: jest.fn(() => 1),
-      getClearColor: jest.fn((color: THREE.Color) => color.set("#123456")),
-      getPixelRatio: jest.fn(() => 2),
-      render: jest.fn(),
-      setClearColor: jest.fn(),
-      setPixelRatio: jest.fn(),
-      setSize: jest.fn(),
-    };
+    jest
+      .spyOn(document, "createElement")
+      .mockImplementation((tagName: string) => {
+        if (tagName === "canvas") {
+          return {
+            getContext: jest.fn(() => ({
+              createImageData: jest.fn((width: number, height: number) => ({
+                data: new Uint8ClampedArray(width * height * 4),
+                height,
+                width,
+              })),
+              putImageData,
+            })),
+            height: 0,
+            toBlob: jest.fn((callback: (value: Blob | null) => void) => callback(null)),
+            toDataURL: jest.fn(() => "data:image/png;base64,cG5n"),
+            width: 0,
+          } as unknown as HTMLCanvasElement;
+        }
 
-    await exportCanvasPhoto({
-      camera,
-      gl,
-      gridRef,
-      preset: {
-        height: 1080,
-        label: "mock-photo-2026-03-23_12-34-56",
-        width: 1920,
-      },
-      scene,
-      size: {
-        height: 720,
-        width: 1280,
-      },
-    });
+        return originalCreateElement(tagName);
+      });
 
-    expect(gl.domElement.toDataURL).toHaveBeenCalledWith("image/png");
-    expect(global.URL.createObjectURL).toHaveBeenCalledWith(
-      expect.objectContaining({ type: "image/png" }),
-    );
-    expect(clickSpy).toHaveBeenCalledTimes(1);
+    const blob = await renderTargetPixelsToBlob(new Uint8Array(4), 1, 1);
+
+    expect(blob).toBeInstanceOf(Blob);
+    expect(blob.type).toBe("image/png");
+    expect(clickSpy).toHaveBeenCalledTimes(0);
   });
 
   it("formats the export timestamp for filenames", () => {
@@ -151,5 +168,48 @@ describe("export-photo", () => {
 
     expect(blob).toBeInstanceOf(Blob);
     expect(blob.type).toBe("image/png");
+  });
+
+  it("flips render target rows before writing to the canvas", async () => {
+    const putImageData = jest.fn();
+
+    jest
+      .spyOn(document, "createElement")
+      .mockImplementation((tagName: string) => {
+        if (tagName === "canvas") {
+          return {
+            getContext: jest.fn(() => ({
+              createImageData: jest.fn((width: number, height: number) => ({
+                data: new Uint8ClampedArray(width * height * 4),
+                height,
+                width,
+              })),
+              putImageData,
+            })),
+            height: 0,
+            toBlob: jest.fn((callback: (value: Blob | null) => void) =>
+              callback(new Blob(["png"], { type: "image/png" })),
+            ),
+            toDataURL: jest.fn(),
+            width: 0,
+          } as unknown as HTMLCanvasElement;
+        }
+
+        return originalCreateElement(tagName);
+      });
+
+    await renderTargetPixelsToBlob(
+      new Uint8Array([
+        1, 2, 3, 4,
+        5, 6, 7, 8,
+      ]),
+      1,
+      2,
+    );
+
+    const imageData = putImageData.mock.calls[0][0] as {
+      data: Uint8ClampedArray;
+    };
+    expect(Array.from(imageData.data)).toEqual([5, 6, 7, 8, 1, 2, 3, 4]);
   });
 });

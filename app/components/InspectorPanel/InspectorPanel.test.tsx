@@ -88,6 +88,7 @@ const copy: AppCopy = {
   backgroundColorButton: "Background color",
   canvasInitialLoadingLabel: "Loading",
   canvasObjectLoadingLabel: "Updating scene",
+  canvasExportLoadingLabel: "Taking photo",
   creditsAuthor: "Author",
   creditsCloseButton: "Close credits",
   creditsDescription: "for 3D models",

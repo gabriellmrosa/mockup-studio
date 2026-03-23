@@ -119,6 +119,7 @@
   align-items: center;
   background: transparent;
   color: var(--icon-fg);
+  cursor: pointer;
   display: inline-flex;
   height: 1rem;
   width: 1.5rem;
@@ -142,6 +143,14 @@
   background: var(--surface-active);
   border-color: var(--button-border-hover);
   color: var(--icon-fg);
+}
+
+.editor-icon-button.context-menu-trigger-quiet:hover,
+.editor-icon-button.context-menu-trigger-quiet.editor-icon-button-active {
+  background: transparent;
+  border-color: transparent;
+  color: var(--icon-fg);
+  transform: none;
 }
 
 /* --- Section action --- */

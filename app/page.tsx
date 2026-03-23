@@ -5,6 +5,7 @@ import type { ScaleOverrides, SpawnOverrides } from "./components/MockupCanvas/M
 import InspectorPanel from "./components/InspectorPanel/InspectorPanel";
 import LayersPanel from "./components/LayersPanel/LayersPanel";
 import MockupCanvas from "./components/MockupCanvas/MockupCanvas";
+import { APP_VERSION } from "./lib/app-version";
 import { APP_COPY, type Locale, type UiTheme } from "./lib/i18n";
 import { readFileAsDataUrl } from "./lib/mockup-image";
 import {
@@ -248,6 +249,7 @@ export default function Home() {
   return (
     <main className="app-shell min-h-screen relative flex">
       <LayersPanel
+        appMeta={APP_VERSION}
         copy={copy}
         locale={locale}
         objects={sceneObjects}

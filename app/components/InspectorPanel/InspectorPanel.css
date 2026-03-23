@@ -13,6 +13,7 @@
 .inspector-stack {
   display: flex;
   flex-direction: column;
+  padding-bottom: var(--space-6);
 }
 
 /* --- Model select --- */

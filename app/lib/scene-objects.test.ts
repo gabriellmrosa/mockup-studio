@@ -90,7 +90,7 @@ describe("scene-objects", () => {
     expect(reset.isVisible).toBe(false);
   });
 
-  it("changes model and refreshes placeholder/theme defaults", () => {
+  it("changes model and refreshes placeholder/theme defaults without moving the object", () => {
     const object = createSceneObject({
       id: "scene-object",
       modelId: "smartphone",
@@ -134,7 +134,13 @@ describe("scene-objects", () => {
     expect(changed.matteColors).toBe(true);
     expect(changed.customColorsEnabled).toBe(false);
     expect(changed.debugMode).toBe(false);
-    expect(changed).toMatchObject(DEFAULT_OBJECT_TRANSFORM);
+    expect(changed.positionX).toBe(1);
+    expect(changed.positionY).toBe(4);
+    expect(changed.positionZ).toBe(-2);
+    expect(changed.rotationX).toBe(33);
+    expect(changed.rotationY).toBe(15);
+    expect(changed.rotationZ).toBe(-11);
+    expect(changed.scale).toBe(2);
     expect(changed.showDeviceShell).toBe(true);
     expect(changed.showNotebookKeyboard).toBe(true);
   });

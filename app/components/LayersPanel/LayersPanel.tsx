@@ -14,6 +14,7 @@ import ContextMenu from "../ContextMenu/ContextMenu";
 import CreditsModal from "../CreditsModal/CreditsModal";
 
 type LayersPanelProps = {
+  appMeta: string;
   copy: AppCopy;
   locale: Locale;
   objects: SceneObject[];
@@ -29,6 +30,7 @@ type LayersPanelProps = {
 };
 
 export default function LayersPanel({
+  appMeta,
   copy,
   locale,
   objects,
@@ -90,7 +92,7 @@ export default function LayersPanel({
         <div className="relative">
           <LayersPanelHeader
             title={copy.appTitle}
-            subtitle={copy.appSubtitle}
+            subtitle={appMeta}
             titleClassName="panel-title panel-title-brand"
             action={
               <ContextMenu
@@ -133,6 +135,7 @@ export default function LayersPanel({
                   },
                 ]}
                 triggerAriaLabel={copy.preferencesLabel}
+                triggerClassName="context-menu-trigger-quiet"
                 triggerTitle={copy.preferencesLabel}
                 triggerIcon={<MoreVertical size={12} />}
               />
@@ -244,7 +247,7 @@ export default function LayersPanel({
                             : []),
                         ]}
                         triggerAriaLabel={copy.objectOptionsLabel}
-                        triggerClassName="layer-menu-trigger"
+                        triggerClassName="layer-menu-trigger context-menu-trigger-quiet"
                         triggerStopPropagation
                         triggerTitle={copy.objectOptionsLabel}
                         triggerIcon={<MoreVertical size={12} />}

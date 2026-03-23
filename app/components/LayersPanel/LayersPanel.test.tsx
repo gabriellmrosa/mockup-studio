@@ -33,6 +33,7 @@ const copy: AppCopy = {
   backgroundColorButton: "Background color",
   canvasInitialLoadingLabel: "Loading",
   canvasObjectLoadingLabel: "Updating scene",
+  canvasExportLoadingLabel: "Taking photo",
   creditsAuthor: "Author",
   creditsCloseButton: "Close credits",
   creditsDescription: "for 3D models",
@@ -107,6 +108,7 @@ describe("LayersPanel", () => {
 
     render(
       <LayersPanel
+        appMeta="v1.0.0"
         copy={copy}
         locale="en-US"
         objects={[object]}
@@ -136,6 +138,7 @@ describe("LayersPanel", () => {
 
     render(
       <LayersPanel
+        appMeta="v1.0.0"
         copy={copy}
         locale="en-US"
         objects={[object]}

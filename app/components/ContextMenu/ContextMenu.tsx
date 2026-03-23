@@ -14,6 +14,7 @@ export type ContextMenuActionItem = {
   disabled?: boolean;
   label: string;
   onClick: () => void;
+  trailingIcon?: ReactNode;
   variant?: "default" | "danger";
 };
 
@@ -231,8 +232,15 @@ export default function ContextMenu({
                     }}
                   >
                     <span className="context-menu-row-label">{item.label}</span>
-                    {item.badgeLabel ? (
-                      <span className="context-menu-row-badge">{item.badgeLabel}</span>
+                    {item.badgeLabel || item.trailingIcon ? (
+                      <span className="context-menu-row-meta">
+                        {item.badgeLabel ? (
+                          <span className="context-menu-row-badge">{item.badgeLabel}</span>
+                        ) : null}
+                        {item.trailingIcon ? (
+                          <span className="context-menu-row-icon">{item.trailingIcon}</span>
+                        ) : null}
+                      </span>
                     ) : null}
                   </button>
                 );

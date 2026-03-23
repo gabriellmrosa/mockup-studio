@@ -157,7 +157,6 @@ function SceneBridge({
         gridRef,
         preset: { height, label, width },
         scene,
-        size,
       });
     });
 
@@ -406,6 +405,7 @@ export default function MockupCanvas(props: MockupCanvasProps) {
   const [resolvedObjectIds, setResolvedObjectIds] = useState<string[]>([]);
   const [incrementalLoadingDelayElapsed, setIncrementalLoadingDelayElapsed] =
     useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
@@ -490,17 +490,20 @@ export default function MockupCanvas(props: MockupCanvasProps) {
   async function handleTakePhoto() {
     const exportHandler = exportHandlerRef.current;
 
-    if (!exportHandler) {
+    if (!exportHandler || isExporting) {
       return;
     }
 
     try {
+      setIsExporting(true);
       await exportHandler({
         ...TAKE_PHOTO_PRESET,
         label: `mock-photo-${formatTimestampForFilename(new Date())}`,
       });
     } catch (error) {
       console.error("Failed to export canvas photo.", error);
+    } finally {
+      setIsExporting(false);
     }
   }
 
@@ -549,6 +552,16 @@ export default function MockupCanvas(props: MockupCanvasProps) {
           </div>
         ) : null}
 
+        {isExporting ? (
+          <div className="canvas-loading-chip">
+            <div
+              className="canvas-loading-spinner canvas-loading-spinner-small"
+              aria-hidden="true"
+            />
+            <span>{props.copy.canvasExportLoadingLabel}</span>
+          </div>
+        ) : null}
+
         <FloatingCanvasControls
           bgColor={canvasBgColor}
           copy={props.copy}
@@ -564,7 +577,7 @@ export default function MockupCanvas(props: MockupCanvasProps) {
           }}
           onZoomIn={() => viewportControls?.zoomIn()}
           onZoomOut={() => viewportControls?.zoomOut()}
-          takePhotoDisabled={!isExportReady}
+          takePhotoDisabled={!isExportReady || isExporting}
           uiTheme={props.uiTheme}
         />
       </div>
