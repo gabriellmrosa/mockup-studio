@@ -133,7 +133,7 @@ function SceneBridge({
   canvasBgColor,
 }: SceneBridgeProps) {
   const controlsRef = useRef<CameraControlsImpl | null>(null);
-  const gridRef = useRef<THREE.Object3D | null>(null);
+  const gridRef = useRef<THREE.Mesh | null>(null);
   const sceneRef = useRef<THREE.Group | null>(null);
   const { camera, gl, scene, size } = useThree();
 

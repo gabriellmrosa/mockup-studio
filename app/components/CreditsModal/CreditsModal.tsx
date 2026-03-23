@@ -10,7 +10,17 @@ type CreditsModalProps = {
   onClose: () => void;
 };
 
-const ASSET_CREDITS = [
+type AssetCredit = {
+  author: string;
+  licenseHref: string;
+  licenseLabel: string;
+  sourceHref: string;
+  sourceLabel: string;
+  title: string;
+  warning?: string;
+};
+
+const ASSET_CREDITS: readonly AssetCredit[] = [
   {
     title: "Smartphone — iPhone 14 Pro Pack",
     author: "Imagigoo",
@@ -48,7 +58,7 @@ const ASSET_CREDITS = [
     warning:
       "Used strictly for educational/portfolio purposes, no monetization involved. Author may request removal at any time.",
   },
-] as const;
+];
 
 export default function CreditsModal({
   isOpen,
