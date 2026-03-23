@@ -17,6 +17,9 @@ import {
 } from "./lib/scene-objects";
 import { DEVICE_MODELS } from "./models/device-models";
 
+const MIN_DESKTOP_WIDTH = 1280;
+const MIN_DESKTOP_HEIGHT = 800;
+
 function detectBrowserLocale(): Locale {
   const preferredLocales = navigator.languages?.length
     ? navigator.languages
@@ -59,6 +62,7 @@ export default function Home() {
   const [scaleOverrides] = useState<ScaleOverrides>({});
   const [spawnOverrides] = useState<SpawnOverrides>({});
   const copy = APP_COPY[locale];
+  const minViewportLabel = `${MIN_DESKTOP_WIDTH} x ${MIN_DESKTOP_HEIGHT} px`;
   const selectedObject =
     sceneObjects.find((object) => object.id === selectedObjectId) ??
     sceneObjects[0] ??
@@ -247,7 +251,8 @@ export default function Home() {
   }
 
   return (
-    <main className="app-shell min-h-screen relative flex">
+    <>
+      <main className="app-shell app-desktop-shell min-h-screen relative flex">
       <LayersPanel
         appMeta={APP_VERSION}
         copy={copy}
@@ -313,6 +318,23 @@ export default function Home() {
         uiTheme={uiTheme}
         uploadError={uploadError}
       />
-    </main>
+      </main>
+
+      <section
+        className="desktop-only-blocker"
+        aria-labelledby="desktop-only-title"
+      >
+        <div className="desktop-only-card panel-card">
+          <p className="desktop-only-eyebrow">{copy.appTitle}</p>
+          <h1 id="desktop-only-title" className="desktop-only-title">
+            {copy.desktopOnlyTitle}
+          </h1>
+          <p className="desktop-only-body">
+            {copy.desktopOnlyBody.replace("{size}", minViewportLabel)}
+          </p>
+          <p className="desktop-only-hint">{copy.desktopOnlyHint}</p>
+        </div>
+      </section>
+    </>
   );
 }

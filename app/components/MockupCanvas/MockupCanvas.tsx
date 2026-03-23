@@ -537,7 +537,7 @@ export default function MockupCanvas(props: MockupCanvasProps) {
 
       <div className="canvas-stage-overlay">
         {isInitialSceneLoading ? (
-          <div className="canvas-loading-overlay">
+          <div className="canvas-loading-overlay" role="status" aria-live="polite">
             <div className="canvas-loading-minimal">
               <div className="canvas-loading-spinner" aria-hidden="true" />
               <p className="canvas-loading-label">{props.copy.canvasInitialLoadingLabel}</p>
@@ -546,14 +546,14 @@ export default function MockupCanvas(props: MockupCanvasProps) {
         ) : null}
 
         {showIncrementalLoading ? (
-          <div className="canvas-loading-chip">
+          <div className="canvas-loading-chip" role="status" aria-live="polite">
             <div className="canvas-loading-spinner canvas-loading-spinner-small" aria-hidden="true" />
             <span>{incrementalLoadingLabel}</span>
           </div>
         ) : null}
 
         {isExporting ? (
-          <div className="canvas-loading-chip">
+          <div className="canvas-loading-chip" role="status" aria-live="polite">
             <div
               className="canvas-loading-spinner canvas-loading-spinner-small"
               aria-hidden="true"

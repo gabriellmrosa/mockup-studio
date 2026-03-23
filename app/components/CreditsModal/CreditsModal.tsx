@@ -143,7 +143,7 @@ export default function CreditsModal({
                     className="credits-link"
                   >
                     {item.sourceLabel}
-                    <ExternalLink size={12} />
+                    <ExternalLink size={12} aria-hidden="true" />
                   </a>
                 </p>
                 <p className="credits-card-line">
@@ -156,7 +156,7 @@ export default function CreditsModal({
                       className="credits-link"
                     >
                       {item.licenseLabel}
-                      <ExternalLink size={12} />
+                      <ExternalLink size={12} aria-hidden="true" />
                     </a>
                   ) : (
                     item.licenseLabel

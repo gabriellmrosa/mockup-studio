@@ -268,6 +268,8 @@ export default function LayersPanel({
               width="9"
               height="9"
               fill="none"
+              aria-hidden="true"
+              focusable="false"
             >
               <path
                 fill="var(--sidebar-muted)"
@@ -294,6 +296,7 @@ export default function LayersPanel({
               type="button"
               className="sidebar-footer-link"
               onClick={() => setIsCreditsOpen(true)}
+              aria-label={copy.creditsLabel}
             >
               {copy.creditsLabel}
             </button>{" "}

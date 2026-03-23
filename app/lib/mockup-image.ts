@@ -61,7 +61,7 @@ export function buildScreenCanvas(
 
   const context = canvas.getContext("2d");
   if (!context) {
-    throw new Error("Nao foi possivel preparar a textura da tela.");
+    throw new Error("Não foi possível preparar a textura da tela.");
   }
 
   context.drawImage(
@@ -89,9 +89,9 @@ export function readFileAsDataUrl(file: File) {
         return;
       }
 
-      reject(new Error("Nao foi possivel ler a imagem enviada."));
+      reject(new Error("Não foi possível ler a imagem enviada."));
     };
-    reader.onerror = () => reject(new Error("Nao foi possivel ler a imagem enviada."));
+    reader.onerror = () => reject(new Error("Não foi possível ler a imagem enviada."));
     reader.readAsDataURL(file);
   });
 }

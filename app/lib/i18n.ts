@@ -57,6 +57,9 @@ export type AppCopy = {
   canvasInitialLoadingLabel: string;
   canvasObjectLoadingLabel: string;
   canvasExportLoadingLabel: string;
+  desktopOnlyTitle: string;
+  desktopOnlyBody: string;
+  desktopOnlyHint: string;
   uploadImageError: string;
   creditsLabel: string;
   creditsDescription: string;
@@ -75,26 +78,26 @@ export type AppCopy = {
 export const APP_COPY: Record<Locale, AppCopy> = {
   "pt-BR": {
     appTitle: "Mock Studio",
-    appSubtitle: "Composicao visual de mockups",
+    appSubtitle: "Composição visual de mockups",
     addObject: "Adicionar camada",
     baseObject: "Camada base",
     hideObject: "Ocultar",
     showObject: "Mostrar",
     hiddenObjectLabel: "Oculto",
-    fitSceneButton: "Enquadrar conteudo",
+    fitSceneButton: "Enquadrar conteúdo",
     languageLabel: "Idioma",
     themeLabel: "Interface",
-    preferencesLabel: "Preferencias",
+    preferencesLabel: "Preferências",
     darkMode: "Escuro",
     lightMode: "Claro",
     portuguese: "PT-BR",
     english: "EN-US",
-    resetCameraButton: "Resetar visao",
+    resetCameraButton: "Resetar visão",
     takePhotoButton: "Exportar PNG",
     deleteObject: "Excluir",
     renameObject: "Renomear",
     layersSectionTitle: "Camadas",
-    objectOptionsLabel: "Opcoes da camada",
+    objectOptionsLabel: "Opções da camada",
     propertiesEyebrow: "Propriedades",
     modelLabel: "Dispositivo",
     sceneSectionHint: "Corpo do dispositivo",
@@ -102,12 +105,12 @@ export const APP_COPY: Record<Locale, AppCopy> = {
     screenSectionTitle: "Tela",
     uploadImage: "Substituir imagem",
     screenSectionHintPrefix: "Tamanho ideal:",
-    themesSectionTitle: "Aparencia",
+    themesSectionTitle: "Aparência",
     bodyColorLabel: "Cores personalizadas",
     matteColorLabel: "Acabamento fosco",
     debugSectionTitle: "Debug",
-    transformSectionTitle: "Transformacao",
-    resetObjectButton: "Resetar transformacao",
+    transformSectionTitle: "Transformação",
+    resetObjectButton: "Resetar transformação",
     positionX: "Posição X",
     positionY: "Posição Y",
     positionZ: "Posição Z",
@@ -125,28 +128,32 @@ export const APP_COPY: Record<Locale, AppCopy> = {
     debugOn: "Debug interativo: ON",
     debugOff: "Debug interativo: OFF",
     canvasInitialLoadingLabel: "Preparando cena",
-    canvasObjectLoadingLabel: "Atualizando visualizacao",
+    canvasObjectLoadingLabel: "Atualizando visualização",
     canvasExportLoadingLabel: "Tirando a foto",
-    uploadImageError: "Nao foi possivel carregar essa imagem.",
-    creditsLabel: "CREDITOS",
+    desktopOnlyTitle: "Disponível apenas em desktop",
+    desktopOnlyBody:
+      "Este app roda apenas em desktop ou notebook com janela de no mínimo {size}.",
+    desktopOnlyHint: "Abra em uma tela maior ou aumente a janela do navegador.",
+    uploadImageError: "Não foi possível carregar essa imagem.",
+    creditsLabel: "CRÉDITOS",
     creditsDescription: "dos modelos 3D",
-    creditsEyebrow: "Modelos 3D e licencas",
-    creditsTitle: "Creditos e atribuicoes",
-    creditsCloseButton: "Fechar creditos",
+    creditsEyebrow: "Modelos 3D e licenças",
+    creditsTitle: "Créditos e atribuições",
+    creditsCloseButton: "Fechar créditos",
     creditsIntro:
-      "Este e um projeto pessoal de estudo, sem finalidade comercial. Todos os modelos 3D sao creditados conforme exigido por suas respectivas licencas.",
+      "Este é um projeto pessoal de estudo, sem finalidade comercial. Todos os modelos 3D são creditados conforme exigido por suas respectivas licenças.",
     creditsAuthor: "Autor",
     creditsSource: "Fonte",
-    creditsLicense: "Licenca",
+    creditsLicense: "Licença",
     creditsFooterThanks:
       "Agradecimento especial aos artistas que compartilham seu trabalho com a comunidade.",
     creditsFooterRemoval:
-      "Criadores: caso identifiquem qualquer uso inadequado dos assets, entre em contato para remocao imediata.",
+      "Criadores: caso identifiquem qualquer uso inadequado dos assets, entre em contato para remoção imediata.",
     themeNames: {
       gray: "Cinza",
       black: "Preto",
       "light-gray": "Cinza Claro",
-      blood: "Red",
+      blood: "Vermelho",
     },
   },
   "en-US": {
@@ -203,6 +210,10 @@ export const APP_COPY: Record<Locale, AppCopy> = {
     canvasInitialLoadingLabel: "Preparing scene",
     canvasObjectLoadingLabel: "Refreshing preview",
     canvasExportLoadingLabel: "Taking photo",
+    desktopOnlyTitle: "Desktop only",
+    desktopOnlyBody:
+      "This app works only on desktop or laptop screens with a minimum viewport of {size}.",
+    desktopOnlyHint: "Open it on a larger screen or make the browser window bigger.",
     uploadImageError: "Could not load this image.",
     creditsLabel: "CREDITS",
     creditsDescription: "for 3D models",

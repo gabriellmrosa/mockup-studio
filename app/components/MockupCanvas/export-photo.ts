@@ -85,7 +85,7 @@ export async function exportCanvasPhoto({
   }
 
   if (!blob) {
-    throw new Error("Nao foi possivel gerar o PNG.");
+    throw new Error("Não foi possível gerar o PNG.");
   }
 
   downloadBlob(blob, `${preset.label}.png`);
@@ -102,7 +102,7 @@ export async function renderTargetPixelsToBlob(
 
   const context = canvas.getContext("2d");
   if (!context) {
-    throw new Error("Nao foi possivel preparar a imagem exportada.");
+    throw new Error("Não foi possível preparar a imagem exportada.");
   }
 
   const rowLength = width * 4;

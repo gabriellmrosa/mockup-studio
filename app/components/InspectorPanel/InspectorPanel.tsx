@@ -118,6 +118,7 @@ export default function InspectorPanel({
               checked={object.showDeviceShell}
               onChange={onToggleDeviceShell}
               className="inspector-checkbox"
+              aria-label={copy.sceneSectionHint}
             />
           </label>
           {object.modelId === "notebook" ? (
@@ -128,6 +129,7 @@ export default function InspectorPanel({
                 checked={object.showNotebookKeyboard}
                 onChange={onToggleNotebookKeyboard}
                 className="inspector-checkbox"
+                aria-label={copy.keyboardToggleLabel}
               />
             </label>
           ) : null}
@@ -143,6 +145,7 @@ export default function InspectorPanel({
             <input
               type="file"
               accept="image/png,image/jpeg,image/webp"
+              aria-label={copy.uploadImage}
               onChange={onImageUpload}
               className="hidden"
             />
@@ -186,6 +189,7 @@ export default function InspectorPanel({
                     checked={object.matteColors}
                     onChange={onToggleMatteColors}
                     className="inspector-checkbox"
+                    aria-label={copy.matteColorLabel}
                   />
                 </label>
 
@@ -196,6 +200,7 @@ export default function InspectorPanel({
                     checked={object.customColorsEnabled}
                     onChange={onToggleCustomColors}
                     className="inspector-checkbox"
+                    aria-label={copy.bodyColorLabel}
                   />
                 </label>
 

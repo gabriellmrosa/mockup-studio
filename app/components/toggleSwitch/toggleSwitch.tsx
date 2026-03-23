@@ -53,7 +53,8 @@ export default function ToggleSwitch<T extends string>({
           >
             <Image
               src={option.iconSrc}
-              alt={option.iconAlt ?? option.label}
+              alt=""
+              aria-hidden="true"
               width={16}
               height={16}
               className={`toggle-switch-icon ${option.iconClassName ?? ""}`}

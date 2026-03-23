@@ -63,7 +63,7 @@ function rotateCanvas180(source: HTMLCanvasElement) {
 
   const context = canvas.getContext("2d");
   if (!context) {
-    throw new Error("Nao foi possivel rotacionar a textura da tela.");
+    throw new Error("Não foi possível rotacionar a textura da tela.");
   }
 
   context.translate(canvas.width, canvas.height);
