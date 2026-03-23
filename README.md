@@ -1,21 +1,43 @@
 # Mockup Studio
 
-Editor de mockups em `Next.js` + `React Three Fiber` para compor telas de app em dispositivos 3D.
+Open source editor for composing app screens inside 3D device mockups with `Next.js`, `React`, `Three.js` and `React Three Fiber`.
 
-## Como Rodar
+## Features
+
+- multi-object composition with `smartphone`, `smartphone2`, `smartwatch` and `notebook`
+- per-object image upload with model-specific placeholders
+- per-object transform controls for position, rotation and scale
+- device themes plus manual color customization by semantic part
+- transparent PNG export from the canvas
+- layered selection flow via list and direct interaction in the 3D scene
+- `pt-BR` and `en-US` UI support
+- dark and light themes
+
+## Stack
+
+- `Next.js 16`
+- `React 19`
+- `Three.js`
+- `@react-three/fiber`
+- `@react-three/drei`
+- `Tailwind CSS 4`
+- `Jest` + `Testing Library`
+- `Vercel Web Analytics`
+
+## Getting Started
 
 ```bash
 npm install
 npm run dev
 ```
 
-Build de validacao:
+Production build:
 
 ```bash
 npm run build
 ```
 
-Checks de qualidade:
+Quality checks:
 
 ```bash
 npx tsc --noEmit
@@ -23,80 +45,73 @@ npm run lint
 npm test -- --runInBand
 ```
 
-## Catalogo de Modelos
+## Analytics
 
-| Modelo | Arquivo GLB | modelScale | baseRotation | modelSpawnOffset | Upload recomendado |
+This project includes the minimal Vercel Web Analytics integration through `@vercel/analytics`.
+
+To see traffic data in production:
+
+1. Deploy the project to Vercel.
+2. Enable `Web Analytics` in the Vercel dashboard.
+3. Visit the Analytics tab for page views, visitors, referrers and geography data.
+
+## Model Catalog
+
+| Model | GLB file | modelScale | baseRotation | modelSpawnOffset | Recommended upload |
 |---|---|---|---|---|---|
 | smartphone | smartphone.glb | [1, 1, 1] | [0, 0, 0] | [0, 0, 0] | 1290x2755 |
 | smartphone2 | apple_iphone_14_pro_orange.glb | [122.9, 122.9, 122.9] | [0, 90.5°, 0] | [0, 0, 0] | 1290x2748 |
 | smartwatch | smartwatch.glb | [19.44, 19.44, 19.44] | [0, -π/2, 0] | [130, 40, 270] | 1290x1452 |
 | notebook | notebook.glb | [2311, 2311, 2311] | [0, π, 0] | [120, 100, 0] | 2755x1684 |
 
-## Recursos Principais
+## Project Structure
 
-- composicao multiobjeto com catalogo de `smartphone`, `smartphone2`, `smartwatch` e `notebook`;
-- upload de imagem por objeto com placeholder especifico por modelo;
-- transformacoes por objeto: posicao, rotacao e escala;
-- temas visuais e customizacao manual de cores por partes nomeadas;
-- export PNG com transparencia real e menu de resolucao no canvas;
-- selecao por painel de camadas e por interacao direta no canvas;
-- novos objetos do mesmo modelo passam a nascer lado a lado para evitar sobreposicao imperceptivel;
-- `Take photo` para captura do canvas sem grid nem fundo visivel;
-- suporte a `pt-BR` e `en-US`;
-- dark mode e light mode;
-- base de testes com `Jest + Testing Library`.
+- [app/page.tsx](app/page.tsx): main editor state, object list and selection
+- [app/components/MockupCanvas/](app/components/MockupCanvas/): 3D canvas, camera, export and render flow
+- [app/components/LayersPanel/](app/components/LayersPanel/): layers list and global preferences
+- [app/components/InspectorPanel/](app/components/InspectorPanel/): controls for the selected object
+- [app/models/device-models.ts](app/models/device-models.ts): device catalog and model metadata
+- [app/lib/scene-objects.ts](app/lib/scene-objects.ts): object creation, reset and model switching
+- [app/lib/3d-tokens/](app/lib/3d-tokens/): per-model themes and color tokens
+- [app/lib/i18n.ts](app/lib/i18n.ts): copy for `pt-BR` and `en-US`
 
-## Estrutura Relevante
-
-- [app/page.tsx](app/page.tsx): orquestra estado do editor, lista de objetos e selecao.
-- [app/components/MockupCanvas/](app/components/MockupCanvas/): canvas 3D, camera, export e renderizacao.
-- [app/components/LayersPanel/](app/components/LayersPanel/): painel de camadas e preferencias globais.
-- [app/components/InspectorPanel/](app/components/InspectorPanel/): propriedades do objeto selecionado.
-- [app/models/device-models.ts](app/models/device-models.ts): catalogo de dispositivos e metadados de escala/rotacao.
-- [app/lib/scene-objects.ts](app/lib/scene-objects.ts): criacao, reset e troca de modelo dos objetos.
-- [app/lib/3d-tokens/](app/lib/3d-tokens/): temas e tokens de cores por modelo.
-- [app/lib/i18n.ts](app/lib/i18n.ts): textos da interface em `pt-BR` e `en-US`.
-
-## Regras de Styling
-
-- `app/styles/tokens.css` e a fonte de verdade para tokens de cor, tipografia, spacing e radius;
-- `app/globals.css` concentra variaveis semanticas dependentes de tema;
-- Tailwind deve ser usado principalmente para layout e composicao estrutural;
-- CSS de componente deve cuidar de estados visuais e regras locais;
-- evitar utilitarios arbitrarios quando houver token equivalente.
-
-## Regras de Copy
-
-- a interface deve soar como ferramenta criativa profissional;
-- labels, menus, tooltips e modais devem passar por `app/lib/i18n.ts`;
-- evitar misturar portugues e ingles no mesmo contexto visual;
-- reutilizar os mesmos termos para a mesma acao em toda a UI.
-
-## Adicionando Novos Modelos 3D
+## Adding a New 3D Model
 
 Checklist:
 
-- colocar o `.glb` em `public/models/`;
-- criar o componente React em `app/components/`;
-- criar os tokens de cor em `app/lib/3d-tokens/`;
-- adicionar entrada em `app/models/device-models.ts` com `modelScale`, `baseRotation`, `pivotOffset` e metadados;
-- atualizar a union `DeviceModelId`;
-- usar `debugPartColors`/`debugMode` para mapear as partes antes de expor o modelo na UI;
-- definir placeholder e temas finais do modelo.
+- add the `.glb` file to `public/models/`
+- create the React component in `app/components/`
+- create its color tokens in `app/lib/3d-tokens/`
+- add a new entry to `app/models/device-models.ts`
+- update the `DeviceModelId` union
+- map semantic parts with `debugPartColors` and `debugMode`
+- define a model-specific placeholder and final themes
 
-## Scripts de Asset
+## Technical Notes
 
-- [scripts/extract-orange-iphone.mjs](scripts/extract-orange-iphone.mjs): isola o node do iPhone usado pelo app a partir do GLB fonte.
-- [scripts/extract-iphone-textures.mjs](scripts/extract-iphone-textures.mjs): exporta texturas selecionadas do GLB original para inspecao local em `tmp/`.
+- placeholders are model-specific and no longer tied to locale
+- same-model objects spawn side by side to avoid invisible overlap when adding layers
+- export uses a floating resolution menu, with `1920x1080` active and higher presets marked as `Em breve`
+- floating menus and list rows use stronger hover contrast in dark mode
+- the infinite grid now stays visible longer during zoom-out before fading
+- `Credits` in the UI contains attribution for the third-party 3D assets used by the project
 
-Esses scripts sao utilitarios de desenvolvimento para preparacao de assets e nao fazem parte do fluxo normal da aplicacao.
+## Learned Lessons
 
-## Creditos e Licencas
+- do not couple placeholders to language; placeholder choice belongs to the model definition
+- floating menus should reuse the shared flyout infrastructure to keep portal, outside-click and contrast behavior consistent
+- when adding repeated models, initial transform values must prevent visual overlap or the editor can look broken even when state changed correctly
+- dark mode hover states for flyouts need stronger local contrast than the base panel token alone
 
-Os creditos e licencas dos assets 3D usados no projeto estao expostos na UI pelo modal `Credits`.
+## Asset Scripts
 
-## Notas de UX
+- [scripts/extract-orange-iphone.mjs](scripts/extract-orange-iphone.mjs): isolates the cropped iPhone node used by the app from the source GLB
+- [scripts/extract-iphone-textures.mjs](scripts/extract-iphone-textures.mjs): exports selected textures from the original GLB into `tmp/`
 
-- o menu de export no canvas deixa `1920x1080` disponivel hoje e antecipa presets de maior resolucao como `Em breve`;
-- menus flutuantes e listas usam contraste reforcado no dark mode para hover e selecao;
-- o grid do canvas permanece visivel por mais tempo em zoom-out antes de desaparecer gradualmente.
+These scripts are development utilities for asset preparation and are not part of the normal app runtime.
+
+## License
+
+Code in this repository is licensed under `GNU AGPL-3.0-only`. See [LICENSE](LICENSE).
+
+Project identity, branding and third-party assets may have separate attribution or usage requirements. Check the in-app `Credits` modal and asset source licenses before redistributing assets.

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Abhaya_Libre } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const abhayaLibre = Abhaya_Libre({
@@ -20,7 +21,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR" data-theme="dark">
-      <body className={abhayaLibre.variable}>{children}</body>
+      <body className={abhayaLibre.variable}>
+        {children}
+        <Analytics />
+      </body>
     </html>
   );
 }
