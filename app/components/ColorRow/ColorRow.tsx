@@ -1,7 +1,7 @@
 "use client";
 
 import "./ColorRow.css";
-import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { ChangeEvent, memo, useEffect, useRef, useState } from "react";
 
 type ColorRowProps = {
   compact?: boolean;
@@ -19,7 +19,7 @@ function normalize(raw: string): string {
   return t && !t.startsWith("#") ? `#${t}` : t;
 }
 
-export default function ColorRow({
+function ColorRowImpl({
   compact = false,
   label,
   onChange,
@@ -30,11 +30,15 @@ export default function ColorRow({
   const [isInvalid, setIsInvalid] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const animationFrameRef = useRef<number | null>(null);
+  const pendingPickerValueRef = useRef<string | null>(null);
 
-  // Cleanup debounce on unmount
   useEffect(() => {
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
+      if (animationFrameRef.current !== null) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
     };
   }, []);
 
@@ -77,7 +81,19 @@ export default function ColorRow({
     if (e.target.value === value) return;
     setInputVal(e.target.value);
     setIsInvalid(false);
-    onChange(e.target.value);
+    pendingPickerValueRef.current = e.target.value;
+
+    if (animationFrameRef.current !== null) {
+      cancelAnimationFrame(animationFrameRef.current);
+    }
+
+    animationFrameRef.current = requestAnimationFrame(() => {
+      animationFrameRef.current = null;
+
+      if (pendingPickerValueRef.current) {
+        onChange(pendingPickerValueRef.current);
+      }
+    });
   };
 
   return (
@@ -121,3 +137,14 @@ export default function ColorRow({
     </div>
   );
 }
+
+const ColorRow = memo(
+  ColorRowImpl,
+  (prevProps, nextProps) =>
+    prevProps.compact === nextProps.compact &&
+    prevProps.label === nextProps.label &&
+    prevProps.uiTheme === nextProps.uiTheme &&
+    prevProps.value === nextProps.value,
+);
+
+export default ColorRow;

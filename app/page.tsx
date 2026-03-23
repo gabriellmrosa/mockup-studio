@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { ChangeEvent, startTransition, useEffect, useRef, useState } from "react";
 import type { ScaleOverrides, SpawnOverrides } from "./components/MockupCanvas/MockupCanvas";
 import InspectorPanel from "./components/InspectorPanel/InspectorPanel";
 import LayersPanel from "./components/LayersPanel/LayersPanel";
@@ -199,9 +199,11 @@ export default function Home() {
           [part]: hex,
         };
 
-    updateSceneObject(selectedObject.id, {
-      colors: nextColors,
-      deviceTheme: "",
+    startTransition(() => {
+      updateSceneObject(selectedObject.id, {
+        colors: nextColors,
+        deviceTheme: "",
+      });
     });
   }
 
@@ -214,11 +216,13 @@ export default function Home() {
       return;
     }
 
-    updateSceneObject(selectedObject.id, {
-      debugPartColors: {
-        ...selectedObject.debugPartColors,
-        [part]: hex,
-      },
+    startTransition(() => {
+      updateSceneObject(selectedObject.id, {
+        debugPartColors: {
+          ...selectedObject.debugPartColors,
+          [part]: hex,
+        },
+      });
     });
   }
 

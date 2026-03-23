@@ -22,6 +22,10 @@ import {
 } from "../../lib/scene-presets";
 import { DEVICE_MODELS } from "../../models/device-models";
 import FloatingCanvasControls from "../FloatingCanvasControls/FloatingCanvasControls";
+import {
+  exportCanvasPhoto,
+  formatTimestampForFilename,
+} from "./export-photo";
 
 export type ExportPreset = {
   height: number;
@@ -147,67 +151,20 @@ function SceneBridge({
 
   useEffect(() => {
     onExportReady(async ({ height, label, width }) => {
-      const previousWidth = size.width;
-      const previousHeight = size.height;
-      const previousPixelRatio = gl.getPixelRatio();
-      const previousClearAlpha = gl.getClearAlpha();
-      const previousClearColor = gl.getClearColor(new THREE.Color()).clone();
-      const previousAspect =
-        camera instanceof THREE.PerspectiveCamera ? camera.aspect : null;
-      const previousSceneBackground = scene.background;
-      const previousGridVisible = gridRef.current?.visible ?? true;
-
-      gl.setPixelRatio(1);
-      gl.setSize(width, height, false);
-      gl.setClearColor(previousClearColor, 0);
-      scene.background = null;
-
-      if (gridRef.current) {
-        gridRef.current.visible = false;
-      }
-
-      if (camera instanceof THREE.PerspectiveCamera) {
-        camera.aspect = width / height;
-        camera.updateProjectionMatrix();
-      }
-
-      gl.render(scene, camera);
-
-      await new Promise<void>((resolve) => {
-        requestAnimationFrame(() => resolve());
+      await exportCanvasPhoto({
+        camera,
+        gl,
+        gridRef,
+        preset: { height, label, width },
+        scene,
+        size,
       });
-
-      const blob =
-        (await new Promise<Blob | null>((resolve) => {
-          gl.domElement.toBlob(resolve, "image/png");
-        })) ?? dataUrlToBlob(gl.domElement.toDataURL("image/png"));
-
-      if (gridRef.current) {
-        gridRef.current.visible = previousGridVisible;
-      }
-      scene.background = previousSceneBackground;
-      gl.setClearColor(previousClearColor, previousClearAlpha);
-      gl.setPixelRatio(previousPixelRatio);
-      gl.setSize(previousWidth, previousHeight, false);
-
-      if (camera instanceof THREE.PerspectiveCamera && previousAspect !== null) {
-        camera.aspect = previousAspect;
-        camera.updateProjectionMatrix();
-      }
-
-      gl.render(scene, camera);
-
-      if (!blob) {
-        throw new Error("Nao foi possivel gerar o PNG.");
-      }
-
-      downloadBlob(blob, `${label}.png`);
     });
 
     return () => {
       onExportReady(null);
     };
-  }, [camera, gl, onExportReady, scene, size.height, size.width]);
+  }, [camera, gl, onExportReady, scene, size]);
 
   const gridColors = getGridColors(canvasBgColor, uiTheme);
 
@@ -612,40 +569,4 @@ export default function MockupCanvas(props: MockupCanvasProps) {
       </div>
     </div>
   );
-}
-
-function downloadBlob(blob: Blob, filename: string) {
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-
-  link.href = url;
-  link.download = filename;
-  link.click();
-
-  URL.revokeObjectURL(url);
-}
-
-function dataUrlToBlob(dataUrl: string) {
-  const [header, base64] = dataUrl.split(",");
-  const mimeMatch = header.match(/data:(.*?);base64/);
-  const mimeType = mimeMatch?.[1] ?? "image/png";
-  const binary = window.atob(base64);
-  const bytes = new Uint8Array(binary.length);
-
-  for (let index = 0; index < binary.length; index += 1) {
-    bytes[index] = binary.charCodeAt(index);
-  }
-
-  return new Blob([bytes], { type: mimeType });
-}
-
-function formatTimestampForFilename(date: Date) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  const hours = String(date.getHours()).padStart(2, "0");
-  const minutes = String(date.getMinutes()).padStart(2, "0");
-  const seconds = String(date.getSeconds()).padStart(2, "0");
-
-  return `${year}-${month}-${day}_${hours}-${minutes}-${seconds}`;
 }

@@ -1,0 +1,246 @@
+import { fireEvent, render, screen } from "@testing-library/react";
+import type { ReactNode } from "react";
+import InspectorPanel from "./InspectorPanel";
+import { createSceneObject } from "../../lib/scene-objects";
+import type { AppCopy } from "../../lib/i18n";
+
+jest.mock("../CustomSelect/CustomSelect", () => ({
+  __esModule: true,
+  default: ({
+    ariaLabel,
+    onChange,
+    value,
+  }: {
+    ariaLabel: string;
+    onChange: (value: string) => void;
+    value: string;
+  }) => (
+    <button
+      type="button"
+      aria-label={ariaLabel}
+      onClick={() => onChange(value === "smartphone" ? "notebook" : "smartphone")}
+    >
+      select-model
+    </button>
+  ),
+}));
+
+jest.mock("../ColorRow/ColorRow", () => ({
+  __esModule: true,
+  default: ({
+    label,
+    onChange,
+  }: {
+    label: string;
+    onChange: (hex: string) => void;
+  }) => (
+    <button type="button" onClick={() => onChange("#123456")}>
+      color-row:{label}
+    </button>
+  ),
+}));
+
+jest.mock("../Control/Control", () => ({
+  __esModule: true,
+  default: ({
+    label,
+    setValue,
+  }: {
+    label: string;
+    setValue: (value: number) => void;
+  }) => (
+    <button type="button" onClick={() => setValue(12)}>
+      control:{label}
+    </button>
+  ),
+}));
+
+jest.mock("../EditorPrimitives/EditorPrimitives", () => ({
+  __esModule: true,
+  InspectorPanelHeader: ({
+    title,
+  }: {
+    title: string;
+  }) => <div>{title}</div>,
+  PanelSection: ({
+    title,
+    children,
+    action,
+  }: {
+    title: string;
+    children: ReactNode;
+    action?: ReactNode;
+  }) => (
+    <section>
+      <h3>{title}</h3>
+      {action}
+      {children}
+    </section>
+  ),
+}));
+
+const copy: AppCopy = {
+  addObject: "Add object",
+  appTitle: "Mock Studio",
+  baseObject: "Base object",
+  bodyColorLabel: "Customize",
+  canvasInitialLoadingLabel: "Loading",
+  canvasObjectLoadingLabel: "Loading model",
+  darkMode: "Dark",
+  debugOff: "Debug off",
+  debugOn: "Debug on",
+  debugSectionTitle: "Debug",
+  deleteObject: "Delete",
+  english: "EN-US",
+  fitSceneButton: "Fit scene",
+  hideObject: "Hide",
+  hiddenObjectLabel: "Hidden",
+  keyboardToggleLabel: "Keyboard",
+  languageLabel: "Language",
+  lightMode: "Light",
+  matteColorLabel: "Matte finish",
+  modelLabel: "Model",
+  positionX: "Position X",
+  positionY: "Position Y",
+  positionZ: "Position Z",
+  portuguese: "PT-BR",
+  renameObject: "Rename",
+  resetCameraButton: "Reset camera",
+  resetObjectButton: "Reset object",
+  rotationX: "Rotation X",
+  rotationY: "Rotation Y",
+  rotationZ: "Rotation Z",
+  scale: "Scale",
+  sceneSectionHint: "3D Shell",
+  screenSectionHintPrefix: "Recommended",
+  screenSectionTitle: "App Screen",
+  showObject: "Show",
+  takePhotoButton: "Take photo",
+  themeLabel: "Theme",
+  themesSectionTitle: "Themes",
+  transformSectionTitle: "Transform",
+  uploadImage: "Upload image",
+  uploadImageError: "Upload failed",
+  themeNames: {
+    black: "Black",
+    blood: "Red",
+    gray: "Gray",
+    "light-gray": "Light Gray",
+  },
+};
+
+function renderInspector(
+  object = createSceneObject({ id: "object-1", modelId: "smartphone", name: "Object 1" }),
+) {
+  const handlers = {
+    onDebugColorChange: jest.fn(),
+    onImageUpload: jest.fn(),
+    onModelChange: jest.fn(),
+    onResetObject: jest.fn(),
+    onThemeColorChange: jest.fn(),
+    onThemeChange: jest.fn(),
+    onToggleCustomColors: jest.fn(),
+    onToggleDebugMode: jest.fn(),
+    onToggleDeviceShell: jest.fn(),
+    onToggleNotebookKeyboard: jest.fn(),
+    onToggleMatteColors: jest.fn(),
+    onUpdatePosition: jest.fn(),
+    onUpdateRotation: jest.fn(),
+    onUpdateScale: jest.fn(),
+  };
+
+  render(
+    <InspectorPanel
+      copy={copy}
+      object={object}
+      uiTheme="dark"
+      uploadError=""
+      {...handlers}
+    />,
+  );
+
+  return handlers;
+}
+
+describe("InspectorPanel", () => {
+  it("calls model change from the custom select", () => {
+    const handlers = renderInspector();
+
+    fireEvent.click(screen.getByLabelText("Model"));
+
+    expect(handlers.onModelChange).toHaveBeenCalledWith("notebook");
+  });
+
+  it("calls reset object from the reset action", () => {
+    const handlers = renderInspector();
+
+    fireEvent.click(screen.getByLabelText("Reset object"));
+
+    expect(handlers.onResetObject).toHaveBeenCalled();
+  });
+
+  it("maps rotation Y control back to the stored object rotation", () => {
+    const handlers = renderInspector();
+
+    fireEvent.click(screen.getByText("control:Rotation Y"));
+
+    expect(handlers.onUpdateRotation).toHaveBeenCalledWith({
+      rotationX: 0,
+      rotationY: 192,
+      rotationZ: 0,
+    });
+  });
+
+  it("shows notebook keyboard toggle only for notebook objects", () => {
+    const notebook = createSceneObject({
+      id: "notebook-1",
+      modelId: "notebook",
+      name: "Notebook",
+    });
+
+    renderInspector(notebook);
+
+    expect(screen.getByText("Keyboard")).toBeInTheDocument();
+  });
+
+  it("filters notebook custom colors when keyboard is disabled", () => {
+    const notebook = {
+      ...createSceneObject({
+        id: "notebook-2",
+        modelId: "notebook",
+        name: "Notebook",
+      }),
+      customColorsEnabled: true,
+      showNotebookKeyboard: false,
+    };
+
+    renderInspector(notebook);
+
+    expect(screen.getByText("color-row:Tampa traseira")).toBeInTheDocument();
+    expect(screen.getByText("color-row:Moldura da tela")).toBeInTheDocument();
+    expect(screen.getByText("color-row:Borracha da tela")).toBeInTheDocument();
+    expect(screen.getByText("color-row:Barra da dobradica")).toBeInTheDocument();
+    expect(screen.queryByText("color-row:Base do teclado")).not.toBeInTheDocument();
+  });
+
+  it("forwards theme color changes from visible color rows", () => {
+    const notebook = {
+      ...createSceneObject({
+        id: "notebook-3",
+        modelId: "notebook",
+        name: "Notebook",
+      }),
+      customColorsEnabled: true,
+      showNotebookKeyboard: false,
+    };
+
+    const handlers = renderInspector(notebook);
+
+    fireEvent.click(screen.getByText("color-row:Tampa traseira"));
+
+    expect(handlers.onThemeColorChange).toHaveBeenCalledWith(
+      "screenBackCover",
+      "#123456",
+    );
+  });
+});

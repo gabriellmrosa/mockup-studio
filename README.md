@@ -28,6 +28,7 @@ Ja implementado:
 - `fit scene` separado de `reset camera` na toolbar flutuante;
 - color picker de cor de fundo do canvas na toolbar flutuante;
 - estado da cor de fundo do canvas isolado no `MockupCanvas`, evitando rerender da shell inteira do editor durante drag do color picker;
+- color picker interno do inspector agora reduz a frequencia de updates para no maximo um commit por frame e aplica mudancas de cor via `transition`, reduzindo lag durante drag nos modelos 3D;
 - export PNG transparente em `1920x1080` e `2560x1440`;
 - CTA `Take photo` exporta captura PNG `1920x1080` com nome timestamped, fundo transparente real e sem grid;
 - loading inicial central para o primeiro carregamento real do canvas/modelo;
@@ -67,8 +68,9 @@ Ja implementado:
 - no inspector, `Cor fosca` fica logo abaixo dos temas e `Customizar` expande uma lista menor de cores amigaveis por modelo;
 - convencao de styling consolidada: tokens CSS para design system, Tailwind para layout e CSS de componente para estados/regras locais;
 - `Suspense` por objeto para isolar o carregamento de textura sem disparar re-fit da camera;
-- camera re-ajusta apenas quando objetos sao adicionados ou removidos (nao em mudancas de propriedade).
+- camera re-ajusta apenas quando objetos sao adicionados ou removidos (nao em mudancas de propriedade);
 - a cor de fundo do canvas fica em estado local do `MockupCanvas` para nao re-renderizar paineis laterais a cada mudanca do color picker;
+- base de testes automatizados com `Jest + Testing Library` para o `photo mode`, cobrindo helpers de `scene-objects`, fluxo de `layers + selection`, regras do `InspectorPanel` e contrato estrutural do export de foto.
 
 ## Catalogo de Modelos
 
@@ -128,7 +130,7 @@ A camada de UI tambem passou por uma refatoracao de manutencao: tipografia e spa
 ## Proximo Passo Sugerido
 
 - continuar o mapeamento semantico das malhas restantes do `notebook`, especialmente onde tampa, dobradica e vedacoes ainda compartilham geometria;
-- refinar UX de camadas (reorder, lock ou visibilidade);
+- fechar validacao do `photo mode 1.0` com QA manual orientado pelos fluxos principais ja cobertos por teste;
 - revisar se vale expor mais presets visuais por modelo no inspector sem aumentar a complexidade da UI.
 
 ## Regras de Styling
@@ -215,7 +217,10 @@ Regra pratica:
 - `OBJECT_POSITION_MULTIPLIER = 140` (X/Y) e `OBJECT_POSITION_MULTIPLIER_Z = 420` (Z);
 - grid em `y=-300` com `infiniteGrid`, `cellSize=50`, `sectionSize=200`;
 - durante o `Take photo`, grid e fundo visivel do canvas sao removidos temporariamente para garantir PNG transparente;
+- a logica de export de foto foi extraida para `app/components/MockupCanvas/export-photo.ts`, facilitando teste e manutencao;
 - `npm run lint` deve passar;
+- `npm test -- --runInBand` deve passar;
+- `npx tsc --noEmit` deve passar;
 - `Notebook` nao deve mais expor calibracao temporaria via `leva` na UI;
 - `npx next build --webpack` para validacao de build.
 
@@ -230,4 +235,12 @@ Build de validacao:
 
 ```bash
 npx next build --webpack
+```
+
+Checks de qualidade:
+
+```bash
+npm test -- --runInBand
+npm run lint
+npx tsc --noEmit
 ```

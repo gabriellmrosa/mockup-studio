@@ -5,9 +5,42 @@ import {
   isPlaceholderImageUrl,
   resetSceneObject,
 } from "./scene-objects";
-import { DEVICE_MODELS } from "../models/device-models";
+import {
+  DEVICE_MODELS,
+  type DeviceModelId,
+} from "../models/device-models";
+import { DEFAULT_OBJECT_TRANSFORM } from "./scene-presets";
 
 describe("scene-objects", () => {
+  it.each([
+    "smartphone",
+    "smartphone2",
+    "smartwatch",
+    "notebook",
+  ] as const)(
+    "creates model-specific defaults for %s",
+    (modelId: DeviceModelId) => {
+      const object = createSceneObject({
+        id: `${modelId}-object`,
+        modelId,
+        name: `${modelId} object`,
+      });
+
+      const model = DEVICE_MODELS[modelId];
+
+      expect(object.modelId).toBe(modelId);
+      expect(object.imageUrl).toBe(getPlaceholderImageUrl(modelId));
+      expect(object.deviceTheme).toBe(model.defaultTheme);
+      expect(object.colors).toEqual(model.themes[model.defaultTheme]);
+      expect(object.debugPartColors).toEqual(model.initialDebugColors);
+      expect(object.customColorsEnabled).toBe(false);
+      expect(object.debugMode).toBe(false);
+      expect(object.showDeviceShell).toBe(true);
+      expect(object.showNotebookKeyboard).toBe(true);
+      expect(object).toMatchObject(DEFAULT_OBJECT_TRANSFORM);
+    },
+  );
+
   it("creates a visible scene object with the expected defaults", () => {
     const object = createSceneObject({
       id: "test-object",
@@ -70,22 +103,53 @@ describe("scene-objects", () => {
         deviceTheme: "custom",
         matteColors: false,
         positionX: 1,
+        positionY: 4,
+        positionZ: -2,
+        rotationX: 33,
+        rotationY: 15,
+        rotationZ: -11,
+        scale: 2,
         customColorsEnabled: true,
+        debugMode: true,
+        showDeviceShell: false,
+        showNotebookKeyboard: false,
       },
       "notebook",
     );
 
+    expect(changed.id).toBe(object.id);
+    expect(changed.name).toBe(object.name);
+    expect(changed.deletable).toBe(object.deletable);
+    expect(changed.isVisible).toBe(object.isVisible);
     expect(changed.modelId).toBe("notebook");
     expect(changed.imageUrl).toBe(getPlaceholderImageUrl("notebook"));
     expect(changed.deviceTheme).toBe(DEVICE_MODELS.notebook.defaultTheme);
+    expect(changed.colors).toEqual(
+      DEVICE_MODELS.notebook.themes[DEVICE_MODELS.notebook.defaultTheme],
+    );
+    expect(changed.debugPartColors).toEqual(
+      DEVICE_MODELS.notebook.initialDebugColors,
+    );
     expect(changed.matteColors).toBe(true);
     expect(changed.customColorsEnabled).toBe(false);
-    expect(changed.positionX).toBe(0);
+    expect(changed.debugMode).toBe(false);
+    expect(changed).toMatchObject(DEFAULT_OBJECT_TRANSFORM);
+    expect(changed.showDeviceShell).toBe(true);
     expect(changed.showNotebookKeyboard).toBe(true);
   });
 
   it("identifies known placeholders", () => {
-    expect(isPlaceholderImageUrl("/placeholder-1290x2748.png")).toBe(true);
+    const knownModelIds: DeviceModelId[] = [
+      "smartphone",
+      "smartphone2",
+      "smartwatch",
+      "notebook",
+    ];
+
+    for (const modelId of knownModelIds) {
+      expect(isPlaceholderImageUrl(getPlaceholderImageUrl(modelId))).toBe(true);
+    }
+
     expect(isPlaceholderImageUrl("data:image/png;base64,abc")).toBe(false);
   });
 });
