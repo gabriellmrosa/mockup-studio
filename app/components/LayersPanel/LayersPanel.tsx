@@ -205,8 +205,12 @@ export default function LayersPanel({
                     </div>
                     <div className="layer-actions">
                       <IconButton
-                        aria-label={object.isVisible ? copy.hideObject : copy.showObject}
-                        title={object.isVisible ? copy.hideObject : copy.showObject}
+                        aria-label={
+                          object.isVisible ? copy.hideObject : copy.showObject
+                        }
+                        title={
+                          object.isVisible ? copy.hideObject : copy.showObject
+                        }
                         className="layer-inline-action"
                         active={!object.isVisible}
                         onClick={(event) => {
@@ -214,7 +218,11 @@ export default function LayersPanel({
                           onToggleObjectVisibility(object.id);
                         }}
                       >
-                        {object.isVisible ? <Eye size={14} /> : <EyeOff size={14} />}
+                        {object.isVisible ? (
+                          <Eye size={14} />
+                        ) : (
+                          <EyeOff size={14} />
+                        )}
                       </IconButton>
                       <ContextMenu
                         items={[
@@ -283,7 +291,7 @@ export default function LayersPanel({
               className="sidebar-footer-link"
               onClick={() => setIsCreditsOpen(true)}
             >
-              Credits
+              CREDITS
             </button>{" "}
             for 3D assets
           </p>
