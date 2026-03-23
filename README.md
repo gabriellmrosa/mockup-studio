@@ -118,15 +118,15 @@ Ja implementado:
 
 ## Onde Paramos
 
-Catalogo consolidado em 4 dispositivos. Arquitetura multimodelo com `modelScale`, `baseRotation`, `pivotOffset` e `modelSpawnOffset` por modelo. `smartwatch` segue com tela texturizada funcional e material fisico preservado no casco. `notebook` aceita a imagem do app na malha correta da tela, com placeholder proprio, debug semantico inicial e agora um modo de tela isolada via toggle de `Teclado`, apoiado por clipping local na tampa traseira. O `smartphone2` antigo foi substituido pelo asset recortado do iPhone 14, com placeholder `1290x2748`, temas ativos e tela aplicada no mesh real do GLB, sem o vidro frontal no fluxo visual atual. O `smartphone` recebeu refinamentos de materiais em aneis, speaker e botoes laterais para eliminar artefatos do asset. Placeholders sao definidos por modelo, sem troca por idioma. O inspector continua com toggle por objeto para acabamento fosco e agora usa um `CustomSelect` proprio para a troca de modelo. O reset de camera agora usa `saveState/reset` do `camera-controls`, `fit scene` e `reset camera` ficaram separados, e o CTA `Take photo` exporta captura real do canvas em PNG com transparencia verdadeira, sem cor do stage nem grid.
+Catalogo consolidado em 4 dispositivos. Arquitetura multimodelo com `modelScale`, `baseRotation`, `pivotOffset` e `modelSpawnOffset` por modelo. `smartwatch` segue com tela texturizada funcional e material fisico preservado no casco. `notebook` aceita a imagem do app na malha correta da tela, com placeholder proprio, debug semantico inicial e um modo de tela isolada via toggle de `Teclado`; com `Teclado` desligado ficam visiveis apenas a moldura original da tela e a tela, e com `Casca` desligada entra uma tela arredondada separada. O `smartphone2` antigo foi substituido pelo asset recortado do iPhone 14, com placeholder `1290x2748`, temas ativos e tela aplicada no mesh real do GLB, sem o vidro frontal no fluxo visual atual. O `smartphone` recebeu refinamentos de materiais em aneis, speaker e botoes laterais para eliminar artefatos do asset. Placeholders sao definidos por modelo, sem troca por idioma. O inspector continua com toggle por objeto para acabamento fosco e agora usa um `CustomSelect` proprio para a troca de modelo. O reset de camera agora usa `saveState/reset` do `camera-controls`, `fit scene` e `reset camera` ficaram separados, e o CTA `Take photo` exporta captura real do canvas em PNG com transparencia verdadeira, sem cor do stage nem grid.
 
 A camada de UI tambem passou por uma refatoracao de manutencao: tipografia e spacing recorrentes foram movidos para tokens em `app/styles/tokens.css`, primitives compartilhados foram consolidados, utilitarios arbitrarios foram reduzidos nos paineis principais e o `ContextMenu` deixou de usar render prop para um trigger padronizado. O canvas agora tambem diferencia loading inicial e loading incremental de objetos. O inspector tambem ganhou uma primeira versao de `custom theme` por objeto, com lista reduzida de cores amigaveis por modelo.
 
 ## Proximo Passo Sugerido
 
-- revisar se os controles temporarios do `leva` para roughness do `notebook` devem virar tokens fixos por tema ou sair da codebase apos calibracao final;
 - continuar o mapeamento semantico das malhas restantes do `notebook`, especialmente onde tampa, dobradica e vedacoes ainda compartilham geometria;
-- refinar UX de camadas (reorder, lock ou visibilidade).
+- refinar UX de camadas (reorder, lock ou visibilidade);
+- revisar se vale expor mais presets visuais por modelo no inspector sem aumentar a complexidade da UI.
 
 ## Regras de Styling
 
@@ -198,7 +198,7 @@ Regra pratica:
 - `screenBezel` e `lowerHingeBar` do `notebook` devem permanecer sempre pretos; a borracha de tela/dobra tambem deve ser tratada como detalhe fixo escuro;
 - o controle de `fosco` precisa atuar no material real de cada modelo, nao apenas existir na UI;
 - no `smartphone2` atual, esconder o vidro frontal no modo fosco produz leitura melhor da textura do app;
-- para depurar brilho/reflexo do `notebook`, expor roughness via `leva` foi mais eficiente do que entupir o inspector principal com controles temporarios.
+- no `notebook`, a estrategia mais simples para `Teclado` desligado foi esconder tudo e manter apenas `screenBezel` + `screen`; para `Casca` desligada, uma tela arredondada separada evita o recorte superior do asset.
 
 ## Observacoes Tecnicas
 
@@ -209,8 +209,6 @@ Regra pratica:
 - `modelSpawnOffset` e somado ao `AUTO_OBJECT_POSITIONS` por indice;
 - placeholders agora sao unicos por modelo e nao mudam com o idioma;
 - `notebook` usa placeholder `/placeholder-2755x1684.png`;
-- `notebook` usa clipping local na `screenBackCover` quando `Teclado` esta desligado, para esconder a base visual sem recortar o asset inteiro;
-- `leva` foi adicionado para calibracao local de materiais do `notebook`;
 - `OBJECT_POSITION_MULTIPLIER = 140` (X/Y) e `OBJECT_POSITION_MULTIPLIER_Z = 420` (Z);
 - grid em `y=-300` com `infiniteGrid`, `cellSize=50`, `sectionSize=200`;
 - durante o `Take photo`, grid e fundo visivel do canvas sao removidos temporariamente para garantir PNG transparente;

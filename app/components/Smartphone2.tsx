@@ -34,6 +34,7 @@ const SCREEN_MESH = MESH_SEMANTIC.screen;
 const FRONT_GLASS_MESH = "Object_10";
 const SCREEN_CROP_W = 421;
 const SCREEN_CROP_H = 896;
+const SHELLLESS_SCREEN_RADIUS_RATIO = 0.12;
 
 export type Smartphone2DebugPartKey = keyof typeof MESH_SEMANTIC;
 export type { Smartphone2Colors };
@@ -70,6 +71,39 @@ function rotateCanvas180(source: HTMLCanvasElement) {
   context.drawImage(source, 0, 0);
 
   return canvas;
+}
+
+function getRoundedRectangleShape(
+  width: number,
+  height: number,
+  radius: number,
+) {
+  const shape = new THREE.Shape();
+  shape.moveTo(-width / 2, height / 2 - radius);
+  shape.lineTo(-width / 2, radius - height / 2);
+  shape.quadraticCurveTo(
+    -width / 2,
+    -height / 2,
+    radius - width / 2,
+    -height / 2,
+  );
+  shape.lineTo(width / 2 - radius, -height / 2);
+  shape.quadraticCurveTo(
+    width / 2,
+    -height / 2,
+    width / 2,
+    radius - height / 2,
+  );
+  shape.lineTo(width / 2, height / 2 - radius);
+  shape.quadraticCurveTo(width / 2, height / 2, width / 2 - radius, height / 2);
+  shape.lineTo(radius - width / 2, height / 2);
+  shape.quadraticCurveTo(
+    -width / 2,
+    height / 2,
+    -width / 2,
+    height / 2 - radius,
+  );
+  return shape;
 }
 
 function Smartphone2Impl({
@@ -152,6 +186,69 @@ function Smartphone2Impl({
 
   useEffect(() => () => screenMaterial.dispose(), [screenMaterial]);
 
+  const shelllessScreenGeometry = useMemo(() => {
+    const screenMesh = clone.getObjectByName(SCREEN_MESH) as THREE.Mesh | undefined;
+    if (!screenMesh) {
+      return null;
+    }
+
+    screenMesh.geometry.computeBoundingBox();
+    const boundingBox = screenMesh.geometry.boundingBox?.clone();
+    if (!boundingBox) {
+      return null;
+    }
+
+    const width = boundingBox.max.z - boundingBox.min.z;
+    const height = boundingBox.max.y - boundingBox.min.y;
+    if (width <= 0 || height <= 0) {
+      return null;
+    }
+
+    const center = boundingBox.getCenter(new THREE.Vector3());
+    const radius = Math.min(width, height) * SHELLLESS_SCREEN_RADIUS_RATIO;
+    const geometry = new THREE.ShapeGeometry(
+      getRoundedRectangleShape(width, height, radius),
+    );
+    const position = geometry.getAttribute("position");
+    const uvArray = new Float32Array(position.count * 2);
+    const halfW = width / 2;
+    const halfH = height / 2;
+
+    for (let i = 0; i < position.count; i += 1) {
+      uvArray[i * 2] = (position.getX(i) + halfW) / width;
+      uvArray[i * 2 + 1] = (position.getY(i) + halfH) / height;
+    }
+
+    geometry.setAttribute("uv", new THREE.BufferAttribute(uvArray, 2));
+    geometry.rotateY(Math.PI / 2);
+    geometry.translate(center.x, center.y, center.z);
+
+    return geometry;
+  }, [clone]);
+
+  useEffect(() => {
+    if (!shelllessScreenGeometry) {
+      return;
+    }
+
+    return () => shelllessScreenGeometry.dispose();
+  }, [shelllessScreenGeometry]);
+
+  const shelllessScreenMatrix = useMemo(() => {
+    const screenMesh = clone.getObjectByName(SCREEN_MESH) as THREE.Mesh | undefined;
+    if (!screenMesh) {
+      return null;
+    }
+
+    clone.updateWorldMatrix(true, true);
+    screenMesh.updateWorldMatrix(true, false);
+
+    return new THREE.Matrix4()
+      .copy(clone.matrixWorld)
+      .invert()
+      .multiply(screenMesh.matrixWorld);
+  }, [clone]);
+
   const themeMaterials = useMemo(() => {
     return Object.fromEntries(
       Object.entries(MESH_SEMANTIC).flatMap(([semantic, meshName]) => {
@@ -231,7 +328,7 @@ function Smartphone2Impl({
       if (!mesh) return;
 
       if (meshName === SCREEN_MESH) {
-        mesh.visible = true;
+        mesh.visible = showDeviceShell;
         return;
       }
 
@@ -243,6 +340,14 @@ function Smartphone2Impl({
     <group {...props} dispose={null}>
       <group position={[1.5, 2.5, -1.0]} rotation={[0, 0, 0]} scale={1}>
         <primitive object={clone} />
+        {!showDeviceShell && shelllessScreenGeometry && shelllessScreenMatrix ? (
+          <mesh
+            geometry={shelllessScreenGeometry}
+            material={screenMaterial}
+            matrix={shelllessScreenMatrix}
+            matrixAutoUpdate={false}
+          />
+        ) : null}
       </group>
     </group>
   );
