@@ -28,7 +28,7 @@ export const SMARTPHONE_DEFAULT_THEME: SmartphoneThemeName = "gray";
 // Os valores estão explícitos aqui para facilitar ajustes finos por tema sem tocar em código.
 export const SMARTPHONE_THEMES: Record<SmartphoneThemeName, SmartphoneColors> = {
   gray: {
-    gradientSound:       "#000000",
+    gradientSound:       "#8A8A8E",
     smartphoneBody:      "#8A8A8E",
     rightBigSideButton:  "#8A8A8E",
     leftSmallSideButton: "#8A8A8E",
@@ -38,7 +38,7 @@ export const SMARTPHONE_THEMES: Record<SmartphoneThemeName, SmartphoneColors> = 
     CircleTopRightMiddle:"#A7A7AA",
   },
   black: {
-    gradientSound:       "#000000",
+    gradientSound:       "#1C1C1E",
     smartphoneBody:      "#1C1C1E",
     rightBigSideButton:  "#1C1C1E",
     leftSmallSideButton: "#1C1C1E",
@@ -48,7 +48,7 @@ export const SMARTPHONE_THEMES: Record<SmartphoneThemeName, SmartphoneColors> = 
     CircleTopRightMiddle:"#555556",
   },
   "light-gray": {
-    gradientSound:       "#000000",
+    gradientSound:       "#d1d1d1",
     smartphoneBody:      "#d1d1d1",
     rightBigSideButton:  "#d1d1d1",
     leftSmallSideButton: "#d1d1d1",
@@ -58,7 +58,7 @@ export const SMARTPHONE_THEMES: Record<SmartphoneThemeName, SmartphoneColors> = 
     CircleTopRightMiddle:"#DCDCDC",
   },
   blood: {
-    gradientSound:       "#000000",
+    gradientSound:       "#6a2525",
     smartphoneBody:      "#6a2525",
     rightBigSideButton:  "#6a2525",
     leftSmallSideButton: "#6a2525",
@@ -76,7 +76,7 @@ export const SMARTPHONE_THEMES: Record<SmartphoneThemeName, SmartphoneColors> = 
 export function buildSmartphoneColorsFromPrimary(hex: string): SmartphoneColors {
   const circle = lerpHexToWhite(hex, 0.25);
   return {
-    gradientSound:       "#000000",
+    gradientSound:       hex,
     smartphoneBody:      hex,
     rightBigSideButton:  hex,
     leftSmallSideButton: hex,

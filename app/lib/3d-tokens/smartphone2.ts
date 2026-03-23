@@ -8,7 +8,6 @@ export interface Smartphone2Colors {
   frame: string;
   rearInset: string;
   cameraMicroPart: string;
-  frontGlass: string;
   cameraBlock: string;
   cameraBlockInner: string;
   cameraLensHighlight: string;
@@ -37,7 +36,6 @@ export function buildSmartphone2ColorsFromPrimary(
     frame: lerpHexToBlack(hex, 0.18),
     rearInset: lerpHexToBlack(hex, 0.08),
     cameraMicroPart: lerpHexToBlack(hex, 0.22),
-    frontGlass: lerpHexToBlack(hex, 0.62),
     cameraBlock: lerpHexToBlack(hex, 0.1),
     cameraBlockInner: lerpHexToBlack(hex, 0.16),
     cameraLensHighlight: lerpHexToWhite(hex, 0.28),

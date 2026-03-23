@@ -79,7 +79,7 @@ const SMARTPHONE_THEME_OPTIONS: DeviceThemeOption[] = [
   { id: "gray",       label: "Cinza",      preview: "#8A8A8E" },
   { id: "black",      label: "Preto",      preview: "#1C1C1E" },
   { id: "light-gray", label: "Light Gray", preview: "#d1d1d1" },
-  { id: "blood",      label: "Blood",      preview: "#6a2525" },
+  { id: "blood",      label: "Red",        preview: "#6a2525" },
 ];
 
 const SMARTPHONE_CUSTOMIZABLE_COLOR_KEYS = [
@@ -108,9 +108,6 @@ const SMARTPHONE_DEBUG_COLORS: Record<DebugPartKey, string> = {
   smartphoneBody: "#cc00ff",
   estruturaFrontal: "#ff00cc",
   gradientSound: "#000000",
-  botaoPowerDireito: "#ff6600",
-  botaoVolumeCima: "#ffcc00",
-  botaoVolumeBaixo: "#ffff00",
   rightBigSideButton: "#ff4400",
   CircleTopLeft: "#000000",
   CircleTopLeftMiddle: "#ccff99",
@@ -144,7 +141,6 @@ const SMARTPHONE2_DEBUG_COLORS: Record<Smartphone2DebugPartKey, string> = {
   body: "#cc00ff",
   sideCuts: "#00ffff",
   cameraMicroPart: "#ff0099",
-  frontGlass: "#33ccff",
   cameraBlock: "#66ff00",
   cameraBlockInner: "#0066ff",
   screen: "#ffffff",
@@ -156,7 +152,7 @@ const SMARTPHONE2_THEME_OPTIONS = [
   { id: "gray",       label: "Cinza",      preview: "#8A8A8E" },
   { id: "black",      label: "Preto",      preview: "#1C1C1E" },
   { id: "light-gray", label: "Light Gray", preview: "#d1d1d1" },
-  { id: "blood",      label: "Blood",      preview: "#6a2525" },
+  { id: "blood",      label: "Red",        preview: "#6a2525" },
 ];
 
 const SMARTPHONE2_CUSTOMIZABLE_COLOR_KEYS = [
@@ -166,7 +162,6 @@ const SMARTPHONE2_CUSTOMIZABLE_COLOR_KEYS = [
   "frame",
   "rearInset",
   "cameraMicroPart",
-  "frontGlass",
   "cameraBlock",
   "cameraBlockInner",
   "cameraLensHighlight",
@@ -180,7 +175,6 @@ const SMARTPHONE2_CUSTOMIZABLE_COLOR_LABELS: Record<string, string> = {
   frame: "Frame",
   rearInset: "Area traseira",
   cameraMicroPart: "Detalhe da camera",
-  frontGlass: "Vidro frontal",
   cameraBlock: "Bloco da camera",
   cameraBlockInner: "Miolo da camera",
   cameraLensHighlight: "Brilho da lente",
@@ -208,7 +202,7 @@ const SMARTWATCH_THEME_OPTIONS = [
   { id: "gray",       label: "Cinza",      preview: "#8A8A8E" },
   { id: "black",      label: "Preto",      preview: "#1C1C1E" },
   { id: "light-gray", label: "Light Gray", preview: "#d1d1d1" },
-  { id: "blood",      label: "Blood",      preview: "#6a2525" },
+  { id: "blood",      label: "Red",        preview: "#6a2525" },
 ];
 
 const SMARTWATCH_CUSTOMIZABLE_COLOR_KEYS = [
@@ -241,7 +235,7 @@ const NOTEBOOK_THEME_OPTIONS = [
   { id: "gray",       label: "Cinza",      preview: "#8A8A8E" },
   { id: "black",      label: "Preto",      preview: "#1C1C1E" },
   { id: "light-gray", label: "Light Gray", preview: "#d1d1d1" },
-  { id: "blood",      label: "Blood",      preview: "#6a2525" },
+  { id: "blood",      label: "Red",        preview: "#6a2525" },
 ];
 
 const NOTEBOOK_CUSTOMIZABLE_COLOR_KEYS = [

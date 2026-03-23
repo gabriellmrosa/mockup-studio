@@ -9,6 +9,7 @@ import {
   buildScreenCanvas,
   MAX_TEXTURE_SIZE,
 } from "../lib/mockup-image";
+import { createSimpleFinishMaterial } from "../lib/simple-finish-material";
 import {
   SMARTPHONE2_DEFAULT_THEME,
   SMARTPHONE2_THEMES,
@@ -22,7 +23,6 @@ export const MESH_SEMANTIC = {
   body: "Object_7",
   sideCuts: "Object_8",
   cameraMicroPart: "Object_9",
-  frontGlass: "Object_10",
   cameraBlock: "Object_11",
   cameraBlockInner: "Object_12",
   screen: "Object_13",
@@ -31,6 +31,7 @@ export const MESH_SEMANTIC = {
 } as const;
 
 const SCREEN_MESH = MESH_SEMANTIC.screen;
+const FRONT_GLASS_MESH = "Object_10";
 const SCREEN_CROP_W = 421;
 const SCREEN_CROP_H = 896;
 
@@ -69,59 +70,6 @@ function rotateCanvas180(source: HTMLCanvasElement) {
   context.drawImage(source, 0, 0);
 
   return canvas;
-}
-
-function applyFinishMaterial(material: THREE.Material, matte: boolean) {
-  material.transparent = false;
-  material.opacity = 1;
-
-  if ("roughness" in material && typeof material.roughness === "number") {
-    material.roughness = matte
-      ? Math.max(material.roughness, 0.82)
-      : Math.min(material.roughness, 0.38);
-  }
-  if ("metalness" in material && typeof material.metalness === "number") {
-    material.metalness = matte
-      ? Math.min(material.metalness, 0.08)
-      : Math.max(material.metalness, 0.14);
-  }
-  if ("clearcoat" in material && typeof material.clearcoat === "number") {
-    material.clearcoat = matte
-      ? Math.min(material.clearcoat, 0.03)
-      : Math.max(material.clearcoat, 0.14);
-  }
-  if (
-    "clearcoatRoughness" in material &&
-    typeof material.clearcoatRoughness === "number"
-  ) {
-    material.clearcoatRoughness = matte
-      ? Math.max(material.clearcoatRoughness, 0.72)
-      : Math.min(material.clearcoatRoughness, 0.28);
-  }
-
-  return material;
-}
-
-function applyGlassFinishMaterial(
-  material: THREE.Material,
-  color: string,
-  matte: boolean,
-) {
-  if ("color" in material && material.color instanceof THREE.Color) {
-    material.color = new THREE.Color(color);
-  }
-
-  material.transparent = true;
-  material.opacity = 0.28;
-
-  if ("roughness" in material && typeof material.roughness === "number") {
-    material.roughness = matte ? 0.06 : 0.02;
-  }
-  if ("metalness" in material && typeof material.metalness === "number") {
-    material.metalness = 0;
-  }
-
-  return material;
 }
 
 function Smartphone2Impl({
@@ -204,18 +152,6 @@ function Smartphone2Impl({
 
   useEffect(() => () => screenMaterial.dispose(), [screenMaterial]);
 
-  const originalMaterials = useMemo(() => {
-    const materials = new Map<string, THREE.Material | THREE.Material[]>();
-
-    clone.traverse((obj) => {
-      if (obj instanceof THREE.Mesh && obj.name) {
-        materials.set(obj.name, obj.material);
-      }
-    });
-
-    return materials;
-  }, [clone]);
-
   const themeMaterials = useMemo(() => {
     return Object.fromEntries(
       Object.entries(MESH_SEMANTIC).flatMap(([semantic, meshName]) => {
@@ -223,33 +159,17 @@ function Smartphone2Impl({
           return [];
         }
 
-        const originalMaterial = originalMaterials.get(meshName);
         const color = resolvedColors[semantic];
-
-        if (!originalMaterial || Array.isArray(originalMaterial) || !color) {
+        if (!color) {
           return [];
         }
 
-        const themedMaterial = originalMaterial.clone();
-        if (semantic === "frontGlass") {
-          applyGlassFinishMaterial(themedMaterial, color, matteColors);
-        } else {
-          const resolvedColor =
-            semantic === "frame" && !matteColors ? "#000000" : color;
-          if (
-            "color" in themedMaterial &&
-            themedMaterial.color instanceof THREE.Color
-          ) {
-            themedMaterial.color = new THREE.Color(resolvedColor);
-          }
-          applyFinishMaterial(themedMaterial, matteColors);
-        }
-        themedMaterial.needsUpdate = true;
+        const themedMaterial = createSimpleFinishMaterial(color, matteColors);
 
         return [[semantic, themedMaterial] as const];
       }),
     ) as Record<string, THREE.Material>;
-  }, [matteColors, originalMaterials, resolvedColors]);
+  }, [matteColors, resolvedColors]);
 
   useEffect(() => {
     return () => {
@@ -295,15 +215,17 @@ function Smartphone2Impl({
         mesh.material = themedMaterial;
         return;
       }
-
-      const originalMaterial = originalMaterials.get(meshName);
-      if (originalMaterial) {
-        mesh.material = originalMaterial;
-      }
     });
-  }, [clone, debugMaterials, originalMaterials, screenMaterial, themeMaterials]);
+  }, [clone, debugMaterials, screenMaterial, themeMaterials]);
 
   useEffect(() => {
+    const frontGlassMesh = clone.getObjectByName(FRONT_GLASS_MESH) as
+      | THREE.Mesh
+      | undefined;
+    if (frontGlassMesh) {
+      frontGlassMesh.visible = false;
+    }
+
     Object.values(MESH_SEMANTIC).forEach((meshName) => {
       const mesh = clone.getObjectByName(meshName) as THREE.Mesh | undefined;
       if (!mesh) return;
@@ -313,14 +235,9 @@ function Smartphone2Impl({
         return;
       }
 
-      if (meshName === MESH_SEMANTIC.frontGlass) {
-        mesh.visible = showDeviceShell && !matteColors;
-        return;
-      }
-
       mesh.visible = showDeviceShell;
     });
-  }, [clone, matteColors, showDeviceShell]);
+  }, [clone, showDeviceShell]);
 
   return (
     <group {...props} dispose={null}>

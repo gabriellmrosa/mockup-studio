@@ -3,6 +3,7 @@
 import "./InspectorPanel.css";
 import ColorRow from "../ColorRow/ColorRow";
 import Control from "../Control/Control";
+import CustomSelect from "../CustomSelect/CustomSelect";
 import type { AppCopy, UiTheme } from "../../lib/i18n";
 import type { SceneObject } from "../../lib/scene-objects";
 import { DEVICE_MODEL_LIST } from "../../models/device-models";
@@ -10,7 +11,7 @@ import {
   InspectorPanelHeader,
   PanelSection,
 } from "../EditorPrimitives/EditorPrimitives";
-import { ChevronDown, RotateCcw, Upload } from "lucide-react";
+import { Laptop, RotateCcw, Smartphone, Upload, Watch } from "lucide-react";
 
 const NOTEBOOK_SCREEN_ONLY_COLOR_KEYS = new Set([
   "screenBackCover",
@@ -80,6 +81,18 @@ export default function InspectorPanel({
       : true,
   );
   const customizableColorLabels = model?.customizableColorLabels ?? {};
+  const modelOptions = DEVICE_MODEL_LIST.map((device) => ({
+    value: device.id,
+    label: device.name,
+    icon:
+      device.id === "smartphone" || device.id === "smartphone2" ? (
+        <Smartphone size={14} />
+      ) : device.id === "smartwatch" ? (
+        <Watch size={14} />
+      ) : (
+        <Laptop size={14} />
+      ),
+  }));
 
   return (
     <aside className="editor-sidebar editor-sidebar-shell inspector-sidebar inspector-sidebar-scroll">
@@ -94,22 +107,13 @@ export default function InspectorPanel({
           title={copy.modelLabel}
           className="--without-border-bottom"
         >
-          <div className="select-wrapper">
-            <select
-              className="editor-input model-select appearance-none focus:outline-none"
-              value={object.modelId}
-              onChange={(event) =>
-                onModelChange(event.target.value as SceneObject["modelId"])
-              }
-            >
-              {DEVICE_MODEL_LIST.map((device) => (
-                <option key={device.id} value={device.id}>
-                  {device.name}
-                </option>
-              ))}
-            </select>
-            <ChevronDown className="select-chevron h-4 w-4" />
-          </div>
+          <CustomSelect
+            ariaLabel={copy.modelLabel}
+            className="model-select"
+            value={object.modelId}
+            options={modelOptions}
+            onChange={(value) => onModelChange(value as SceneObject["modelId"])}
+          />
           <label className="inspector-inline-toggle">
             <span className="inspector-inline-toggle-text">{copy.sceneSectionHint}</span>
             <input

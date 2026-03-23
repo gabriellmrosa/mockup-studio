@@ -37,6 +37,7 @@ Ja implementado:
 - toggle global de idioma `pt-BR/en-US`;
 - placeholders por modelo, independentes de idioma;
 - recomendacao de upload por modelo no inspector;
+- selector de modelo do inspector agora usa `CustomSelect` proprio com portal, icones e estilo consistente com a UI;
 - catalogo com 4 modelos 3D: `smartphone`, `smartphone2`, `smartwatch` e `notebook`;
 - arquitetura multimodelo com `modelScale`, `baseRotation`, `pivotOffset` e `modelSpawnOffset` por modelo;
 - `smartwatch` com tela texturizada em plano separado, raio calibrado e casco preservando o material fisico do GLB;
@@ -45,8 +46,12 @@ Ja implementado:
 - no `notebook`, quando `Teclado` esta desligado, a lista de `Customizar` passa a mostrar apenas as partes que continuam visiveis;
 - `smartphone2` agora usa o asset recortado do iPhone 14, com tela aplicada no mesh real do GLB, placeholder proprio `1290x2748`, temas ativos e debug semantico inicial;
 - modo `Cor fosca` reduz reflexo dos materiais fisicos e, no `smartphone2` atual, oculta o vidro frontal para privilegiar a leitura da tela;
+- `smartphone`, `smartphone2` e `notebook` passaram a usar materiais simples e consistentes por tema, enquanto o `smartwatch` manteve o casco baseado no material fisico original do GLB para evitar aparencia oca;
+- no `smartphone`, os aneis da camera, speaker e botoes laterais foram refinados para eliminar artefatos visuais do GLB e respeitar melhor o toggle de acabamento;
 - `smartphone`, `smartphone2`, `smartwatch` e `notebook` iniciam no tema `gray`;
+- o tema visual `blood` manteve o id interno, mas a label exibida ao usuario agora e `Red`;
 - design system com tokens primitivos de cor (`--black-000` a `--black-980`, `--gray-*`, `--ink-*`), border-radius (`--radius-xs` a `--radius-full`), font-weight (`--font-regular` a `--font-bold`), font-size (`--font-size-*`) e spacing (`--space-*`) para dark e light mode;
+- tokens semanticos de contraste em dark/light foram rebalanceados para melhorar leitura de contornos e componentes sem deixar a UI agressiva;
 - menu de preferencias com submenus cascata (Theme e Language) com checkmark no item ativo;
 - menu de contexto por layer (3 pontos) com opcoes de Renomear e Deletar;
 - `ContextMenu` renderizado via React Portal para evitar clipping por `overflow`;
@@ -92,6 +97,7 @@ Ja implementado:
 - [app/components/EditorPrimitives/](app/components/EditorPrimitives/): primitives compartilhados da UI do editor.
 - [app/components/LayersPanel/](app/components/LayersPanel/): painel esquerdo com camadas/objetos e preferencias globais.
 - [app/components/InspectorPanel/](app/components/InspectorPanel/): painel direito com configuracoes do objeto selecionado (transform, temas, debug).
+- [app/components/CustomSelect/](app/components/CustomSelect/): select custom reutilizavel com portal para menus consistentes.
 - [app/components/MockupCanvas/](app/components/MockupCanvas/): canvas 3D, CameraControls, grid, export e renderizacao de multiplos objetos.
 - [app/components/ContextMenu/](app/components/ContextMenu/): menu contextual via portal com trigger padronizado.
 - [app/components/Smartphone.tsx](app/components/Smartphone.tsx): modelo smartphone com tela texturizada.
@@ -112,7 +118,7 @@ Ja implementado:
 
 ## Onde Paramos
 
-Catalogo consolidado em 4 dispositivos. Arquitetura multimodelo com `modelScale`, `baseRotation`, `pivotOffset` e `modelSpawnOffset` por modelo. `smartwatch` segue com tela texturizada funcional e material fisico preservado no casco. `notebook` aceita a imagem do app na malha correta da tela, com placeholder proprio, debug semantico inicial e agora um modo de tela isolada via toggle de `Teclado`, apoiado por clipping local na tampa traseira. O `smartphone2` antigo foi substituido pelo asset recortado do iPhone 14, com placeholder `1290x2748`, temas ativos, mapeamento semantico inicial e tela aplicada no mesh real do GLB. Placeholders sao definidos por modelo, sem troca por idioma. O inspector continua com toggle por objeto para acabamento fosco. O reset de camera agora usa `saveState/reset` do `camera-controls`, `fit scene` e `reset camera` ficaram separados, e o CTA `Take photo` exporta captura real do canvas em PNG com transparencia verdadeira, sem cor do stage nem grid.
+Catalogo consolidado em 4 dispositivos. Arquitetura multimodelo com `modelScale`, `baseRotation`, `pivotOffset` e `modelSpawnOffset` por modelo. `smartwatch` segue com tela texturizada funcional e material fisico preservado no casco. `notebook` aceita a imagem do app na malha correta da tela, com placeholder proprio, debug semantico inicial e agora um modo de tela isolada via toggle de `Teclado`, apoiado por clipping local na tampa traseira. O `smartphone2` antigo foi substituido pelo asset recortado do iPhone 14, com placeholder `1290x2748`, temas ativos e tela aplicada no mesh real do GLB, sem o vidro frontal no fluxo visual atual. O `smartphone` recebeu refinamentos de materiais em aneis, speaker e botoes laterais para eliminar artefatos do asset. Placeholders sao definidos por modelo, sem troca por idioma. O inspector continua com toggle por objeto para acabamento fosco e agora usa um `CustomSelect` proprio para a troca de modelo. O reset de camera agora usa `saveState/reset` do `camera-controls`, `fit scene` e `reset camera` ficaram separados, e o CTA `Take photo` exporta captura real do canvas em PNG com transparencia verdadeira, sem cor do stage nem grid.
 
 A camada de UI tambem passou por uma refatoracao de manutencao: tipografia e spacing recorrentes foram movidos para tokens em `app/styles/tokens.css`, primitives compartilhados foram consolidados, utilitarios arbitrarios foram reduzidos nos paineis principais e o `ContextMenu` deixou de usar render prop para um trigger padronizado. O canvas agora tambem diferencia loading inicial e loading incremental de objetos. O inspector tambem ganhou uma primeira versao de `custom theme` por objeto, com lista reduzida de cores amigaveis por modelo.
 
@@ -186,6 +192,7 @@ Regra pratica:
 - aplicar a textura do app diretamente em `Object_11` vaza para o casco e gera aparencia incorreta;
 - a solucao robusta para o `smartwatch` foi usar um plano separado para a tela e preservar o material original do GLB no casco;
 - trocar `MeshPhysicalMaterial` original por `MeshLambertMaterial` no `smartwatch` fazia o corpo parecer oco; clonar o material original e trocar apenas a cor resolveu isso;
+- no `smartphone`, certas marcas aparentes de aneis, speaker e botoes laterais vinham de sobreposicao/geometria auxiliar do GLB; simplificar os materiais visiveis e remover as malhas de botoes antigas do fluxo principal resolveu o artefato;
 - no `notebook`, a malha de tela correta e `tfTbkkzhxqpKRgC`; o contorno preto da tela e `nAIWMiVEtSYdjdZ`, e a barra inferior da dobra e `WyuoVWKMOcOlXJM`;
 - no `smartphone2` atual, a malha de tela correta e `Object_13`; o recorte superior preto e `Object_4`, o body principal e `Object_7`, e os pequenos cortes laterais seguem a cor do body via `Object_8`;
 - `screenBezel` e `lowerHingeBar` do `notebook` devem permanecer sempre pretos; a borracha de tela/dobra tambem deve ser tratada como detalhe fixo escuro;

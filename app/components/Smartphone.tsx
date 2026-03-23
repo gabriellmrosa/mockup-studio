@@ -10,6 +10,7 @@ import {
   SCREEN_HEIGHT,
   SCREEN_WIDTH,
 } from "../lib/mockup-image";
+import { createSimpleFinishMaterial } from "../lib/simple-finish-material";
 import {
   SMARTPHONE_DEFAULT_THEME,
   SMARTPHONE_THEMES,
@@ -31,9 +32,6 @@ export const MESH_SEMANTIC: Record<string, string> = {
   gradientSound: "o_Cube", // sempre preto
   smartphoneBody: "o_Boole1",
   estruturaFrontal: "o_Extrude4",
-  botaoPowerDireito: "o_Extrude2",
-  botaoVolumeCima: "o_Cap1",
-  botaoVolumeBaixo: "o_Cap2",
   CircleTopLeft: "o_Cap1_6",
   rightBigSideButton: "o_Capsule",
   notchBolinha1: "o_Cap1_1",
@@ -155,15 +153,28 @@ type SmartphoneProps = JSX.IntrinsicElements["group"] & {
   showNotebookKeyboard?: boolean;
 };
 
-function createFinishMaterial(color: string, matte: boolean) {
+function createFlatColorMaterial(color: string) {
+  return new THREE.MeshBasicMaterial({
+    color,
+    toneMapped: false,
+    polygonOffset: true,
+    polygonOffsetFactor: -1,
+    polygonOffsetUnits: -1,
+  });
+}
+
+function createAccentMaterial(color: string, matte: boolean) {
   if (matte) {
-    return new THREE.MeshLambertMaterial({ color });
+    return createFlatColorMaterial(color);
   }
 
   return new THREE.MeshPhongMaterial({
     color,
-    shininess: 65,
-    specular: new THREE.Color("#555555"),
+    shininess: 24,
+    specular: new THREE.Color("#2a2a2a"),
+    polygonOffset: true,
+    polygonOffsetFactor: -1,
+    polygonOffsetUnits: -1,
   });
 }
 
@@ -282,14 +293,14 @@ function SmartphoneImpl({
   const c = colors ?? SMARTPHONE_THEMES[SMARTPHONE_DEFAULT_THEME];
   const partMaterials = useMemo(
     () => ({
-      gradientSound:       createFinishMaterial(c.gradientSound, matteColors),
-      smartphoneBody:      createFinishMaterial(c.smartphoneBody, matteColors),
-      rightBigSideButton:  createFinishMaterial(c.rightBigSideButton, matteColors),
-      leftSmallSideButton: createFinishMaterial(c.leftSmallSideButton, matteColors),
-      CircleTopLeft:       createFinishMaterial(c.CircleTopLeft, matteColors),
-      CircleTopLeftMiddle: createFinishMaterial(c.CircleTopLeftMiddle, matteColors),
-      CircleTopRight:      createFinishMaterial(c.CircleTopRight, matteColors),
-      CircleTopRightMiddle:createFinishMaterial(c.CircleTopRightMiddle, matteColors),
+      gradientSound:       createAccentMaterial(c.gradientSound, matteColors),
+      smartphoneBody:      createSimpleFinishMaterial(c.smartphoneBody, matteColors),
+      rightBigSideButton:  createAccentMaterial(c.rightBigSideButton, matteColors),
+      leftSmallSideButton: createAccentMaterial(c.leftSmallSideButton, matteColors),
+      CircleTopLeft:       createAccentMaterial(c.CircleTopLeft, matteColors),
+      CircleTopLeftMiddle: createAccentMaterial(c.CircleTopLeftMiddle, matteColors),
+      CircleTopRight:      createAccentMaterial(c.CircleTopRight, matteColors),
+      CircleTopRightMiddle:createAccentMaterial(c.CircleTopRightMiddle, matteColors),
     }),
     [c.gradientSound, c.smartphoneBody, c.rightBigSideButton, c.leftSmallSideButton,
      c.CircleTopLeft, c.CircleTopLeftMiddle, c.CircleTopRight, c.CircleTopRightMiddle, matteColors],
@@ -319,6 +330,13 @@ function SmartphoneImpl({
     return debugMaterials?.[partName] ?? partMaterials[partName];
   }
 
+  function visAlias(
+    debugPartName: string,
+    themedPartName: keyof typeof partMaterials,
+  ): THREE.Material {
+    return debugMaterials?.[debugPartName] ?? partMaterials[themedPartName];
+  }
+
   // Retorna o material de debug para partes não-temáticas (originais do GLTF ou preto fixo)
   function orig(glbName: string, fallback: THREE.Material): THREE.Material {
     const semanticKey = GLB_TO_SEMANTIC[glbName];
@@ -337,30 +355,14 @@ function SmartphoneImpl({
       {showDeviceShell ? (
         <>
           <mesh
-            name="botaoPowerDireito"
-            geometry={nodes.o_Extrude2.geometry}
-            material={orig("o_Extrude2", gltfMats["Mat.6"])}
-          />
-          <mesh
-            name="botaoVolumeCima"
-            geometry={nodes.o_Cap1.geometry}
-            material={orig("o_Cap1", gltfMats["default"])}
-          />
-          <mesh
-            name="botaoVolumeBaixo"
-            geometry={nodes.o_Cap2.geometry}
-            material={orig("o_Cap2", gltfMats["default"])}
-          />
-
-          <mesh
             name="moduloCameraAro"
             geometry={nodes.o_Extrude.geometry}
-            material={orig("o_Extrude", gltfMats.Mat)}
+            material={visAlias("moduloCameraAro", "CircleTopLeft")}
           />
           <mesh
             name="notchBolinha1"
             geometry={nodes.o_Cap1_1.geometry}
-            material={orig("o_Cap1_1", gltfMats["default"])}
+            material={visAlias("notchBolinha1", "CircleTopLeftMiddle")}
           />
           <mesh
             name="lente3"
@@ -370,12 +372,12 @@ function SmartphoneImpl({
           <mesh
             name="notchBolinha2"
             geometry={nodes.o_Extrude1.geometry}
-            material={orig("o_Extrude1", gltfMats.Mat)}
+            material={visAlias("notchBolinha2", "CircleTopRight")}
           />
           <mesh
             name="notchBolinha3"
             geometry={nodes.o_Cap1_2.geometry}
-            material={orig("o_Cap1_2", gltfMats["default"])}
+            material={visAlias("notchBolinha3", "CircleTopRightMiddle")}
           />
           <mesh
             name="lente1"
@@ -396,7 +398,7 @@ function SmartphoneImpl({
           <mesh
             name="estruturaFrontal"
             geometry={nodes.o_Extrude4.geometry}
-            material={orig("o_Extrude4", gltfMats.Mat)}
+            material={visAlias("estruturaFrontal", "smartphoneBody")}
           />
 
           <mesh
@@ -407,7 +409,7 @@ function SmartphoneImpl({
           <mesh
             name="notchPill"
             geometry={nodes.o_Extrude3.geometry}
-            material={orig("o_Extrude3", gltfMats.Mat)}
+            material={visAlias("notchPill", "gradientSound")}
           />
 
           <mesh

@@ -9,6 +9,7 @@ import {
   buildScreenCanvas,
   MAX_TEXTURE_SIZE,
 } from "../lib/mockup-image";
+import { createSimpleFinishMaterial } from "../lib/simple-finish-material";
 
 // ---------------------------------------------------------------------------
 // Notebook — parte das malhas já foi identificada via debug mode.
@@ -68,17 +69,6 @@ const NOTEBOOK_SCREEN_CROP_H = 978;
 
 export type NotebookDebugPartKey = keyof typeof NOTEBOOK_MESH_SEMANTIC;
 
-const NOTEBOOK_FINISH_DEFAULTS = {
-  bodyBottomClearcoat: 0.015,
-  bodyBottomClearcoatRoughness: 0.86,
-  bodyBottomMetalness: 0.02,
-  bodyBottomRoughness: 0,
-  keyboardBaseOuterRoughness: 0,
-  keyboardDeckRoughness: 0,
-  touchpadBorderRoughness: 0,
-  touchpadRoughness: 0,
-} as const;
-
 type GLTFResult = GLTF & {
   nodes: Record<string, THREE.Mesh>;
   materials: Record<string, THREE.Material>;
@@ -112,91 +102,6 @@ function applyMaterialClipping(
   material.clippingPlanes = enabled ? [clippingPlane] : [];
   material.clipShadows = enabled;
   material.needsUpdate = true;
-  return material;
-}
-
-function applyFinishMaterial(material: THREE.Material, matte: boolean) {
-  material.transparent = false;
-  material.opacity = 1;
-
-  if ("roughness" in material && typeof material.roughness === "number") {
-    material.roughness = matte ? Math.max(material.roughness, 0.82) : Math.min(material.roughness, 0.42);
-  }
-  if ("metalness" in material && typeof material.metalness === "number") {
-    material.metalness = matte ? Math.min(material.metalness, 0.05) : Math.max(material.metalness, 0.12);
-  }
-  if ("clearcoat" in material && typeof material.clearcoat === "number") {
-    material.clearcoat = matte ? Math.min(material.clearcoat, 0.03) : Math.max(material.clearcoat, 0.14);
-  }
-  if ("clearcoatRoughness" in material && typeof material.clearcoatRoughness === "number") {
-    material.clearcoatRoughness = matte ? Math.max(material.clearcoatRoughness, 0.72) : Math.min(material.clearcoatRoughness, 0.28);
-  }
-  if ("reflectivity" in material && typeof material.reflectivity === "number") {
-    material.reflectivity = matte ? Math.min(material.reflectivity, 0.04) : Math.max(material.reflectivity, 0.18);
-  }
-  if ("envMapIntensity" in material && typeof material.envMapIntensity === "number") {
-    material.envMapIntensity = matte ? Math.min(material.envMapIntensity, 0.16) : Math.max(material.envMapIntensity, 0.62);
-  }
-
-  return material;
-}
-
-function applyNotebookPartFinish(
-  semantic: keyof typeof NOTEBOOK_MESH_SEMANTIC,
-  material: THREE.Material,
-  matte: boolean,
-  bodyBottomFinish: {
-    bodyBottomRoughness: number;
-    bodyBottomMetalness: number;
-    bodyBottomClearcoat: number;
-    bodyBottomClearcoatRoughness: number;
-    keyboardBaseOuterRoughness: number;
-    keyboardDeckRoughness: number;
-    touchpadRoughness: number;
-    touchpadBorderRoughness: number;
-  },
-) {
-  applyFinishMaterial(material, matte);
-
-  if (semantic === "bodyBottom") {
-    if ("roughness" in material && typeof material.roughness === "number") {
-      material.roughness = bodyBottomFinish.bodyBottomRoughness;
-    }
-    if ("metalness" in material && typeof material.metalness === "number") {
-      material.metalness = bodyBottomFinish.bodyBottomMetalness;
-    }
-    if ("clearcoat" in material && typeof material.clearcoat === "number") {
-      material.clearcoat = bodyBottomFinish.bodyBottomClearcoat;
-    }
-    if ("clearcoatRoughness" in material && typeof material.clearcoatRoughness === "number") {
-      material.clearcoatRoughness = bodyBottomFinish.bodyBottomClearcoatRoughness;
-    }
-  }
-
-  if (semantic === "keyboardBaseOuter") {
-    if ("roughness" in material && typeof material.roughness === "number") {
-      material.roughness = bodyBottomFinish.keyboardBaseOuterRoughness;
-    }
-  }
-
-  if (semantic === "keyboardDeck") {
-    if ("roughness" in material && typeof material.roughness === "number") {
-      material.roughness = bodyBottomFinish.keyboardDeckRoughness;
-    }
-  }
-
-  if (semantic === "touchpad") {
-    if ("roughness" in material && typeof material.roughness === "number") {
-      material.roughness = bodyBottomFinish.touchpadRoughness;
-    }
-  }
-
-  if (semantic === "touchpadBorder") {
-    if ("roughness" in material && typeof material.roughness === "number") {
-      material.roughness = bodyBottomFinish.touchpadBorderRoughness;
-    }
-  }
-
   return material;
 }
 
@@ -273,16 +178,6 @@ function NotebookImpl({
     });
   }, [clone]);
 
-  const originalMaterials = useMemo(() => {
-    const materials = new Map<string, THREE.Material | THREE.Material[]>();
-    clone.traverse((obj) => {
-      if (obj instanceof THREE.Mesh && obj.name) {
-        materials.set(obj.name, obj.material);
-      }
-    });
-    return materials;
-  }, [clone]);
-
   const backCoverClipPlane = useMemo(() => new THREE.Plane(), []);
   const debugMaterials = useMemo(() => {
     if (!debugPartColors) return null;
@@ -310,15 +205,11 @@ function NotebookImpl({
     return Object.fromEntries(
       Object.entries(NOTEBOOK_MESH_SEMANTIC).flatMap(([semantic, meshName]) => {
         const color = colors[semantic];
-        const originalMaterial = originalMaterials.get(meshName);
-        if (!color || !originalMaterial || Array.isArray(originalMaterial)) {
+        if (!color || meshName === NOTEBOOK_SCREEN_MESH) {
           return [];
         }
 
-        const themedMaterial = originalMaterial.clone();
-        if ("color" in themedMaterial && themedMaterial.color instanceof THREE.Color) {
-          themedMaterial.color = new THREE.Color(color);
-        }
+        const themedMaterial = createSimpleFinishMaterial(color, matteColors);
         if (semantic === "screenBackCover") {
           applyMaterialClipping(
             themedMaterial,
@@ -326,12 +217,6 @@ function NotebookImpl({
             !showNotebookKeyboard,
           );
         }
-        applyNotebookPartFinish(
-          semantic as keyof typeof NOTEBOOK_MESH_SEMANTIC,
-          themedMaterial,
-          matteColors,
-          NOTEBOOK_FINISH_DEFAULTS,
-        );
         themedMaterial.needsUpdate = true;
         return [[semantic, themedMaterial] as const];
       }),
@@ -340,7 +225,6 @@ function NotebookImpl({
     backCoverClipPlane,
     colors,
     matteColors,
-    originalMaterials,
     showNotebookKeyboard,
   ]);
 
@@ -348,31 +232,6 @@ function NotebookImpl({
     if (!themeMaterials) return;
     return () => Object.values(themeMaterials).forEach((mat) => mat.dispose());
   }, [themeMaterials]);
-
-  const clippedOriginalBackCoverMaterial = useMemo(() => {
-    const originalMaterial = originalMaterials.get(
-      NOTEBOOK_MESH_SEMANTIC.screenBackCover,
-    );
-
-    if (
-      showNotebookKeyboard ||
-      !originalMaterial ||
-      Array.isArray(originalMaterial)
-    ) {
-      return null;
-    }
-
-    return applyMaterialClipping(
-      originalMaterial.clone(),
-      backCoverClipPlane,
-      true,
-    );
-  }, [backCoverClipPlane, originalMaterials, showNotebookKeyboard]);
-
-  useEffect(() => {
-    if (!clippedOriginalBackCoverMaterial) return;
-    return () => clippedOriginalBackCoverMaterial.dispose();
-  }, [clippedOriginalBackCoverMaterial]);
 
   useEffect(() => {
     Object.entries(NOTEBOOK_MESH_SEMANTIC).forEach(([semantic, meshName]) => {
@@ -393,28 +252,12 @@ function NotebookImpl({
       const themedMaterial = themeMaterials?.[semantic];
       if (themedMaterial) {
         mesh.material = themedMaterial;
-        return;
-      }
-
-      const originalMaterial = originalMaterials.get(meshName);
-      if (originalMaterial) {
-        if (semantic === "screenBackCover" && clippedOriginalBackCoverMaterial) {
-          mesh.material = clippedOriginalBackCoverMaterial;
-          return;
-        }
-
-        mesh.material = originalMaterial;
       }
     });
   }, [
-    backCoverClipPlane,
     clone,
-    clippedOriginalBackCoverMaterial,
-    colors,
     debugMaterials,
-    originalMaterials,
     screenMaterial,
-    showNotebookKeyboard,
     themeMaterials,
   ]);
 

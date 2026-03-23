@@ -229,7 +229,6 @@ function SmartwatchImpl({
     return mesh?.material;
   }, [clone]);
 
-  // Materiais de tema — preservam o MeshPhysicalMaterial original do GLB
   const c: SmartwatchColors = (colors as SmartwatchColors) ?? SMARTWATCH_THEMES[SMARTWATCH_DEFAULT_THEME];
   const partMaterials = useMemo(
     () => ({

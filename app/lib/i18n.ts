@@ -89,7 +89,7 @@ export const APP_COPY: Record<Locale, AppCopy> = {
       gray: "Cinza",
       black: "Preto",
       "light-gray": "Cinza Claro",
-      blood: "Blood",
+      blood: "Red",
     },
   },
   "en-US": {
@@ -135,7 +135,7 @@ export const APP_COPY: Record<Locale, AppCopy> = {
       gray: "Gray",
       black: "Black",
       "light-gray": "Light Gray",
-      blood: "Blood",
+      blood: "Red",
     },
   },
 };
