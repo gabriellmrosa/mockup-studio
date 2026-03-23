@@ -23,14 +23,12 @@ const NOTEBOOK_SCREEN_ONLY_COLOR_KEYS = new Set([
 type InspectorPanelProps = {
   copy: AppCopy;
   object: SceneObject | null;
-  onDebugColorChange: (part: string, hex: string) => void;
   onImageUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onModelChange: (modelId: SceneObject["modelId"]) => void;
   onResetObject: () => void;
   onThemeColorChange: (part: string, hex: string) => void;
   onThemeChange: (themeId: string) => void;
   onToggleCustomColors: () => void;
-  onToggleDebugMode: () => void;
   onToggleDeviceShell: () => void;
   onToggleNotebookKeyboard: () => void;
   onToggleMatteColors: () => void;
@@ -48,14 +46,12 @@ type InspectorPanelProps = {
 export default function InspectorPanel({
   copy,
   object,
-  onDebugColorChange,
   onImageUpload,
   onModelChange,
   onResetObject,
   onThemeColorChange,
   onThemeChange,
   onToggleCustomColors,
-  onToggleDebugMode,
   onToggleDeviceShell,
   onToggleNotebookKeyboard,
   onToggleMatteColors,
@@ -97,7 +93,7 @@ export default function InspectorPanel({
   return (
     <aside className="editor-sidebar editor-sidebar-shell inspector-sidebar inspector-sidebar-scroll">
       <InspectorPanelHeader
-        eyebrow="Properties"
+        eyebrow={copy.propertiesEyebrow}
         title={object.name}
         titleClassName="panel-title-object"
       />
@@ -158,84 +154,66 @@ export default function InspectorPanel({
           ) : null}
         </PanelSection>
 
-        {!object.debugMode ? (
-          <>
-            <PanelSection
-              title={copy.themesSectionTitle}
-              className="--without-border-bottom"
-            >
-              <div className="theme-grid">
-                {model?.themeOptions.map((theme) => (
-                  <button
-                    key={theme.id}
-                    onClick={() => onThemeChange(theme.id)}
-                    title={copy.themeNames[theme.id]}
-                    className={`theme-card ${object.deviceTheme === theme.id ? "theme-card-active" : "theme-card-inactive"}`}
-                  >
-                    <div
-                      className="theme-preview"
-                      style={{ backgroundColor: theme.preview }}
-                    />
-                    <span className="theme-card-label">
-                      {copy.themeNames[theme.id]}
-                    </span>
-                  </button>
-                ))}
-              </div>
-              {customizableColorKeys.length > 0 ? (
-                <>
-                  <label className="inspector-inline-toggle">
-                    <span className="inspector-inline-toggle-text">{copy.matteColorLabel}</span>
-                      <input
-                        type="checkbox"
-                        checked={object.matteColors}
-                        onChange={onToggleMatteColors}
-                        className="inspector-checkbox"
-                      />
-                    </label>
-
-                  <label className="inspector-inline-toggle">
-                    <span className="inspector-inline-toggle-text">{copy.bodyColorLabel}</span>
-                      <input
-                        type="checkbox"
-                        checked={object.customColorsEnabled}
-                        onChange={onToggleCustomColors}
-                        className="inspector-checkbox"
-                      />
-                    </label>
-
-                  {object.customColorsEnabled ? (
-                    <div className="panel-card custom-theme-panel">
-                      {customizableColorKeys.map((part) => (
-                        <ColorRow
-                          key={part}
-                          label={customizableColorLabels[part] ?? formatColorPartLabel(part)}
-                          uiTheme={uiTheme}
-                          value={object.colors[part] ?? "#000000"}
-                          onChange={(hex) => onThemeColorChange(part, hex)}
-                        />
-                      ))}
-                    </div>
-                  ) : null}
-                </>
-              ) : null}
-            </PanelSection>
-          </>
-        ) : (
-          <PanelSection title={copy.debugSectionTitle}>
-            <div className="panel-card debug-panel">
-              {Object.entries(object.debugPartColors).map(([part, color]) => (
-                <ColorRow
-                  key={part}
-                  label={part}
-                  uiTheme={uiTheme}
-                  value={color}
-                  onChange={(hex) => onDebugColorChange(part, hex)}
+        <PanelSection
+          title={copy.themesSectionTitle}
+          className="--without-border-bottom"
+        >
+          <div className="theme-grid">
+            {model?.themeOptions.map((theme) => (
+              <button
+                key={theme.id}
+                onClick={() => onThemeChange(theme.id)}
+                title={copy.themeNames[theme.id]}
+                className={`theme-card ${object.deviceTheme === theme.id ? "theme-card-active" : "theme-card-inactive"}`}
+              >
+                <div
+                  className="theme-preview"
+                  style={{ backgroundColor: theme.preview }}
                 />
-              ))}
-            </div>
-          </PanelSection>
-        )}
+                <span className="theme-card-label">
+                  {copy.themeNames[theme.id]}
+                </span>
+              </button>
+            ))}
+          </div>
+          {customizableColorKeys.length > 0 ? (
+            <>
+              <label className="inspector-inline-toggle">
+                <span className="inspector-inline-toggle-text">{copy.matteColorLabel}</span>
+                  <input
+                    type="checkbox"
+                    checked={object.matteColors}
+                    onChange={onToggleMatteColors}
+                    className="inspector-checkbox"
+                  />
+                </label>
+
+              <label className="inspector-inline-toggle">
+                <span className="inspector-inline-toggle-text">{copy.bodyColorLabel}</span>
+                  <input
+                    type="checkbox"
+                    checked={object.customColorsEnabled}
+                    onChange={onToggleCustomColors}
+                    className="inspector-checkbox"
+                  />
+                </label>
+
+              {object.customColorsEnabled ? (
+                <div className="panel-card custom-theme-panel">
+                  {customizableColorKeys.map((part) => (
+                    <ColorRow
+                      key={part}
+                      label={customizableColorLabels[part] ?? formatColorPartLabel(part)}
+                      uiTheme={uiTheme}
+                      value={object.colors[part] ?? "#000000"}
+                      onChange={(hex) => onThemeColorChange(part, hex)}
+                    />
+                  ))}
+                </div>
+              ) : null}
+            </>
+          ) : null}
+        </PanelSection>
 
         <PanelSection
           title={copy.transformSectionTitle}
@@ -357,14 +335,6 @@ export default function InspectorPanel({
           </div>
         </PanelSection>
 
-        <PanelSection title={copy.debugSectionTitle}>
-          <button
-            onClick={onToggleDebugMode}
-            className={`debug-toggle-button ${object.debugMode ? "debug-toggle-button-on" : "editor-button editor-button-muted debug-toggle-button-off"}`}
-          >
-            {object.debugMode ? copy.debugOn : copy.debugOff}
-          </button>
-        </PanelSection>
       </div>
     </aside>
   );

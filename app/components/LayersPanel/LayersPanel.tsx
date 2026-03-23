@@ -82,6 +82,7 @@ export default function LayersPanel({
     <aside className="editor-sidebar editor-sidebar-shell layers-sidebar">
       <CreditsModal
         isOpen={isCreditsOpen}
+        copy={copy}
         onClose={() => setIsCreditsOpen(false)}
       />
 
@@ -89,7 +90,7 @@ export default function LayersPanel({
         <div className="relative">
           <LayersPanelHeader
             title={copy.appTitle}
-            subtitle="Version 1.0"
+            subtitle={copy.appSubtitle}
             titleClassName="panel-title panel-title-brand"
             action={
               <ContextMenu
@@ -131,8 +132,8 @@ export default function LayersPanel({
                     ],
                   },
                 ]}
-                triggerAriaLabel="Open preferences"
-                triggerTitle="Open preferences"
+                triggerAriaLabel={copy.preferencesLabel}
+                triggerTitle={copy.preferencesLabel}
                 triggerIcon={<MoreVertical size={12} />}
               />
             }
@@ -141,7 +142,7 @@ export default function LayersPanel({
 
         <div className="layers-body">
           <PanelSection
-            title="3D Objects"
+            title={copy.layersSectionTitle}
             className="section-objects"
             action={
               <button
@@ -242,10 +243,10 @@ export default function LayersPanel({
                               ]
                             : []),
                         ]}
-                        triggerAriaLabel="Object options"
+                        triggerAriaLabel={copy.objectOptionsLabel}
                         triggerClassName="layer-menu-trigger"
                         triggerStopPropagation
-                        triggerTitle="Object options"
+                        triggerTitle={copy.objectOptionsLabel}
                         triggerIcon={<MoreVertical size={12} />}
                       />
                     </div>
@@ -291,9 +292,9 @@ export default function LayersPanel({
               className="sidebar-footer-link"
               onClick={() => setIsCreditsOpen(true)}
             >
-              CREDITS
+              {copy.creditsLabel}
             </button>{" "}
-            for 3D assets
+            {copy.creditsDescription}
           </p>
         </footer>
       </div>

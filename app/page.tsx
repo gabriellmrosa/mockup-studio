@@ -207,25 +207,6 @@ export default function Home() {
     });
   }
 
-  function handleDebugColorChange(part: string, hex: string) {
-    if (!selectedObject) {
-      return;
-    }
-
-    if (selectedObject.debugPartColors[part] === hex) {
-      return;
-    }
-
-    startTransition(() => {
-      updateSceneObject(selectedObject.id, {
-        debugPartColors: {
-          ...selectedObject.debugPartColors,
-          [part]: hex,
-        },
-      });
-    });
-  }
-
   function handleModelChange(modelId: SceneObject["modelId"]) {
     if (!selectedObject) {
       return;
@@ -282,7 +263,6 @@ export default function Home() {
       <InspectorPanel
         copy={copy}
         object={selectedObject}
-        onDebugColorChange={handleDebugColorChange}
         onImageUpload={handleImageUpload}
         onModelChange={handleModelChange}
         onResetObject={handleResetObject}
@@ -291,11 +271,6 @@ export default function Home() {
         onToggleCustomColors={() =>
           selectedObject && updateSceneObject(selectedObject.id, {
             customColorsEnabled: !selectedObject?.customColorsEnabled,
-          })
-        }
-        onToggleDebugMode={() =>
-          selectedObject && updateSceneObject(selectedObject.id, {
-            debugMode: !selectedObject?.debugMode,
           })
         }
         onToggleDeviceShell={() =>

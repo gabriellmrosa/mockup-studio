@@ -4,8 +4,10 @@ import "./CreditsModal.css";
 import { useEffect } from "react";
 import { createPortal } from "react-dom";
 import { ExternalLink, X } from "lucide-react";
+import type { AppCopy } from "../../lib/i18n";
 
 type CreditsModalProps = {
+  copy: AppCopy;
   isOpen: boolean;
   onClose: () => void;
 };
@@ -61,6 +63,7 @@ const ASSET_CREDITS: readonly AssetCredit[] = [
 ];
 
 export default function CreditsModal({
+  copy,
   isOpen,
   onClose,
 }: CreditsModalProps) {
@@ -104,9 +107,9 @@ export default function CreditsModal({
       >
         <div className="credits-modal-header">
           <div>
-            <p className="credits-modal-eyebrow">3D Assets & Credits</p>
+            <p className="credits-modal-eyebrow">{copy.creditsEyebrow}</p>
             <h2 id="credits-modal-title" className="credits-modal-title">
-              Attributions
+              {copy.creditsTitle}
             </h2>
           </div>
 
@@ -114,28 +117,25 @@ export default function CreditsModal({
             type="button"
             className="credits-modal-close"
             onClick={onClose}
-            aria-label="Close credits"
-            title="Close credits"
+            aria-label={copy.creditsCloseButton}
+            title={copy.creditsCloseButton}
           >
             <X size={16} />
           </button>
         </div>
 
         <div className="credits-modal-body">
-          <p className="credits-modal-intro">
-            This is a personal/study project with no commercial intent. All 3D
-            models are used with proper attribution as required by their licenses.
-          </p>
+          <p className="credits-modal-intro">{copy.creditsIntro}</p>
 
           <div className="credits-modal-list">
             {ASSET_CREDITS.map((item) => (
               <section key={item.title} className="credits-card">
                 <h3 className="credits-card-title">{item.title}</h3>
                 <p className="credits-card-line">
-                  <span>Author:</span> {item.author}
+                  <span>{copy.creditsAuthor}:</span> {item.author}
                 </p>
                 <p className="credits-card-line">
-                  <span>Source:</span>{" "}
+                  <span>{copy.creditsSource}:</span>{" "}
                   <a
                     href={item.sourceHref}
                     target="_blank"
@@ -147,7 +147,7 @@ export default function CreditsModal({
                   </a>
                 </p>
                 <p className="credits-card-line">
-                  <span>License:</span>{" "}
+                  <span>{copy.creditsLicense}:</span>{" "}
                   {item.licenseHref ? (
                     <a
                       href={item.licenseHref}
@@ -170,8 +170,8 @@ export default function CreditsModal({
           </div>
 
           <div className="credits-modal-footer">
-            <p>Special thanks to the artists who generously share their work with the community.</p>
-            <p>Creators: if you identify any improper use of your assets, please reach out for immediate removal.</p>
+            <p>{copy.creditsFooterThanks}</p>
+            <p>{copy.creditsFooterRemoval}</p>
           </div>
         </div>
       </div>

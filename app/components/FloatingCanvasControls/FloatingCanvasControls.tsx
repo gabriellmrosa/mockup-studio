@@ -85,8 +85,8 @@ export default function FloatingCanvasControls({
         <button
           type="button"
           className="editor-fab"
-          aria-label="Move up"
-          title="Move up"
+          aria-label={copy.moveUpButton}
+          title={copy.moveUpButton}
           onClick={onPanUp}
         >
           <ArrowUp size={16} />
@@ -94,8 +94,8 @@ export default function FloatingCanvasControls({
         <button
           type="button"
           className="editor-fab"
-          aria-label="Move down"
-          title="Move down"
+          aria-label={copy.moveDownButton}
+          title={copy.moveDownButton}
           onClick={onPanDown}
         >
           <ArrowDown size={16} />
@@ -103,8 +103,8 @@ export default function FloatingCanvasControls({
         <button
           type="button"
           className="editor-fab"
-          aria-label="Move left"
-          title="Move left"
+          aria-label={copy.moveLeftButton}
+          title={copy.moveLeftButton}
           onClick={onPanLeft}
         >
           <ArrowLeft size={16} />
@@ -112,8 +112,8 @@ export default function FloatingCanvasControls({
         <button
           type="button"
           className="editor-fab"
-          aria-label="Move right"
-          title="Move right"
+          aria-label={copy.moveRightButton}
+          title={copy.moveRightButton}
           onClick={onPanRight}
         >
           <ArrowRight size={16} />
@@ -121,8 +121,8 @@ export default function FloatingCanvasControls({
         <button
           type="button"
           className="editor-fab"
-          aria-label="Zoom out"
-          title="Zoom out"
+          aria-label={copy.zoomOutButton}
+          title={copy.zoomOutButton}
           onClick={onZoomOut}
         >
           <ZoomOut size={16} />
@@ -130,8 +130,8 @@ export default function FloatingCanvasControls({
         <button
           type="button"
           className="editor-fab"
-          aria-label="Zoom in"
-          title="Zoom in"
+          aria-label={copy.zoomInButton}
+          title={copy.zoomInButton}
           onClick={onZoomIn}
         >
           <ZoomIn size={16} />
@@ -141,8 +141,8 @@ export default function FloatingCanvasControls({
           <button
             type="button"
             className="editor-fab"
-            aria-label="Canvas background color"
-            title="Canvas background color"
+            aria-label={copy.backgroundColorButton}
+            title={copy.backgroundColorButton}
             onClick={() => colorInputRef.current?.click()}
           >
             <div

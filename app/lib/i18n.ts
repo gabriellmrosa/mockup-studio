@@ -5,6 +5,7 @@ export type UiTheme = "dark" | "light";
 
 export type AppCopy = {
   appTitle: string;
+  appSubtitle: string;
   addObject: string;
   baseObject: string;
   hideObject: string;
@@ -13,6 +14,7 @@ export type AppCopy = {
   fitSceneButton: string;
   languageLabel: string;
   themeLabel: string;
+  preferencesLabel: string;
   darkMode: string;
   lightMode: string;
   portuguese: string;
@@ -21,6 +23,9 @@ export type AppCopy = {
   takePhotoButton: string;
   deleteObject: string;
   renameObject: string;
+  layersSectionTitle: string;
+  objectOptionsLabel: string;
+  propertiesEyebrow: string;
   modelLabel: string;
   sceneSectionHint: string;
   keyboardToggleLabel: string;
@@ -40,45 +45,68 @@ export type AppCopy = {
   rotationY: string;
   rotationZ: string;
   scale: string;
+  moveUpButton: string;
+  moveDownButton: string;
+  moveLeftButton: string;
+  moveRightButton: string;
+  zoomInButton: string;
+  zoomOutButton: string;
+  backgroundColorButton: string;
   debugOn: string;
   debugOff: string;
   canvasInitialLoadingLabel: string;
   canvasObjectLoadingLabel: string;
   uploadImageError: string;
+  creditsLabel: string;
+  creditsDescription: string;
+  creditsEyebrow: string;
+  creditsTitle: string;
+  creditsCloseButton: string;
+  creditsIntro: string;
+  creditsAuthor: string;
+  creditsSource: string;
+  creditsLicense: string;
+  creditsFooterThanks: string;
+  creditsFooterRemoval: string;
   themeNames: Record<string, string>;
 };
 
 export const APP_COPY: Record<Locale, AppCopy> = {
   "pt-BR": {
     appTitle: "Mock Studio",
-    addObject: "Adicionar objeto",
-    baseObject: "Objeto base",
+    appSubtitle: "Composicao visual de mockups",
+    addObject: "Adicionar camada",
+    baseObject: "Camada base",
     hideObject: "Ocultar",
     showObject: "Mostrar",
     hiddenObjectLabel: "Oculto",
-    fitSceneButton: "Enquadrar cena",
+    fitSceneButton: "Enquadrar conteudo",
     languageLabel: "Idioma",
-    themeLabel: "Tema",
-    darkMode: "Dark",
-    lightMode: "Light",
+    themeLabel: "Interface",
+    preferencesLabel: "Preferencias",
+    darkMode: "Escuro",
+    lightMode: "Claro",
     portuguese: "PT-BR",
     english: "EN-US",
-    resetCameraButton: "Reset camera",
-    takePhotoButton: "Tirar foto",
+    resetCameraButton: "Resetar visao",
+    takePhotoButton: "Exportar PNG",
     deleteObject: "Excluir",
     renameObject: "Renomear",
-    modelLabel: "Modelo",
-    sceneSectionHint: "Casca 3D",
+    layersSectionTitle: "Camadas",
+    objectOptionsLabel: "Opcoes da camada",
+    propertiesEyebrow: "Propriedades",
+    modelLabel: "Dispositivo",
+    sceneSectionHint: "Corpo do dispositivo",
     keyboardToggleLabel: "Teclado",
-    screenSectionTitle: "Tela do App",
-    uploadImage: "Upload imagem",
-    screenSectionHintPrefix: "Recommended",
-    themesSectionTitle: "Temas",
-    bodyColorLabel: "Customizar",
-    matteColorLabel: "Cor fosca",
+    screenSectionTitle: "Tela",
+    uploadImage: "Substituir imagem",
+    screenSectionHintPrefix: "Tamanho ideal:",
+    themesSectionTitle: "Aparencia",
+    bodyColorLabel: "Cores personalizadas",
+    matteColorLabel: "Acabamento fosco",
     debugSectionTitle: "Debug",
-    transformSectionTitle: "Transform",
-    resetObjectButton: "Reset objeto",
+    transformSectionTitle: "Transformacao",
+    resetObjectButton: "Resetar transformacao",
     positionX: "Posição X",
     positionY: "Posição Y",
     positionZ: "Posição Z",
@@ -86,11 +114,32 @@ export const APP_COPY: Record<Locale, AppCopy> = {
     rotationY: "Rotação Y",
     rotationZ: "Rotação Z",
     scale: "Escala",
+    moveUpButton: "Mover para cima",
+    moveDownButton: "Mover para baixo",
+    moveLeftButton: "Mover para a esquerda",
+    moveRightButton: "Mover para a direita",
+    zoomInButton: "Aproximar",
+    zoomOutButton: "Afastar",
+    backgroundColorButton: "Cor de fundo",
     debugOn: "Debug interativo: ON",
     debugOff: "Debug interativo: OFF",
-    canvasInitialLoadingLabel: "Carregando",
-    canvasObjectLoadingLabel: "Carregando modelo",
-    uploadImageError: "Nao foi possivel preparar essa imagem.",
+    canvasInitialLoadingLabel: "Preparando cena",
+    canvasObjectLoadingLabel: "Atualizando visualizacao",
+    uploadImageError: "Nao foi possivel carregar essa imagem.",
+    creditsLabel: "Creditos",
+    creditsDescription: "dos modelos 3D",
+    creditsEyebrow: "Modelos 3D e licencas",
+    creditsTitle: "Creditos e atribuicoes",
+    creditsCloseButton: "Fechar creditos",
+    creditsIntro:
+      "Este e um projeto pessoal de estudo, sem finalidade comercial. Todos os modelos 3D sao creditados conforme exigido por suas respectivas licencas.",
+    creditsAuthor: "Autor",
+    creditsSource: "Fonte",
+    creditsLicense: "Licenca",
+    creditsFooterThanks:
+      "Agradecimento especial aos artistas que compartilham seu trabalho com a comunidade.",
+    creditsFooterRemoval:
+      "Criadores: caso identifiquem qualquer uso inadequado dos assets, entre em contato para remocao imediata.",
     themeNames: {
       gray: "Cinza",
       black: "Preto",
@@ -100,34 +149,39 @@ export const APP_COPY: Record<Locale, AppCopy> = {
   },
   "en-US": {
     appTitle: "Mock Studio",
-    addObject: "Add object",
-    baseObject: "Base object",
+    appSubtitle: "Visual mockup composition",
+    addObject: "Add layer",
+    baseObject: "Base layer",
     hideObject: "Hide",
     showObject: "Show",
     hiddenObjectLabel: "Hidden",
-    fitSceneButton: "Fit scene",
+    fitSceneButton: "Fit to view",
     languageLabel: "Language",
-    themeLabel: "Theme",
+    themeLabel: "Interface",
+    preferencesLabel: "Preferences",
     darkMode: "Dark",
     lightMode: "Light",
     portuguese: "PT-BR",
     english: "EN-US",
-    resetCameraButton: "Reset camera",
-    takePhotoButton: "Take photo",
+    resetCameraButton: "Reset view",
+    takePhotoButton: "Export PNG",
     deleteObject: "Delete",
     renameObject: "Rename",
-    modelLabel: "Model",
-    sceneSectionHint: "3D Shell",
+    layersSectionTitle: "Layers",
+    objectOptionsLabel: "Layer options",
+    propertiesEyebrow: "Properties",
+    modelLabel: "Device",
+    sceneSectionHint: "Device body",
     keyboardToggleLabel: "Keyboard",
-    screenSectionTitle: "App Screen",
-    uploadImage: "Upload image",
-    screenSectionHintPrefix: "Recommended",
-    themesSectionTitle: "Themes",
-    bodyColorLabel: "Customize",
+    screenSectionTitle: "Screen",
+    uploadImage: "Replace image",
+    screenSectionHintPrefix: "Ideal size:",
+    themesSectionTitle: "Appearance",
+    bodyColorLabel: "Custom colors",
     matteColorLabel: "Matte finish",
     debugSectionTitle: "Debug",
     transformSectionTitle: "Transform",
-    resetObjectButton: "Reset object",
+    resetObjectButton: "Reset transform",
     positionX: "Position X",
     positionY: "Position Y",
     positionZ: "Position Z",
@@ -135,11 +189,32 @@ export const APP_COPY: Record<Locale, AppCopy> = {
     rotationY: "Rotation Y",
     rotationZ: "Rotation Z",
     scale: "Scale",
+    moveUpButton: "Move up",
+    moveDownButton: "Move down",
+    moveLeftButton: "Move left",
+    moveRightButton: "Move right",
+    zoomInButton: "Zoom in",
+    zoomOutButton: "Zoom out",
+    backgroundColorButton: "Background color",
     debugOn: "Interactive debug: ON",
     debugOff: "Interactive debug: OFF",
-    canvasInitialLoadingLabel: "Loading",
-    canvasObjectLoadingLabel: "Loading model",
-    uploadImageError: "Could not prepare this image.",
+    canvasInitialLoadingLabel: "Preparing scene",
+    canvasObjectLoadingLabel: "Refreshing preview",
+    uploadImageError: "Could not load this image.",
+    creditsLabel: "Credits",
+    creditsDescription: "for 3D models",
+    creditsEyebrow: "3D models and licensing",
+    creditsTitle: "Credits and attributions",
+    creditsCloseButton: "Close credits",
+    creditsIntro:
+      "This is a personal study project with no commercial intent. All 3D models are credited as required by their respective licenses.",
+    creditsAuthor: "Author",
+    creditsSource: "Source",
+    creditsLicense: "License",
+    creditsFooterThanks:
+      "Special thanks to the artists who share their work with the community.",
+    creditsFooterRemoval:
+      "Creators: if you identify any improper use of your assets, please reach out for immediate removal.",
     themeNames: {
       gray: "Gray",
       black: "Black",

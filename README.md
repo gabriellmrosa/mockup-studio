@@ -33,7 +33,7 @@ Ja implementado:
 - CTA `Take photo` exporta captura PNG `1920x1080` com nome timestamped, fundo transparente real e sem grid;
 - loading inicial central para o primeiro carregamento real do canvas/modelo;
 - loading incremental discreto no topo do canvas para troca/adicao de modelos, com atraso para evitar flicker em loads rapidos;
-- modo debug de cores por parte por objeto;
+- infraestrutura interna de debug de cores por parte por objeto, mantida para desenvolvimento e onboarding de novos modelos, sem exposicao na UI principal;
 - modo `So tela`, que remove a casca do dispositivo e deixa apenas a textura da tela;
 - toggle global de `dark/light`;
 - toggle global de idioma `pt-BR/en-US`;
@@ -101,7 +101,7 @@ Ja implementado:
 - [app/globals.css](app/globals.css): tokens semanticos e resets globais.
 - [app/components/EditorPrimitives/](app/components/EditorPrimitives/): primitives compartilhados da UI do editor.
 - [app/components/LayersPanel/](app/components/LayersPanel/): painel esquerdo com camadas/objetos e preferencias globais.
-- [app/components/InspectorPanel/](app/components/InspectorPanel/): painel direito com configuracoes do objeto selecionado (transform, temas, debug).
+- [app/components/InspectorPanel/](app/components/InspectorPanel/): painel direito com configuracoes do objeto selecionado (transform e temas).
 - [app/components/CustomSelect/](app/components/CustomSelect/): select custom reutilizavel com portal para menus consistentes.
 - [app/components/MockupCanvas/](app/components/MockupCanvas/): canvas 3D, CameraControls, grid, export e renderizacao de multiplos objetos.
 - [app/components/ContextMenu/](app/components/ContextMenu/): menu contextual via portal com trigger padronizado.
@@ -141,6 +141,39 @@ A camada de UI tambem passou por uma refatoracao de manutencao: tipografia e spa
 - CSS de componente deve cuidar de estados visuais e regras locais do componente;
 - evitar utilitarios arbitrarios como `text-[...]`, `rounded-[...]`, `border-[...]` e `w-[...]` quando ja houver token equivalente;
 - inline style deve ficar restrito a valores realmente dinamicos, como posicao calculada, cor variavel, progresso de slider e custom properties derivadas de estado.
+
+## Regras de Copy
+
+### Tom de voz
+
+- a interface deve soar como ferramenta criativa profissional, nao como painel tecnico de engenharia;
+- preferir frases curtas, neutras e operacionais, no estilo de produtos como Figma, Adobe e Blender;
+- evitar termos improvisados, coloquiais ou internos de implementacao quando houver equivalente mais claro para design/marketing;
+- a UI deve privilegiar clareza funcional antes de personalidade de marca.
+
+### Nomenclatura
+
+- usar `Camadas` / `Layers` como modelo mental principal da composicao;
+- usar `Propriedades` / `Properties` para o painel do item selecionado;
+- usar `Aparencia` / `Appearance` para cores e acabamento do dispositivo;
+- usar `Interface` / `Interface` apenas para preferencias globais da UI, como dark/light;
+- usar `Dispositivo` / `Device` para o tipo de mockup 3D;
+- usar `Escala` / `Scale` para tamanho do objeto na cena;
+- usar `Exportar PNG` / `Export PNG` para a acao principal de saida;
+- usar `Resetar transformacao` / `Reset transform` quando a acao afetar apenas posicao, rotacao e escala.
+
+### Localizacao e consistencia
+
+- evitar misturar portugues e ingles no mesmo contexto visual;
+- textos de botoes, menus, tooltips e modais devem passar por `app/lib/i18n.ts`;
+- labels iguais devem usar o mesmo termo em toda a interface;
+- microcopy de loading deve descrever estado visual do editor, nao detalhes tecnicos de implementacao.
+
+### Defaults de idioma e tema
+
+- na primeira visita, o app deve respeitar `navigator.languages` / `navigator.language` e `prefers-color-scheme`;
+- depois que o usuario alterar idioma ou tema, a preferencia salva em `localStorage` passa a prevalecer;
+- o comportamento atual nao deve sobrescrever automaticamente a escolha salva quando o navegador ou sistema mudar depois.
 
 ## Adicionando Novos Modelos 3D
 
@@ -188,8 +221,20 @@ Regra pratica:
 - criar os tokens de cor em `app/lib/3d-tokens/`;
 - adicionar entrada em `app/models/device-models.ts` com `modelScale`, `baseRotation`, `pivotOffset` e metadados;
 - atualizar a union `DeviceModelId`;
-- ligar `debug mode`, identificar visualmente as partes e renomear `MESH_SEMANTIC`;
+- usar a infraestrutura interna de `debugPartColors`/`debugMode` para identificar visualmente as partes e renomear `MESH_SEMANTIC` antes de expor o modelo na UI;
 - definir temas de cor e `buildColorsFromPrimary` no token file do modelo.
+
+### Debug interno para novos modelos
+
+Existe uma camada de debug ja pronta no estado dos objetos (`debugMode` e `debugPartColors`) e no render dos modelos para coloracao semantica temporaria das malhas.
+
+Utilidade pratica:
+
+- isolar rapidamente quais meshes pertencem a corpo, moldura, tela, vedacoes, dobradicas e detalhes;
+- validar se a separacao semantica proposta para `MESH_SEMANTIC` faz sentido antes de criar temas finais;
+- acelerar a entrada de novos GLBs sem depender de tentativa e erro manual em materiais definitivos.
+
+Esse debug foi mantido no codigo como ferramenta interna de desenvolvimento e nao deve ser tratado como parte da interface principal do editor.
 
 ## Aprendizados
 
