@@ -19,24 +19,35 @@ jest.mock("./components/ContextMenu/ContextMenu", () => ({
     >;
     triggerAriaLabel: string;
     triggerIcon: React.ReactNode;
-  }) => (
-    <div>
-      <button type="button" aria-label={triggerAriaLabel}>
-        {triggerIcon}
-      </button>
-      {items
-        .filter((item) => item.type === "action")
-        .map((item) => (
-          <button
-            key={`${triggerAriaLabel}-${item.label}`}
-            type="button"
-            onClick={item.onClick}
-          >
-            {item.label}
-          </button>
-        ))}
-    </div>
-  ),
+  }) => {
+    const { useState } = jest.requireActual("react") as typeof import("react");
+    const [isOpen, setIsOpen] = useState(false);
+
+    return (
+      <div>
+        <button
+          type="button"
+          aria-label={triggerAriaLabel}
+          onClick={() => setIsOpen((current) => !current)}
+        >
+          {triggerIcon}
+        </button>
+        {isOpen
+          ? items
+              .filter((item) => item.type === "action")
+              .map((item) => (
+                <button
+                  key={`${triggerAriaLabel}-${item.label}`}
+                  type="button"
+                  onClick={item.onClick}
+                >
+                  {item.label}
+                </button>
+              ))
+          : null}
+      </div>
+    );
+  },
 }));
 
 jest.mock("./components/MockupCanvas/MockupCanvas", () => ({

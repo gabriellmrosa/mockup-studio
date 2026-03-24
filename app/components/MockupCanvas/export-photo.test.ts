@@ -126,6 +126,7 @@ describe("export-photo", () => {
       .spyOn(HTMLAnchorElement.prototype, "click")
       .mockImplementation(() => {});
     const putImageData = jest.fn();
+    const toDataURL = jest.fn(() => "data:image/png;base64,cG5n");
 
     jest
       .spyOn(document, "createElement")
@@ -142,7 +143,7 @@ describe("export-photo", () => {
             })),
             height: 0,
             toBlob: jest.fn((callback: (value: Blob | null) => void) => callback(null)),
-            toDataURL: jest.fn(() => "data:image/png;base64,cG5n"),
+            toDataURL,
             width: 0,
           } as unknown as HTMLCanvasElement;
         }
@@ -154,6 +155,8 @@ describe("export-photo", () => {
 
     expect(blob).toBeInstanceOf(Blob);
     expect(blob.type).toBe("image/png");
+    expect(blob.size).toBe(3);
+    expect(toDataURL).toHaveBeenCalledWith("image/png");
     expect(clickSpy).toHaveBeenCalledTimes(0);
   });
 
