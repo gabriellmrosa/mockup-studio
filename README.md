@@ -1,6 +1,37 @@
-# Mock Studio
+<p align="center">
+  <img src="./public/readme-header.png" alt="Mock Studio editor preview showing smartphone, notebook and smartwatch mockups in a 3D scene" />
+</p>
 
-Open source editor for composing app screens inside 3D device mockups with `Next.js`, `React`, `Three.js` and `React Three Fiber`.
+<h1 align="center">Mock Studio</h1>
+
+<p align="center">
+  Open source editor for composing app screens inside interactive 3D device mockups.
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Next.js-16-111111?logo=next.js" alt="Next.js 16" />
+  <img src="https://img.shields.io/badge/React-19-20232a?logo=react" alt="React 19" />
+  <img src="https://img.shields.io/badge/Three.js-R3F-000000?logo=three.js" alt="Three.js and React Three Fiber" />
+  <img src="https://img.shields.io/badge/TypeScript-5-3178c6?logo=typescript&logoColor=white" alt="TypeScript 5" />
+  <img src="https://img.shields.io/badge/License-AGPL--3.0-5c4ee5" alt="AGPL 3.0" />
+</p>
+
+<p align="center">
+  <a href="#features">Features</a> •
+  <a href="#getting-started">Getting Started</a> •
+  <a href="#model-catalog">Model Catalog</a> •
+  <a href="#project-structure">Project Structure</a>
+</p>
+
+Built with `Next.js`, `React`, `Three.js` and `React Three Fiber` to compose marketing shots, product screens and device scenes with per-object controls, layered editing and transparent PNG export.
+
+## Highlights
+
+- compose multiple devices in one scene with independent transforms and uploaded screens
+- switch between themes, semantic part colors and model-specific placeholders
+- export transparent PNGs directly from the canvas
+- manage layers with selection, duplication and inspector-driven editing
+- support `pt-BR` and `en-US` UI modes
 
 ## Features
 
