@@ -136,6 +136,10 @@
   gap: var(--space-1);
 }
 
+.sidebar-footer-separator {
+  color: color-mix(in srgb, var(--sidebar-muted) 72%, transparent);
+}
+
 .sidebar-footer-link {
   background: transparent;
   border: 0;
@@ -144,6 +148,24 @@
   font: inherit;
   padding: 0;
   text-decoration: underline;
+}
+
+.sidebar-footer-icon-link {
+  align-items: center;
+  color: inherit;
+  display: inline-flex;
+  justify-content: center;
+  opacity: 0.82;
+  transition:
+    color 160ms ease,
+    opacity 160ms ease,
+    transform 160ms ease;
+}
+
+.sidebar-footer-icon-link:hover {
+  color: var(--foreground);
+  opacity: 1;
+  transform: translateY(-1px);
 }
 
 /* --- Device card (future use) --- */

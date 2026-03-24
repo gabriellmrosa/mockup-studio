@@ -106,6 +106,37 @@ const copy: AppCopy = {
 };
 
 describe("LayersPanel", () => {
+  it("renders a discreet GitHub link in the footer", () => {
+    const object = createSceneObject({
+      id: "object-1",
+      name: "Object 1",
+    });
+
+    render(
+      <LayersPanel
+        appMeta="v1.0.0"
+        copy={copy}
+        locale="en-US"
+        objects={[object]}
+        onAddObject={jest.fn()}
+        onDuplicateObject={jest.fn()}
+        onLocaleChange={jest.fn()}
+        onRenameObject={jest.fn()}
+        onRemoveObject={jest.fn()}
+        onSelectObject={jest.fn()}
+        onToggleObjectVisibility={jest.fn()}
+        onUiThemeChange={jest.fn()}
+        selectedObjectId={object.id}
+        uiTheme="dark"
+      />,
+    );
+
+    expect(screen.getByLabelText("View source on GitHub")).toHaveAttribute(
+      "href",
+      "https://github.com/gabriellmrosa/mockup-studio",
+    );
+  });
+
   it("calls visibility toggle from the eye button", () => {
     const object = createSceneObject({
       id: "object-1",

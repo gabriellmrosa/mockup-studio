@@ -9,9 +9,11 @@ import {
   LayersPanelHeader,
   PanelSection,
 } from "../EditorPrimitives/EditorPrimitives";
-import { Eye, EyeOff, MoreVertical, Plus } from "lucide-react";
+import { Eye, EyeOff, Github, MoreVertical, Plus } from "lucide-react";
 import ContextMenu from "../ContextMenu/ContextMenu";
 import CreditsModal from "../CreditsModal/CreditsModal";
+
+const REPOSITORY_URL = "https://github.com/gabriellmrosa/mockup-studio";
 
 type LayersPanelProps = {
   appMeta: string;
@@ -296,6 +298,19 @@ export default function LayersPanel({
                 Gabriel Rosa
               </a>
             </p>
+            <span className="sidebar-footer-separator" aria-hidden="true">
+              ·
+            </span>
+            <a
+              href={REPOSITORY_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="sidebar-footer-icon-link"
+              aria-label="View source on GitHub"
+              title="View source on GitHub"
+            >
+              <Github size={12} aria-hidden="true" />
+            </a>
           </div>
 
           <p>
