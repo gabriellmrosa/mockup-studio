@@ -8,7 +8,7 @@ jest.mock("./components/CreditsModal/CreditsModal", () => ({
 
 jest.mock("./components/ContextMenu/ContextMenu", () => ({
   __esModule: true,
-  default: ({
+  default: function MockContextMenu({
     items,
     triggerAriaLabel,
     triggerIcon,
@@ -19,7 +19,7 @@ jest.mock("./components/ContextMenu/ContextMenu", () => ({
     >;
     triggerAriaLabel: string;
     triggerIcon: React.ReactNode;
-  }) => {
+  }) {
     const { useState } = jest.requireActual("react") as typeof import("react");
     const [isOpen, setIsOpen] = useState(false);
 
@@ -81,10 +81,15 @@ jest.mock("./components/InspectorPanel/InspectorPanel", () => ({
   __esModule: true,
   default: ({
     object,
+    onModelChange,
   }: {
     object: { name: string; modelId: string; positionX: number } | null;
+    onModelChange: (modelId: string) => void;
   }) => (
     <aside data-testid="inspector-panel">
+      <button type="button" onClick={() => onModelChange("smartwatch")}>
+        change-model-smartwatch
+      </button>
       {object
         ? `${object.name} :: ${object.modelId} :: x=${object.positionX.toFixed(2)}`
         : "no-selection"}
@@ -178,5 +183,20 @@ describe("Home page layers and selection flow", () => {
       "Object 1 copy :: smartphone :: x=1.94",
     );
     expect(screen.getByTestId("mockup-canvas")).toHaveTextContent("visible:2");
+  });
+
+  it("adds the next layer to the side even when the previous layer changed model", () => {
+    render(<Home />);
+
+    fireEvent.click(screen.getByText("change-model-smartwatch"));
+    expect(screen.getByTestId("inspector-panel")).toHaveTextContent(
+      "Object 1 :: smartwatch :: x=0.00",
+    );
+
+    fireEvent.click(screen.getByLabelText("Add layer"));
+
+    expect(screen.getByTestId("inspector-panel")).toHaveTextContent(
+      "Object 2 :: smartphone :: x=1.64",
+    );
   });
 });

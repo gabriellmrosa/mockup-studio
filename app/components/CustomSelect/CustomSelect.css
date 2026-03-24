@@ -118,9 +118,10 @@
 
 .custom-select-option-copy {
   align-items: center;
-  display: inline-flex;
+  display: flex;
   flex: 1;
   gap: var(--space-2);
+  justify-content: space-between;
   min-width: 0;
 }
 
@@ -132,6 +133,20 @@
   font-weight: var(--font-regular);
   gap: var(--space-2);
   line-height: 1.2;
+  min-width: 0;
+}
+
+.custom-select-option-badge {
+  background: color-mix(in srgb, var(--foreground) 10%, transparent);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-full);
+  color: var(--sidebar-muted);
+  flex-shrink: 0;
+  font-size: 0.65rem;
+  font-weight: var(--font-semibold);
+  letter-spacing: 0.06em;
+  padding: 0.18rem 0.5rem;
+  text-transform: uppercase;
 }
 
 .custom-select-option-icon {
@@ -144,6 +159,21 @@
 .custom-select-option-check {
   color: var(--foreground);
   flex-shrink: 0;
+}
+
+.custom-select-option[data-disabled="true"] {
+  color: var(--button-muted-fg);
+  cursor: default;
+}
+
+.custom-select-option[data-disabled="true"]:hover,
+.custom-select-option[data-disabled="true"][data-highlighted="true"] {
+  background: transparent;
+}
+
+.custom-select-option[data-disabled="true"] .custom-select-option-icon,
+.custom-select-option[data-disabled="true"] .custom-select-option-check {
+  color: currentColor;
 }
 
 @keyframes custom-select-appear {

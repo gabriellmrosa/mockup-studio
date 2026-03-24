@@ -63,6 +63,14 @@ function hasSameModelAtTransform(
   );
 }
 
+function isOnTransformPlane(
+  object: SceneObject,
+  positionY: number,
+  positionZ: number,
+) {
+  return object.positionY === positionY && object.positionZ === positionZ;
+}
+
 function getNormalizedSpawnWidth(modelId: DeviceModelId, scale = 1) {
   return (DEVICE_MODELS[modelId].spawnFootprintWidth * scale) / OBJECT_POSITION_MULTIPLIER;
 }
@@ -76,6 +84,40 @@ function getOffsetSpawnTransformForPlane(
 ) {
   const objectsOnPlane = objects.filter((object) =>
     hasSameModelAtTransform(object, modelId, positionY, positionZ),
+  );
+
+  if (objectsOnPlane.length === 0) {
+    return {
+      positionX: DEFAULT_OBJECT_TRANSFORM.positionX,
+      positionY,
+      positionZ,
+    };
+  }
+
+  const nextWidth = getNormalizedSpawnWidth(modelId, scale);
+  const gapX = SPAWN_GAP_WORLD_X / OBJECT_POSITION_MULTIPLIER;
+  const rightmostEdge = Math.max(
+    ...objectsOnPlane.map(
+      (object) =>
+        object.positionX + getNormalizedSpawnWidth(object.modelId, object.scale) / 2,
+    ),
+  );
+
+  return {
+    positionX: rightmostEdge + nextWidth / 2 + gapX,
+    positionY,
+    positionZ,
+  };
+}
+
+export function getSequentialSpawnTransform(
+  objects: SceneObject[],
+  modelId: DeviceModelId,
+  scale = 1,
+) {
+  const { positionY, positionZ } = DEFAULT_OBJECT_TRANSFORM;
+  const objectsOnPlane = objects.filter((object) =>
+    isOnTransformPlane(object, positionY, positionZ),
   );
 
   if (objectsOnPlane.length === 0) {

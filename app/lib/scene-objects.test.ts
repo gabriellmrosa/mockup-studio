@@ -4,6 +4,7 @@ import {
   duplicateSceneObject,
   getOffsetSpawnTransform,
   getPlaceholderImageUrl,
+  getSequentialSpawnTransform,
   isPlaceholderImageUrl,
   resetSceneObject,
 } from "./scene-objects";
@@ -272,5 +273,21 @@ describe("scene-objects", () => {
       positionY: 0,
       positionZ: 0,
     });
+  });
+
+  it("spawns the next layer after the rightmost object even when models differ", () => {
+    const existingObjects = [
+      createSceneObject({
+        id: "watch-1",
+        modelId: "smartwatch",
+        name: "Watch 1",
+      }),
+    ];
+
+    const spawn = getSequentialSpawnTransform(existingObjects, "smartphone");
+
+    expect(spawn.positionX).toBeCloseTo(1.6393928571428573);
+    expect(spawn.positionY).toBe(0);
+    expect(spawn.positionZ).toBe(0);
   });
 });

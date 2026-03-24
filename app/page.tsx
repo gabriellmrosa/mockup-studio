@@ -15,7 +15,7 @@ import {
   changeSceneObjectModel,
   createSceneObject,
   duplicateSceneObject,
-  getOffsetSpawnTransform,
+  getSequentialSpawnTransform,
   resetSceneObject,
   type SceneObject,
 } from "./lib/scene-objects";
@@ -152,7 +152,10 @@ export default function Home() {
     });
 
     setSceneObjects((current) => {
-      const spawnTransform = getOffsetSpawnTransform(current, nextObject.modelId);
+      const spawnTransform = getSequentialSpawnTransform(
+        current,
+        nextObject.modelId,
+      );
 
       return [
         ...current,

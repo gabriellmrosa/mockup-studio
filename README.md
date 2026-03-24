@@ -92,7 +92,7 @@ Checklist:
 ## Technical Notes
 
 - placeholders are model-specific and no longer tied to locale
-- same-model objects spawn side by side to avoid invisible overlap when adding layers
+- new layers spawn after the rightmost object on the default plane, even when models differ
 - duplicated layers also reuse the anti-overlap spawn logic on the same plane
 - export uses a floating resolution menu, with `1920x1080` active and higher presets marked as `Em breve`
 - PNG export now renders offscreen, avoiding visible canvas distortion during capture
@@ -105,7 +105,7 @@ Checklist:
 
 - do not couple placeholders to language; placeholder choice belongs to the model definition
 - floating menus should reuse the shared flyout infrastructure to keep portal, outside-click and contrast behavior consistent
-- when adding repeated models, initial transform values must prevent visual overlap or the editor can look broken even when state changed correctly
+- when adding layers, initial transform values must prevent visual overlap across the whole default plane or the editor can look broken even when state changed correctly
 - automatic anti-overlap logic should apply only when creating a new layer, not when editing an existing one
 - dark mode hover states for flyouts need stronger local contrast than the base panel token alone
 

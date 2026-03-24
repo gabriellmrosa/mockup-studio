@@ -11,7 +11,7 @@ import {
   InspectorPanelHeader,
   PanelSection,
 } from "../EditorPrimitives/EditorPrimitives";
-import { Laptop, RotateCcw, Smartphone, Upload, Watch } from "lucide-react";
+import { Laptop, RotateCcw, Smartphone, Upload, Video, Watch } from "lucide-react";
 
 const NOTEBOOK_SCREEN_ONLY_COLOR_KEYS = new Set([
   "screenBackCover",
@@ -89,7 +89,13 @@ export default function InspectorPanel({
       ) : (
         <Laptop size={14} />
       ),
-  }));
+  })).concat({
+    value: "video-mp4",
+    label: "Video MP4",
+    badgeLabel: "Em breve",
+    disabled: true,
+    icon: <Video size={14} />,
+  });
 
   return (
     <aside className="editor-sidebar editor-sidebar-shell inspector-sidebar inspector-sidebar-scroll">

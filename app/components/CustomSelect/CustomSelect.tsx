@@ -14,6 +14,8 @@ import { createPortal } from "react-dom";
 import { Check, ChevronDown } from "lucide-react";
 
 export type CustomSelectOption = {
+  badgeLabel?: string;
+  disabled?: boolean;
   icon?: ReactNode;
   label: string;
   value: string;
@@ -110,6 +112,11 @@ export default function CustomSelect({
   }
 
   function selectValue(nextValue: string) {
+    const option = options.find((item) => item.value === nextValue);
+    if (option?.disabled) {
+      return;
+    }
+
     onChange(nextValue);
     close();
     triggerRef.current?.focus();
@@ -117,10 +124,18 @@ export default function CustomSelect({
 
   function moveHighlight(direction: 1 | -1) {
     if (options.length === 0) return;
+
     setHighlightedIndex((current) => {
       const base = current >= 0 ? current : selectedIndex;
-      const next = (base + direction + options.length) % options.length;
-      return next;
+
+      for (let step = 1; step <= options.length; step += 1) {
+        const next = (base + direction * step + options.length) % options.length;
+        if (!options[next]?.disabled) {
+          return next;
+        }
+      }
+
+      return base;
     });
   }
 
@@ -151,7 +166,7 @@ export default function CustomSelect({
       }
 
       const option = options[highlightedIndex];
-      if (option) {
+      if (option && !option.disabled) {
         selectValue(option.value);
       }
     }
@@ -251,11 +266,18 @@ export default function CustomSelect({
                       type="button"
                       role="option"
                       aria-selected={isSelected}
+                      aria-disabled={option.disabled}
+                      disabled={option.disabled}
                       className="custom-select-option"
                       data-selected={isSelected}
+                      data-disabled={option.disabled}
                       data-highlighted={isHighlighted}
                       onClick={() => selectValue(option.value)}
-                      onMouseEnter={() => setHighlightedIndex(index)}
+                      onMouseEnter={() => {
+                        if (!option.disabled) {
+                          setHighlightedIndex(index);
+                        }
+                      }}
                     >
                       <span className="custom-select-option-copy">
                         <span className="custom-select-option-label">
@@ -266,6 +288,11 @@ export default function CustomSelect({
                           ) : null}
                           {option.label}
                         </span>
+                        {option.badgeLabel ? (
+                          <span className="custom-select-option-badge">
+                            {option.badgeLabel}
+                          </span>
+                        ) : null}
                       </span>
                       {isSelected ? (
                         <Check size={14} className="custom-select-option-check" />
