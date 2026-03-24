@@ -3,7 +3,7 @@
 import "./InspectorPanel.css";
 import ColorRow from "../ColorRow/ColorRow";
 import Control from "../Control/Control";
-import CustomSelect from "../CustomSelect/CustomSelect";
+import CustomSelect, { type CustomSelectOption } from "../CustomSelect/CustomSelect";
 import type { AppCopy, UiTheme } from "../../lib/i18n";
 import type { SceneObject } from "../../lib/scene-objects";
 import { DEVICE_MODEL_LIST } from "../../models/device-models";
@@ -78,24 +78,27 @@ export default function InspectorPanel({
   );
   const customizableColorLabels = model?.customizableColorLabels ?? {};
   const positionXRange = Math.max(5, Math.ceil(Math.abs(object.positionX)) + 1);
-  const modelOptions = DEVICE_MODEL_LIST.map((device) => ({
-    value: device.id,
-    label: device.name,
-    icon:
-      device.id === "smartphone" || device.id === "smartphone2" ? (
-        <Smartphone size={14} />
-      ) : device.id === "smartwatch" ? (
-        <Watch size={14} />
-      ) : (
-        <Laptop size={14} />
-      ),
-  })).concat({
-    value: "video-mp4",
-    label: "Video MP4",
-    badgeLabel: "Em breve",
-    disabled: true,
-    icon: <Video size={14} />,
-  });
+  const modelOptions: CustomSelectOption[] = [
+    ...DEVICE_MODEL_LIST.map((device) => ({
+      value: device.id,
+      label: device.name,
+      icon:
+        device.id === "smartphone" || device.id === "smartphone2" ? (
+          <Smartphone size={14} />
+        ) : device.id === "smartwatch" ? (
+          <Watch size={14} />
+        ) : (
+          <Laptop size={14} />
+        ),
+    })),
+    {
+      value: "video-mp4",
+      label: "Video MP4",
+      badgeLabel: "Em breve",
+      disabled: true,
+      icon: <Video size={14} />,
+    },
+  ];
 
   return (
     <aside className="editor-sidebar editor-sidebar-shell inspector-sidebar inspector-sidebar-scroll">
