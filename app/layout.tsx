@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Abhaya_Libre } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
+import PwaRegistration from "./components/PwaRegistration";
 import "./globals.css";
 
 const abhayaLibre = Abhaya_Libre({
@@ -12,6 +13,7 @@ const abhayaLibre = Abhaya_Libre({
 export const metadata: Metadata = {
   title: "Mock Studio",
   description: "Editor de mockups com export transparente em PNG",
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({
@@ -23,6 +25,7 @@ export default function RootLayout({
     <html lang="pt-BR" data-theme="dark">
       <body className={abhayaLibre.variable}>
         {children}
+        <PwaRegistration />
         <Analytics />
       </body>
     </html>

@@ -1,7 +1,9 @@
 {
+  "id": "/",
   "name": "Mock Studio",
   "short_name": "Mock Studio",
   "description": "Editor de mockups com export transparente em PNG",
+  "scope": "/",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#34312E",
