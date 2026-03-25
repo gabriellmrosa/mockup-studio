@@ -9,6 +9,7 @@ import Snackbar, {
   type SnackbarNotification,
 } from "./components/Snackbar/Snackbar";
 import { APP_VERSION } from "./lib/app-version";
+import { buildNextDeviceColors } from "./lib/device-colors";
 import { APP_COPY, type Locale, type UiTheme } from "./lib/i18n";
 import { readFileAsDataUrl } from "./lib/mockup-image";
 import {
@@ -222,37 +223,34 @@ export default function Home() {
       return;
     }
 
+    const selectedId = selectedObject.id;
     const model = DEVICE_MODELS[selectedObject.modelId];
-    if (selectedObject.colors[part] === hex) {
-      return;
-    }
-
-    const primaryColorKey = model.primaryColorKey;
-    const isPrimaryColorUpdate = Boolean(primaryColorKey && part === primaryColorKey);
-
-    const nextColors = isPrimaryColorUpdate
-      ? {
-          ...model.buildColorsFromPrimary(hex),
-          ...Object.fromEntries(
-            model.customizableColorKeys.map((key) => [
-              key,
-              key === part
-                ? hex
-                : (selectedObject.colors[key] ??
-                  model.buildColorsFromPrimary(hex)[key]),
-            ]),
-          ),
-        }
-      : {
-          ...selectedObject.colors,
-          [part]: hex,
-        };
 
     startTransition(() => {
-      updateSceneObject(selectedObject.id, {
-        colors: nextColors,
-        deviceTheme: "",
-      });
+      setSceneObjects((current) =>
+        current.map((object) => {
+          if (object.id !== selectedId) {
+            return object;
+          }
+
+          const nextColors = buildNextDeviceColors({
+            currentColors: object.colors,
+            hex,
+            model,
+            part,
+          });
+
+          if (nextColors === object.colors) {
+            return object;
+          }
+
+          return {
+            ...object,
+            colors: nextColors,
+            deviceTheme: "",
+          };
+        }),
+      );
     });
   }
 

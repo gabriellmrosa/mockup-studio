@@ -249,6 +249,7 @@ describe("InspectorPanel", () => {
     expect(screen.getByText("color-row:Moldura da tela")).toBeInTheDocument();
     expect(screen.getByText("color-row:Borracha da tela")).toBeInTheDocument();
     expect(screen.getByText("color-row:Barra da dobradica")).toBeInTheDocument();
+    expect(screen.getByText("color-row:Borracha da dobradica")).toBeInTheDocument();
     expect(screen.queryByText("color-row:Base do teclado")).not.toBeInTheDocument();
   });
 

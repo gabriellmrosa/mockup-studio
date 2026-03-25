@@ -18,6 +18,7 @@ const NOTEBOOK_SCREEN_ONLY_COLOR_KEYS = new Set([
   "screenBezel",
   "screenRubberSeal",
   "lowerHingeBar",
+  "hingeRubberSeal",
 ]);
 
 type InspectorPanelProps = {

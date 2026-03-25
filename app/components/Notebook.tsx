@@ -90,6 +90,10 @@ type NotebookProps = React.ComponentPropsWithoutRef<"group"> & {
 const NOTEBOOK_DISPLAY_ASSEMBLY_PARTS = new Set<keyof typeof NOTEBOOK_MESH_SEMANTIC>([
   "screen",
   "screenBezel",
+  "screenBackCover",
+  "screenRubberSeal",
+  "lowerHingeBar",
+  "hingeRubberSeal",
 ]);
 
 // ---------------------------------------------------------------------------
